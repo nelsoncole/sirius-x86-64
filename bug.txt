@@ -1,0 +1,15 @@
+KERNEL:
+	
+USER:
+	Verificar a pilha do usuário, pode existir um possível bug
+
+LUA:
+	O Lua 1.0 está cheio de variávas nao inicializadas, tem que executar este programa numa area limpa.
+	
+LIB:
+	Falta remover os blocos ocupados pelo arquivo ao chamar remove_file()
+	
+
+
+
+	

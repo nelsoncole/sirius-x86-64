@@ -1,2 +1,3 @@
-# sirius-x86-64
-# sirius-x86-64
+Seja bem-vindo ao Sirius OS
+
+	By: Nelson Cole

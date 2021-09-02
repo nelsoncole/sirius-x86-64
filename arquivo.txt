@@ -1,0 +1,3 @@
+Nelson
+
+gcc -O0 -masm=intel -S -fno-stack-protector test.c

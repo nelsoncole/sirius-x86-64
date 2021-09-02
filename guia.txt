@@ -1,0 +1,11 @@
+Nelson: 
+
+31.05.2021: 
+	Debugamos o LUA na máquina real, limpamos todo area de memoria no executive de processos filho. 
+
+	Dar suporte ao realloc()
+	
+	Verificar as rotinas de numeros na stdlib.c
+	
+10.07.2021:
+	Melhorar o putc
