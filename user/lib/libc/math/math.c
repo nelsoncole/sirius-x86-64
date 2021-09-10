@@ -7,11 +7,6 @@ double log10(double x)
 
 }
 
-double log(double x)
-{
-	return 0;
-}
-
 
 double ldexp(double x, int exp)
 {

@@ -64,11 +64,11 @@ int menumotor(MENU_T *menu)
 	drawstring( menu->name, menu->x+8, menu->y+4, 0xff0000, 0xe0e0e0, &w->font, w);
 	drawstring_trans( "____", menu->x+8, menu->y+4, 0xff0000, 0xe0e0e0, &w->font, w);
 	
-	int x1 = w->area_x + menu->x;
-	int y1 = w->area_y;
+	int x1 = w->area_x + menu->x + 2;
+	int y1 = w->area_y + 2;
 	int x2 = 100;
 	int y2 = 20;
-	int bg = 0x808080;
+	int bg = 0xe0e0e0;
 	
 	unsigned int mb = 0; 
 	
@@ -77,6 +77,8 @@ int menumotor(MENU_T *menu)
 	if(menu->count > 0){
 	
 		drawline(x1, y1, x2, y2*menu->count+4, bg, w);
+        //border(y1, y2*menu->count+4, x1, x2, w);
+        drawrect(x1, y1, x2, y2*menu->count+4, 0x808080, w );
 		
 		do{
 			//while(w->spinlock);
@@ -92,8 +94,8 @@ int menumotor(MENU_T *menu)
 				char *name = (char*) menu->sub[i].name;
 				
 				if( x > x1 && y > (y1 + y2*i + 4) && x < (x1+x2) && y < ((y1 + y2*i)+y2) ) {
-					//drawstring("        ", x1+8, (y2*i) + y1+4, 0, bg, &w->font, w);
-					drawstring( name, x1+16, (y2*i) + y1+4, -1, bg, &w->font, w);
+
+					drawstring( name, x1+16, (y2*i) + y1+4, 0xD2691E, bg, &w->font, w);
 					//drawstring_trans("_____", x1+8, (y2*i) + y1+4, 0, bg, &w->font, w);
 					
 					idx = i;
@@ -125,8 +127,8 @@ int menumotor(MENU_T *menu)
 	}
 	
 	while(mouse2->b&0x1); // espera soltar
-		
-	drawstring( menu->name, menu->x+8, menu->y+4, 0, 0xe0e0e0, &w->font, w);
+	
+	drawstring( menu->name, menu->x+8, menu->y+4, 0, bg, &w->font, w);
 			
 	//printf("MENU: %s\n", menu->name);
 	

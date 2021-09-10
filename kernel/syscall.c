@@ -1,4 +1,3 @@
-
 #include <idt.h>
 #include <stdio.h>
 #include <thread.h>
@@ -12,12 +11,15 @@
 
 #include <data.h>
 
+#include <gui.h>
 
-#define SYSCALL_TABLE 12
+
+#define SYSCALL_TABLE 15
 
 unsigned long ret;
 
 extern unsigned long server_id[6];
+extern PAINT *paint_ready_queue;
 
 
 extern char *syspwd;
@@ -150,6 +152,22 @@ void syscall_register_pipe_launcher()
     pipe_launcher = current_thread->pipe;
 }
 
+void syscall_get_pipe_launcher()
+{
+    ret = (unsigned long)pipe_launcher;
+}
+
+
+void syscall_get_paint_list()
+{
+    ret = (unsigned long)paint_ready_queue;
+}
+
+void syscall_get_thread_id()
+{
+    ret = current_thread->id;
+}
+
 
 void *fnvetors_syscall[SYSCALL_TABLE] = {
 	&default_syscall, 	    // 0
@@ -164,6 +182,9 @@ void *fnvetors_syscall[SYSCALL_TABLE] = {
     &syscall_tmpnam,	    // 9
     &syscall_io,	        // 10
     &syscall_register_pipe_launcher, // 11
+    &syscall_get_pipe_launcher, // 12
+    &syscall_get_paint_list, // 13
+    &syscall_get_thread_id, // 14
     
 };
 

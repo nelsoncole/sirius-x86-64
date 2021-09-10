@@ -1,6 +1,7 @@
 #include <window.h>
 #include <string.h>
 #include <stdlib.h>
+#include <pipe.h>
 
 void drawline(int x1, int y1, int x2, int y2, int rgb, WINDOW *w)
 {
@@ -171,8 +172,8 @@ WINDOW *window(const char *title,int x, int y, int width, int height, int fg, in
 	
 	
 	/*
-	drawrect(0, 0, w->width, w->height, 0x80808080, w );
-	drawrect(1, 1, w->width-2, w->height-2, 0x80808080, w ); */
+	drawrect(0, 0, w->width, w->height, 0x808080, w );
+	drawrect(1, 1, w->width-2, w->height-2, 0x808080, w ); */
 	
 	border(0, w->height, 0, w->width, w);
 	
@@ -242,7 +243,30 @@ void update(const char *id, WINDOW *w )
 
 
 void wcl(WINDOW *w) {
-	__asm__ __volatile__("int $0x72"::"d"(2),"D"(w));
+
+    // enviar para compositor 
+    // TODO esta operação será feita no window server
+	// __asm__ __volatile__("int $0x72"::"d"(2),"D"(w));
+
+    // enviar para window server
+    unsigned long id = 0;
+    __asm__ __volatile__("int $0x72":"=a"(id):"d"(14));
+    unsigned long addr = 0;
+    // get pipe launcher
+    __asm__ __volatile__("int $0x72":"=a"(addr):"d"(12));
+    FILE *pipe_launcher = (FILE *)addr;
+    addr = (unsigned long) w;
+
+    short pipe_ptr[8] = {0,0,0,0,0,0,0,0};
+
+    __pipe_t *pipe = &pipe_ptr;
+
+	pipe->id = PIPE_WINDOW_REGISTER;
+    pipe->r1 = id &0xffff;
+    pipe->r2 = id >> 16 &0xffff;
+    pipe->r3 = id >> 32 &0xffff; //id >> 48 &0xffff; */
+    pipe->r4 = addr;
+	pipe_write ( pipe, pipe_launcher ); 
 }
 
 void update_window(WINDOW *w)

@@ -54,4 +54,15 @@ extern double log(double x);
 extern double ldexp(double x, int exp);
 extern double frexp(double value, int *exp);
 extern double atan2(double y, double x);
+
+extern double fmax(double x, double y);
+extern float fmaxf(float x, float y);
+extern double fmin(double x, double y);
+extern float fminf(float x, float y);
+
+extern int min(int x, int y);
+extern int max(int x, int y);
+
+extern double fabs(double x);
+
 #endif

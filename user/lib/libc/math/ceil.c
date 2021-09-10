@@ -3,5 +3,11 @@
 
 double ceil(double x)
 {
-	return 0;
+	int n = (int) x;
+
+    if (n >= x) {
+        return n;
+    }
+
+    return n + 1;
 }

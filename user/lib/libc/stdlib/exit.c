@@ -6,8 +6,9 @@
 
 void exit(int rc)
 {
-
 	__asm__ __volatile__("int $0x72"::"d"(8),"c"(6));
-	for(;;);
+	for(;;) {
+        __asm__ __volatile__("pause;");
+    };
 
 }

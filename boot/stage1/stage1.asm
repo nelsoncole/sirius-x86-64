@@ -33,7 +33,7 @@ start:
 	
 	
 ; cmd
-	call cmd
+	;call cmd
 	cli
 	
 ; BIOSes Get Device Parameters

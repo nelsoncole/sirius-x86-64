@@ -287,7 +287,7 @@ void setup_acpi()
         	printf("DSDT nao encontrado\n");
         }
  	   
- 	//acpi_enable();
+ 	acpi_enable();
  	
 }
 

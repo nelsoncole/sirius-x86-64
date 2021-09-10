@@ -77,7 +77,7 @@ fs:
 	
 	
 vbox_install:
-	./copy disk.vhd "/home/nelson/VirtualBox VMs/Kinguio/"*.vhd
+	./copy disk.vhd "/home/nelson/VirtualBox VMs/sirius/"*.vhd
 	
 install:
 	sudo ./copy disk.vhd /dev/sdb

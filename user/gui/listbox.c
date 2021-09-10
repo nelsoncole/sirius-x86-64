@@ -40,7 +40,7 @@ HANDLE_T *file_listbox(int x, int y, int width, int height, int fg, int bg, WIND
 	//area
 	drawline( obj->x ,obj->y, obj->width, obj->height , obj->bg, w);
 	
-	drawrect(obj->x, obj->y, obj->width, obj->height, 0x80808080, w );
+	drawrect(obj->x, obj->y, obj->width, obj->height, 0x808080, w );
 	
 	return obj;
 }

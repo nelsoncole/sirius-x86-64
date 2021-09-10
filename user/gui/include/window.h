@@ -36,11 +36,11 @@ typedef struct _font {
 typedef struct __WINDOW {
 	unsigned int	spinlock;
 	unsigned int	rx, ry, bpp, scanline;
-	unsigned int 	height, width;
-	unsigned int 	pos_y, pos_x;
+	unsigned int 	width, height;
+	unsigned int 	pos_x, pos_y;
 	
-	unsigned int 	area_height, area_width;
-	unsigned int 	area_y, area_x;
+	unsigned int 	area_width, area_height;
+	unsigned int 	area_x, area_y;
 	
 	unsigned int  	fg, bg, text_fg;
 	
@@ -50,7 +50,7 @@ typedef struct __WINDOW {
 	unsigned int	style;
 	unsigned int	gid;
 	char		    rsv[4096 - 104];
-	unsigned int 	start;
+	unsigned long 	start;
 	
 }__attribute__ ((packed)) WINDOW;
 

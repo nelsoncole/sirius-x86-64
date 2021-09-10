@@ -22,7 +22,7 @@ ctype = ctype.o tolower.o toupper.o
 string = memcmp.o memcpy.o memset.o strcasecmp.o strcat.o strchr.o strcmp.o strcpy.o strcspn.o string.o \
 	strlen.o strncasecmp.o strncmp.o strncpy.o strpbrk.o strrchr.o strsep.o strspn.o strtok.o strstr.o \
 	strdup.o memmove.o strcoll.o strerror.o
-math = math.o pow.o sqrt.o atan.o acos.o asin.o sin.o tan.o cos.o floor.o ceil.o exp.o
+math = math.o pow.o sqrt.o atan.o acos.o asin.o sin.o tan.o cos.o floor.o ceil.o exp.o log.o fmax.o fmin.o fminf.o min.o max.o fabs.o
 locale = locale.o
 
 signal = signal.o

@@ -8,8 +8,19 @@
 
 #include <pipe.h>
 
+#include <math.h>
+#include <stdbool.h>
+
 
 #define APP_LIST_SIZE 1024
+
+
+typedef struct _PAINT
+{
+	unsigned long 	w;
+	unsigned long	spinlock;
+	struct _PAINT   *next;
+}__attribute__ ((packed)) PAINT;
 
 
 struct app
@@ -19,9 +30,14 @@ struct app
     unsigned int x1, y1, x2, y2; 
     unsigned long icone_addr; 
     unsigned long path_name_addr;
-};
+
+    //
+    unsigned long w; 
+}__attribute__ ((packed));
 
 
+
+PAINT *paint, *paint_ready_queue;
 struct app app[APP_LIST_SIZE];
 int app_index;
 int app_index_foco;
@@ -80,6 +96,39 @@ static int app_fixe(unsigned long status, const char *pathname, const char *icon
     return app_index ++;
 }
 
+static int app_foreground(int x, int y)
+{
+    WINDOW *wa = 0;
+    paint = paint_ready_queue;
+
+    while(paint) {
+        WINDOW *w = (WINDOW *) paint->w;
+        paint = paint->next;
+        if( !w ) continue;
+
+        int x1 = w->pos_x;
+        int y1 = w->pos_y;
+        int x2 = w->width;
+        int y2 = w->height;
+
+        if( x > x1 && y > y1 && x < (x1+x2) && y < (y1 + y2) ) 
+        {
+            wa = w;
+        }
+    }
+
+    if(!wa) return (-1);
+
+    for(int i=0; i < app_index; i++ ) {
+        WINDOW *wb = (WINDOW *) app[i].w;
+        if( wa == wb && (app[i].status & 1)  ) {
+            return i;
+        }
+    }
+
+    return (-1);
+}
+
 
 static int app_check_cursor()
 {
@@ -103,6 +152,10 @@ static int app_check_cursor()
                 return i;
             }
         }
+
+        return app_foreground( x, y );
+       
+                
     }
 
     return (-1);
@@ -184,6 +237,27 @@ static void app_fixe_remove(WINDOW *w, unsigned long id)
     }
 }
 
+static void app_window_register(__pipe_t *pipe)
+{
+    unsigned long new_window = pipe->r4 ;
+    unsigned long id = 0;
+    id = pipe->r1 | pipe->r2 << 16 | pipe->r3 << 32;
+
+    for(int i=0; i < app_index; i ++) {
+        if( app[i].id == id ) 
+        {
+            app[i].w = new_window;
+            // enviar para compositor
+	        __asm__ __volatile__("int $0x72"::"d"(2),"D"(new_window));
+
+            return;
+        }
+    }
+
+    printf("error: app_window_register\n");
+
+}
+
 const char *ss[60]={\
 "00","01","02","03","04","05","06","07","08","09",
 "10","11","12","13","14","15","16","17","18","19",
@@ -194,10 +268,12 @@ const char *ss[60]={\
 };
 
 
-
-
+void tests();
 int main()
 {
+    // register pipe launcher
+    __asm__ __volatile__("int $0x72"::"d"(11));
+
     app_pathname = malloc(0x1000);
     app_index = 0;
     app_index_foco = -1;
@@ -236,7 +312,7 @@ int main()
 	w->font.bg_color = 0xe0e0e0;
 	w->font.buf = (unsigned long)font8x16;
 	
-    // area
+    // area 8ba8aa
 	drawline(w->pos_x ,w->pos_y, w->width, w->height, 0x3030,w);
     //wp("w.ppm");
 
@@ -244,10 +320,13 @@ int main()
 	drawline(w->pos_x ,w->height-36, w->width, WMENU_BAR_SIZE, 0xe0e0e0,w);
 
 	// register 
-	wcl(w);
+	//wcl(w);
+    __asm__ __volatile__("int $0x72"::"d"(2),"D"(w));
 
-    // register pipe launcher
-    __asm__ __volatile__("int $0x72"::"d"(11));
+    // get list
+    unsigned long addr = 0;
+    __asm__ __volatile__("int $0x72":"=a"(addr):"d"(13));
+    paint = paint_ready_queue = (PAINT*)addr;
 
     // inicializa os icones fixados
     app_x = w->pos_x  +  4; 
@@ -277,9 +356,17 @@ int main()
 
         if( pipe_read_2x ( &pipe, __pipe__) )
         {
-            //printf("PIPE: %x %x %x %x %lx\n", pipe.id, pipe.r1, pipe.r2, pipe.r3, pipe.r4);
-            app_fixe_remove(w, pipe.r4);
-
+            switch(pipe.id) {
+                case PIPE_EXIT:
+                    app_fixe_remove(w, pipe.r4);
+                break;
+                case PIPE_WINDOW_REGISTER:
+                    app_window_register(&pipe);
+                break;
+                default:
+                    printf("failed comunication\n");
+                break;
+            }
         }
 		
 	}

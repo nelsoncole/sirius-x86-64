@@ -35,13 +35,25 @@ static void *trans_memcpy(void *s1, const void *s2, unsigned n)
     while( p --)
     {
         if( (*src&0x80000000) ){
+            
+            unsigned char *rgb = (unsigned char *)dst;
+            unsigned char k = 0;
+
             // tom de cinza
             // Luminosidade = R*0.3 + G*0.59 + B*0.11
-            unsigned char *rgb = (unsigned char *)dst;
+            /*k = ( ((rgb[2] * 30 ) / 100) + ((rgb[1] * 59 ) / 100) + ((rgb[0] * 11 ) / 100) );
+            rgb[0] = k;
+            rgb[1] = k;
+            rgb[2] = k; */
 
-            unsigned char k = ( ((rgb[2] * 30 ) / 100) + ((rgb[1] * 59 ) / 100) + ((rgb[0] * 11 ) / 100) );
-            *dst = ((k | k << 8 | k << 16) &0xFFFFFF);
-            // *dst = (*dst & 0x808080); // 0x00FFFF 
+            // Luminosidade de qualquer cor é dada pela multiplicação por uma constante
+            // k (R, G, B) = (kR, kG, kB)
+            // aqui podemos dividir para baixar a luminosidade, obtendo a transparência  
+            k = 7;
+            rgb[0] = rgb[0]/k;
+            rgb[1] = rgb[1]/k;
+            rgb[2] = rgb[2]/k;
+
             dst ++;
             src ++;
         } else {
@@ -164,48 +176,45 @@ void paint_desktop(void *bankbuffer) {
 
 	paint = paint_ready_queue->next;
 	while(paint){
-	if(paint->w != 0) {
-	
-	
-		WINDOW *w = (WINDOW*) paint->w;
+	    if(paint->w != 0) {
+		    WINDOW *w = (WINDOW*) paint->w;
 		
-		while(w->spinlock);
-		w->spinlock++;
+		    while(w->spinlock);
+		    w->spinlock++;
 		
 		
-		unsigned long start  = (unsigned long) &w->start;
-		unsigned long zbuf  = ( unsigned long) bankbuffer;
+		    unsigned long start  = (unsigned long) &w->start;
+		    unsigned long zbuf  = ( unsigned long) bankbuffer;
 		
-		long y =  w->pos_y;
-		long x =  w->pos_x;
+		    long y =  w->pos_y;
+		    long x =  w->pos_x;
 		
-		long pos = ((w->pos_y * gui->pixels_per_scan_line) + w->pos_x) << 2;//*4;
-		long width = w->width;
-		long height = w->height;
-        unsigned int style = w->style;		
-
-		long len = width;
+		    long pos = ((w->pos_y * gui->pixels_per_scan_line) + w->pos_x) << 2;//*4;
+		    long width = w->width;
+		    long height = w->height;
+            unsigned int style = w->style;		
+    
+		    long len = width;
 		
-		if( (x + width) > gui->pixels_per_scan_line ) {
+		    if( (x + width) > gui->pixels_per_scan_line ) {
 		
-			len = width - ((x + width) - gui->pixels_per_scan_line );
+			    len = width - ((x + width) - gui->pixels_per_scan_line );
 			
 		
-		}
+		    }
 		
 		
-		w->spinlock = 0;
+		    w->spinlock = 0;
 		
 		
-		if( x > gui->pixels_per_scan_line ) {
-			paint = paint->next;
-			continue;
-		}
+		    if( x > gui->pixels_per_scan_line ) {
+			    paint = paint->next;
+			    continue;
+		    }
   		
 		
-		for(int i=0; i < height; i++) {
-		
-				unsigned char *src = (unsigned char *) (start + (i*(width << 2)));
+		    for(int i=0; i < height; i++) {
+		        unsigned char *src = (unsigned char *) (start + (i*(width << 2)));
 				unsigned char *dst = (unsigned char *) (zbuf + (i*(gui->pixels_per_scan_line << 2)) + pos);
 				// alinhar 
 				if( (((unsigned long int)dst)%SSE_MMREG_SIZE) != 0 )  {
@@ -234,9 +243,7 @@ void paint_desktop(void *bankbuffer) {
          	}
        }
        	paint = paint->next;
-       }
-
-
+    }
 	paint_ready_queue->spinlock = 0;
 }
 
@@ -293,7 +300,7 @@ void compose()
 
 	cli();
 	alloc_pages(0, 1024*4, (unsigned long *)&gui->bank_buffer);
-	alloc_pages(0, 1, (unsigned long *)&paint);
+	alloc_pages(1, 1, (unsigned long *)&paint);
 	alloc_pages(0, 4, (unsigned long *)&mouseaddr);
 	sti();
 	
@@ -319,7 +326,7 @@ void compose()
     for (;;){
 
         // 40 fps
-        while( timer_ticks%2 != 0) {
+        while( timer_ticks%2 != 0 && 1) {
             __asm__ __volatile__ ("nop;" :: );
         }
     

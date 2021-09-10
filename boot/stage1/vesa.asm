@@ -8,9 +8,9 @@ vesa_vbe_mode:
 ; Info da chip VBE
 
 
-    	call .vbe_infos
-    	cmp ax,0x004F
-    	jne vesa_error
+    call .vbe_infos
+    cmp ax,0x004F
+    jne vesa_error
 
 	push ds
 	xor si,si

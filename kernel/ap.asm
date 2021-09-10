@@ -11,43 +11,43 @@ PML4E: 	dq 0
 func_enter: 	dq 0
 
 align 16
-_gdt:
-    	dd 0, 0
-    	dd 0x0000FFFF, 0x00CF9A00    ; code
-    	dd 0x0000FFFF, 0x008F9200    ; data
-_gdtr:
-    	dw _gdtr - _gdt - 1
-    	dd _gdt
-    	dd 0
+gdt:
+    dd 0, 0
+    dd 0x0000FFFF, 0x00CF9A00    ; code
+    dd 0x0000FFFF, 0x00CF9200    ; data
+gdtr:
+    dw gdtr - gdt - 1
+    dd gdt
+    dd 0
 code:
 	cli
 	cld
 	xor   	ax, ax
-    	mov 	ds, ax
-    	mov	eax, _gdtr
-    	db 0x66		; Execute GDT 32-Bits
-	lgdt [eax]
+    mov 	ds, ax
+    mov	    eax, gdtr
+    db 0x66		; Execute GDT 32-Bits
+	lgdt    [eax]
     	
-    	mov 	eax, cr0
-    	or	eax, 1
-    	mov 	cr0, eax
-    	jmp  	8: start32
+    mov 	eax, cr0
+    or	    eax, 0x10001    ; Turn on protected mode and write protection
+    mov 	cr0, eax
+    jmp  	8: start32
     	
 align 16
 [bits 32]
 start32:
-	mov	ax, 0x10
-    	mov 	ds, ax
-    	mov 	es, ax
-    	mov 	fs, ax
-    	mov	gs, ax
-    	mov 	ss, ax
+	mov	    ax, 0x10
+    mov 	ds, ax
+    mov 	es, ax
+    mov 	fs, ax
+    mov	    gs, ax
+    mov 	ss, ax
     	
-    	xor	ebp, ebp
-    	mov 	esp, dword[stack]
+    xor	    ebp, ebp
+    mov 	esp, dword[stack]
     	
     	
-    	lock    inc dword[aprunning]
+    lock    inc dword[aprunning]
     	
 ; Local APIC
 
@@ -55,7 +55,7 @@ start32:
 	mov 	dword[0xFEE00000 + 0xE0], eax   ; Value after reset
 	
 	mov 	eax, dword[0xFEE00000 + 0xD0]
-	or 	eax, 1
+	or 	    eax, 1
 	mov 	dword[0xFEE00000 + 0xD0], eax	
 	
 	;Task Priority Register (TPR), to inhibit softint delivery
@@ -63,22 +63,22 @@ start32:
 	mov 	dword[0xFEE00000 + 0x80], eax
 	
 	mov 	eax, 0x10F
-      	mov 	dword[0xFEE000F0], eax
+    mov 	dword[0xFEE000F0], eax
 	
 	;Timer interrupt vector, to disable timer interrupts
 	mov 	eax, 0x10024
-	add	eax, dword[aprunning]	; vector 37++
+	add	    eax, dword[aprunning]	; vector 37++
 	mov 	dword[0xFEE00000 + 0x320], eax
 	
 	
 	mov 	ecx, 0x1B
-    	mov 	eax, 0xFEE00800
-    	mov 	edx, 0
-    	wrmsr
+    mov 	eax, 0xFEE00800
+    mov 	edx, 0
+    wrmsr
 	
 	
 	; Timer umasked
-    	mov 	eax, dword[0xFEE00000 + 0x320]
+    mov 	eax, dword[0xFEE00000 + 0x320]
 	and 	eax, 0xFFFEFFFF
 	mov 	dword[0xFEE00000 + 0x320], eax
 	
@@ -94,30 +94,30 @@ start32:
 ; spinlock, wait for the BSP to finish
 .loop:  
 	pause
-    	cmp 	byte[spinlock], 0 
-    	jz      .loop
+    cmp 	byte[spinlock], 0 
+    jz      .loop
     	
 	; PAE
 	mov 	eax, cr4
-    	or	eax, 0x20	
-    	mov 	cr4, eax
+    or	    eax, 0x20	
+    mov 	cr4, eax
     	
-    	mov 	edi, dword[PML4E]
+    mov 	edi, dword[PML4E]
 	mov 	cr3, edi
     	
-    	mov 	ecx, 0xC0000080
-    	rdmsr
-    	or 	eax, 0x100
-    	mov 	edx, 0
-    	wrmsr
+    mov 	ecx, 0xC0000080
+    rdmsr
+    or 	    eax, 0x100
+    mov 	edx, 0
+    wrmsr
 	
 	mov 	eax, cr0
-    	or	eax, 0x80000000
-    	mov 	cr0, eax
+    or	    eax, 0x80000000
+    mov 	cr0, eax
     	
 
 	; execute modo longo
-    	mov	eax, dword[COPY_GDTR]
+    mov	eax, dword[COPY_GDTR]
 	lgdt [eax]
 	jmp 8:start64
 align 16	
@@ -126,14 +126,14 @@ start64:
 
 	xor 	rax, rax
 	mov 	ds, ax
-    	mov 	es, ax
-    	mov 	fs, ax
-    	mov	gs, ax
-    	mov 	ss, ax
+    mov 	es, ax
+    mov 	fs, ax
+    mov	    gs, ax
+    mov 	ss, ax
     	
-    	; carregar o stack
+    ; carregar o stack
 	;xor 	rbp, rbp
-    	;mov	rap, qword[stack]
+    ;mov	rap, qword[stack]
 	
 	
 	mov	rax, qword[COPY_GDTR]
@@ -157,25 +157,25 @@ start64:
 	lidt 	[rax]
 	
 ; get our Local APIC ID
-    	mov   	eax, 1
-    	cpuid
-    	shr   	ebx, 24
+    mov   	eax, 1
+    cpuid
+    shr   	ebx, 24
     
-    	; jump into C code (should never return)
-    	xor	rax, rax
-    	mov 	eax, dword[func_enter]
-    	mov	rdi, 1
+    ; jump into C code (should never return)
+    xor	    rax, rax
+    mov 	eax, dword[func_enter]
+    mov	    rdi, 1
  
 ; enable sse
 
-	mov rax, cr4
-	or  rax, 0x600 ; OSFXSR and OSXMMEXCPT
-	mov cr4, rax
+	mov     rax, cr4
+	or      rax, 0x600 ; OSFXSR and OSXMMEXCPT
+	mov     cr4, rax
 	
-	mov rax, cr0
-	and ax,  0xFFFB ; Clear EM
-	or  rax, 0x2    ; Set MP
-	mov cr0, rax
+	mov     rax, cr0
+	and     ax,  0xFFFB ; Clear EM
+	or      rax, 0x2    ; Set MP
+	mov     cr0, rax
 
 	fninit
 	
@@ -184,9 +184,7 @@ start64:
 	mov cr0, rax
  
     	
-    	sti
-    	;call 	rax
-    	
+    sti
 L1:	
 	hlt
 	jmp L1 
