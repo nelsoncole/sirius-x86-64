@@ -21,56 +21,47 @@ int BitMAP( void *Data, int X, int Y, int bg, WINDOW *w)
 
 	}
 
-
 	for(y = bmp->binfo.height; y > 0; y--) {
-	for(x = 0; x < bmp->binfo.width;  x++) {
+	    for(x = 0; x < bmp->binfo.width;  x++) {
 	
-		// <= 8-Bit
-		if(bmp->binfo.count <= 8) {
-		if(bmp->binfo.count == 4) {
+		    // <= 8-Bit
+		    if(bmp->binfo.count <= 8) {
+		        if(bmp->binfo.count == 4) {
+		            printf("Not suport BitMAP 4-bit");
+		            return 2;
 		
-		printf("Not suport BitMAP 4-bit");
-		return 2;
-		
-		}else
-		color = *(unsigned int*)((paleta) + *(unsigned char*/*count*/)(((unsigned long)data_area) + i++)) &0xffffff;
-		
-		// > 8-Bit
-		}else if(bmp->binfo.count > 8){
+		        }else {
+		            color = *(unsigned int*)((paleta) + *(unsigned char*/*count*/)(((unsigned long)data_area) + i++)) &0xffffff;
+		        }
+		    // > 8-Bit
+		    }else if(bmp->binfo.count > 8){
 
+		        if(bmp->binfo.count == 24){
+			        color =  (*(unsigned int*)((data_area) + (3*i++))) &0xffffff;
 
+		        }else if(bmp->binfo.count == 32){
+                    color =  (*(unsigned int*)((data_area) + (4*i++))) &0xffffffff;
 
-		if(bmp->binfo.count == 24){
-	
-			color =  (*(unsigned int*)((data_area) + (3*i++))) &0xffffff;
+		        }else {
+			        printf("Not suport BitMAP > 8-bit");
+			        return 2;
+		        }
+		    }
 
-		}else if(bmp->binfo.count == 32){
-
-			color =  (*(unsigned int*)((data_area) + (4*i++))) &0xffffffff;
-
-		}else {
-			printf("Not suport BitMAP > 8-bit");
-			return 2;
-		}
-		
-	
-		}
-
-		// Aqui por onde ampliamos o pixel
-		for(int l =0; l < Z00Y; l++) 
-		{
-			for(int z =0; z < Z00X; z++) 
-			{
-				if(color != 0)
-					put_pixel(X + x*Z00X+z, Y + y*Z00Y+l, w->width, color, &w->start);
-				else
-					put_pixel(X + x*Z00X+z, Y + y*Z00Y+l, w->width, bg, &w->start);
+		    // Aqui por onde ampliamos o pixel
+		    for(int l =0; l < Z00Y; l++) 
+		    {
+			    for(int z =0; z < Z00X; z++) 
+			    {
+				    if(color != 0)
+					    put_pixel(X + x*Z00X+z, Y + y*Z00Y+l, w->width, color, &w->start);
+				    else
+					    put_pixel(X + x*Z00X+z, Y + y*Z00Y+l, w->width, bg, &w->start);
 			
-			}
+			    }
+		    }
 		}
-		
-		}}
-
+    }
 
 
 	return 0;

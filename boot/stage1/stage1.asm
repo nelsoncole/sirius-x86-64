@@ -33,7 +33,7 @@ start:
 	
 	
 ; cmd
-	;call cmd
+	call cmd
 	cli
 	
 ; BIOSes Get Device Parameters
@@ -142,7 +142,7 @@ start:
 	out 0x70,al
 
 ; Instala a GDT
-    	mov eax,gdtr
+    mov eax,gdtr
 	db 0x66		; Execute GDT 32-Bits
 	lgdt [eax]
 

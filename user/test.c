@@ -36,7 +36,7 @@ bool putpixel(int x, int y, unsigned int c )
 
 
 // Algorítmo de bresenham
-void line(int x0, int y0, int x1, int y1, unsigned int color )
+void BRESENHAM_line(int x0, int y0, int x1, int y1, unsigned int color )
 {
     int a, b;
     bool steep = false;
@@ -73,59 +73,42 @@ void line(int x0, int y0, int x1, int y1, unsigned int color )
 
 }
 
-void triangle(int t0, int t1, int t2, unsigned int c)
-{/*
-    line(int x0, int y0, int x1, int y1, c );
-    line(int x0, int y0, int x1, int y1, c );
-    line(int x0, int y0, int x1, int y1, c );*/
+
+// Algorítimo DDA, incrementa qualquer um dos eixos
+void DDA_line(int x0, int y0, int x1, int y1, unsigned int color )
+{
+    int dx = x1 - x0;
+    int dy = y1 - y0;
+    int x = x1;
+    int y = y1;
+    int p;
+    float incx, incy;
+    if(abs(dx) > abs(dy)) {
+        // deslocamento em x, x recebe incremento unitario
+        p = abs(dx);
+    }else {
+        p = abs(dy);
+    }
+
+    incx = dx/(float)p;
+    incy = dy/(float)p;
+
+    putpixel(x, y, color);
+    for(int i=0; i < p; i++) {
+        putpixel(x, y, color);
+        x += incx;
+        y += incy;
+    }
 }
 
 int main(int argc, char **argv) {
 
-	/*unsigned char *a = (unsigned char*) malloc(0x100000); //1MiB
-	int size = 0;
-	FILE *f = fopen("ubuntu.ttf","r");
-	if(f == NULL) printf("error: fopen: ubuntu.ttf\n");
-	else {
-	
-		fseek(f, 0,SEEK_END);
-		size = (int) ftell(f);
-		fseek(f, 0,SEEK_SET);
-		
-		if(size < 0x100000) {
-			if(fread(a, 1, size, f) != size) printf("error: fread\n");	
-		}
-	
-		printf("TTF: filesize: %d\n",size);
-		
-		for(int i=0; i < 0x200; i ++) putchar(a[i]);
-	
-		putchar('\n');
-	}
-	
-	free(a);
-	fclose(f);*/
-    
-	/*line(13, 60, 80, 40, 0xffffff);
-    line(20, 13, 40, 80, 0xff0000);
-    line(80, 40, 13, 20, 0xff0000);*/
+//    DDA_line(400, 100, 500, 300, 0xFFFFFF);
 
+//    DDA_line(400, 100, 600, 300, 0xFFFFFF);
     int x = 100;
     int y = 200;
-
-    /*line( x + 25, y , x, y - 100, 0xFF0000);
-    line( x - 25, y , x, y - 100, 0xFF0000);
-    line( x, y , x, y - 100, 0xFF0000);*/
-
-
-
-    double r = 100;
-    for(int i=0; i < 100; i++){
-        //line( 100, 200 , 100, 100, 0xFF0000);
-        line( 100, 200 , 100+i, r, 0xFF0000);
-
-       // r = sqrt();
-    }
+    DDA_line(x + 10, y + 300, x, y + 100, 0xFF0000);
 
 	return 0;
 }

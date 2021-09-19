@@ -51,7 +51,6 @@ void server(unsigned long entry_pointer_info)
 	char *path;
 	char *pwd;
 	unsigned long pid;
-	int flag = 0;
 	
 	short pipe[8] = {0,0,0,0,0,0,0,0};
 	pipe[0] = 0x1001;
@@ -100,7 +99,6 @@ loop:
 				fclose(file);
 				
 			}
-			flag = 0;
 			memset(server_id, 0, sizeof(unsigned long)*5);
 			sti();
 				break;
@@ -119,21 +117,18 @@ loop:
 				fclose(file);
 				
 			}
-			flag = 0;
 			memset(server_id, 0, sizeof(unsigned long)*5);
 			sti();
 				break;
 		case 3:
-			reboot(); flag = 0;
+			reboot();
 			break;
 		case 4:	
-			poweroff(); flag = 0;
+			poweroff();
 			break;
 		case 5:
 			cli();
 			foco(server_id[4], server_id[2]);
-			flag = 0;
-			
 			memset(server_id, 0, sizeof(unsigned long)*5);
 			sti();
 			break;
@@ -144,23 +139,11 @@ loop:
 			exit(0, thr);
 			memset(server_id, 0, sizeof(unsigned long)*5);
 			sti();
-			flag = 0;
 			break;
 		default: 
-			flag++;
 			break;
 	}
 
-
-	// clean
-	if(!flag) {
-		cli();
-		//memset(server_id, 0, sizeof(unsigned long)*5); TODO BUG
-		sti();
-		
-		flag++;
-	}
-	__asm__ __volatile__("hlt");
 	goto loop;
 }
 

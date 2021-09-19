@@ -156,6 +156,15 @@ void main(unsigned long entry_pointer_info)
 	done();
 	
 	sti();
+
+    /*    
+    // TODO testes do PIT    
+    clears_creen();
+    for(int i=0;;) {
+        printf("%d ",i++);
+        sleep(1000);
+        
+    }*/
 	while(launcher)
 		__asm__ __volatile__("pause" :::"memory");
 	cli();

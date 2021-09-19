@@ -19,7 +19,7 @@ static void pit_handler()
 void pit_set_frequencia(unsigned int freq)
 {
 
-	unsigned int divisor = 1193180/freq;
+	unsigned int divisor = 1193182/freq;
 
 	cli();
 	
@@ -46,7 +46,6 @@ void pit_enable(int control){
 	if(control)
 	{
 		// Set mode 2 (rate generator)
-		outportb(0x43, 0x36);
 		pit_set_frequencia( FREQ );
 	
 	} else {

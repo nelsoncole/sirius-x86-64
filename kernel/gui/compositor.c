@@ -49,7 +49,7 @@ static void *trans_memcpy(void *s1, const void *s2, unsigned n)
             // Luminosidade de qualquer cor é dada pela multiplicação por uma constante
             // k (R, G, B) = (kR, kG, kB)
             // aqui podemos dividir para baixar a luminosidade, obtendo a transparência  
-            k = 7;
+            k = 3;
             rgb[0] = rgb[0]/k;
             rgb[1] = rgb[1]/k;
             rgb[2] = rgb[2]/k;
@@ -326,6 +326,7 @@ void compose()
     for (;;){
 
         // 40 fps
+        // o pit deve ser divido por 100 = 10ms
         while( timer_ticks%2 != 0 && 1) {
             __asm__ __volatile__ ("nop;" :: );
         }

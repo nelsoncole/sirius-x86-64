@@ -85,7 +85,7 @@ static int app_fixe(unsigned long status, const char *pathname, const char *icon
         if(size <= 0x3000) {
 		    fread(data, 1, size, f);
 
-		    BitMAP( data, app[app_index].x1 , app[app_index].y1, 0xe0e0e0, w);
+		    BitMAP( data, app[app_index].x1 , app[app_index].y1, 0x808080, w);
 	    }
 
 		fclose(f);
@@ -133,11 +133,10 @@ static int app_foreground(int x, int y)
 static int app_check_cursor()
 {
     int x, y;
+    int r = -1;
 
     if(mouse->b&0x1) 
 	{
-        while(mouse->b&0x1)__asm__ __volatile__("pause": : :"memory");
-
         x = mouse->x;
         y = mouse->y;
 
@@ -149,16 +148,19 @@ static int app_check_cursor()
 
             if( x > x1 && y > y1 && x < (x1+x2) && y < (y1 + y2) ) 
             {
-                return i;
+                r = i;
+                break;
             }
         }
 
-        return app_foreground( x, y );
-       
+        if(r == -1) {
+            r = app_foreground( x, y );
+        } 
                 
     }
-
-    return (-1);
+    // TODO
+    //while(mouse->b&0x1)__asm__ __volatile__("pause": : :"memory");
+    return (r);
 }
 
 static void app_remove_foco(WINDOW *w)
@@ -173,7 +175,7 @@ static void app_remove_foco(WINDOW *w)
 
     char *data = (char*) app[app_index_foco].icone_addr;
 
-    BitMAP( data, app[app_index_foco].x1 , app[app_index_foco].y1, 0xe0e0e0, w);
+    BitMAP( data, app[app_index_foco].x1 , app[app_index_foco].y1, 0x808080, w);
 
     app_index_foco = -1;
 }
@@ -192,7 +194,7 @@ static int app_execute(int index, WINDOW *w)
             app[index].status |= 0x2;
             app_remove_foco(w);
             app_index_foco = index;
-            BitMAP( data, app[index].x1 , app[index].y1, 0, w);
+            BitMAP( data, app[index].x1 , app[index].y1, 0xe0e0e0, w);
 
             // foco
             __asm__ __volatile__("int $0x72"::"d"(8),"S"( app[index].id),"c"(5));
@@ -206,7 +208,7 @@ static int app_execute(int index, WINDOW *w)
         app[index].status |= 0x2;
         app_remove_foco(w);
         app_index_foco = index;
-        BitMAP( data, app[index].x1 , app[index].y1, 0, w);
+        BitMAP( data, app[index].x1 , app[index].y1, 0xe0e0e0, w);
 
         strcpy( app_pathname , (char*)app[index].path_name_addr );
 
@@ -313,11 +315,11 @@ int main()
 	w->font.buf = (unsigned long)font8x16;
 	
     // area 8ba8aa
-	drawline(w->pos_x ,w->pos_y, w->width, w->height, 0x3030,w);
+	drawline(w->pos_x ,w->pos_y, w->width, w->height, 0x303030,w);
     //wp("w.ppm");
 
 	// barra
-	drawline(w->pos_x ,w->height-36, w->width, WMENU_BAR_SIZE, 0xe0e0e0,w);
+	drawline(w->pos_x ,w->height-36, w->width, WMENU_BAR_SIZE, 0x808080,w);
 
 	// register 
 	//wcl(w);

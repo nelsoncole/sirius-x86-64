@@ -30,7 +30,7 @@ int vfprintf(FILE *fp,const char * fmt, va_list ap) {
   
   int i;
   long l;
-  double f;
+  float f;
   double d;
   
   unsigned int u;
@@ -83,7 +83,7 @@ int vfprintf(FILE *fp,const char * fmt, va_list ap) {
           case 0x06: // format usando notação cientifica
           case 0x07:
             f = va_arg (ap, double);
-            ftoa(f, buffer, 6);
+            ftoa(f, buffer, 10);
             fputs(buffer,fp);
           break;
           // long
@@ -105,7 +105,7 @@ int vfprintf(FILE *fp,const char * fmt, va_list ap) {
           case 0x16: // format usando notação cientifica
           case 0x17:
             d = va_arg (ap, double);
-            ftoa(d, buffer, 6);
+            ftoa(d, buffer, 10);
             fputs(buffer,fp);
           break;
         

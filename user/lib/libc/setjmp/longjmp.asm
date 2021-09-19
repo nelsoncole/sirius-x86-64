@@ -1,3 +1,4 @@
+bits 64
 global longjmp
 longjmp:
     mov rax, rsi

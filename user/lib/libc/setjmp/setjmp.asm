@@ -1,3 +1,4 @@
+bits 64
 global setjmp
 setjmp:
     mov [rdi], rbx
