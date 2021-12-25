@@ -49,7 +49,7 @@ char *app_pathname;
 extern char *pwd;
 
 extern int wp(char *name);
-extern void update(const char *id, WINDOW *w );
+static void update(const char *id, WINDOW *w );
 
 // Fixar app na bara de tarefa
 static int app_fixe(unsigned long status, const char *pathname, const char *icone_pathname, WINDOW *w)
@@ -315,7 +315,7 @@ int main()
 	w->font.buf = (unsigned long)font8x16;
 	
     // area 8ba8aa
-	drawline(w->pos_x ,w->pos_y, w->width, w->height, 0x303030,w);
+	drawline(w->pos_x ,w->pos_y, w->width, w->height, 0x2f2f,w);
     //wp("w.ppm");
 
 	// barra
@@ -337,7 +337,7 @@ int main()
     app_height = 28;
 
     app_fixe( 0, "explore.bin\0" , "folder.bmp\0" , w);
-    app_fixe( 0, "term.bin\0" , "console.bmp\0" , w);
+    app_fixe( 0, "term.bin\0" , "trm.bmp\0" , w);
     app_fixe( 0, "editor.bin\0" , "edit.bmp\0" , w);
 	
 	for(;;){
@@ -374,4 +374,26 @@ int main()
 	}
 
 	return 0;
+}
+
+static void update(const char *id, WINDOW *w )
+{
+	
+	int _x = w->area_x + w->width - 80;
+	int _y = w->area_y + w->height- 28;
+	
+	int width  = 10*8; 
+	int height = 20;
+	
+	int fg = 0xFFFFFF;//-1; 
+	int bg = 0x808080;//0x80808080;
+	
+	//drawline(_x, _y, width, height, bg, w);
+	//drawrect(_x, _y, width, height, bg - 0x10101010, w );
+	
+	
+	// centro
+	int len = strlen(id);
+	drawstring(id, _x + ( width/2 - (len*8/2)), _y + (height/2 - 8), fg, bg, &w->font, w);
+	
 }

@@ -30,6 +30,7 @@
 
 #include <sse.h>
 
+#include <ethernet.h>
 
 #define false 0
 #define true 1
@@ -45,7 +46,7 @@ extern void setup_smp();
 extern void done();
 extern unsigned long gid;
 extern int tmpnam;
-
+extern int VERBOSE;
 int no;
 user_t *user;
 char *syspwd;
@@ -57,6 +58,7 @@ extern play_speaker(unsigned short frequence);
 void main(unsigned long entry_pointer_info)
 {
 
+    VERBOSE = 1;
 	launcher = 1;
 	no = mult_task = 0;
 	memset(server_id, 0, sizeof(unsigned long)*5);
@@ -106,6 +108,8 @@ void main(unsigned long entry_pointer_info)
 	ioapic_umasked(2);
 	//ioapic_umasked(8);
 	ioapic_umasked(12);
+    ioapic_umasked(11);
+    ioapic_umasked(19);
 
     printf("Setup I965 ...\\\\\n"); 
 	setup_i965();
@@ -132,10 +136,16 @@ void main(unsigned long entry_pointer_info)
 	
 	printf("ATA ...\\\\\n"); 
 	ata_initialize();
-	/*
+
+
+	/* Testing
+    */
 	clears_creen();
-	setup_hda();
-	*/
+	//setup_hda();
+	int_ethernet();
+    sti();
+    initialise_ethernet();
+    for(;;);
 	
 	user = (user_t*)malloc(sizeof(user_t));
 	user->mouse = (unsigned long) mouse;
@@ -157,14 +167,6 @@ void main(unsigned long entry_pointer_info)
 	
 	sti();
 
-    /*    
-    // TODO testes do PIT    
-    clears_creen();
-    for(int i=0;;) {
-        printf("%d ",i++);
-        sleep(1000);
-        
-    }*/
 	while(launcher)
 		__asm__ __volatile__("pause" :::"memory");
 	cli();

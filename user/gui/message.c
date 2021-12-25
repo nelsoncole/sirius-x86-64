@@ -7,8 +7,7 @@ int getmsg(int msg, WINDOW *w) {
 
 	// esta funcao deve mudar de nome
 	fmouse(w);
-	
-	
+
 	int id = msg_read();
 	
 	return id;

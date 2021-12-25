@@ -38,6 +38,7 @@ mout_vhd:
 	./fs -g bmp/logo.bmp disk.vhd
 	./fs -g bmp/folder.bmp disk.vhd
 	./fs -g bmp/console.bmp disk.vhd
+	./fs -g bmp/trm.bmp disk.vhd
 	./fs -g bmp/edit.bmp disk.vhd
 	./fs -g bmp/file.bmp disk.vhd
 	./fs -g bmp/text.bmp disk.vhd
@@ -65,7 +66,7 @@ clean:
 test:
 	qemu-system-x86_64 -m 512 \
 	-smp 2 -s -machine q35 -enable-kvm -cpu host -drive file=disk.vhd,format=raw,bus=0 \
-	-device ich9-intel-hda -device hda-duplex
+	-device ich9-intel-hda -device hda-duplex -net nic,model=e1000 -net user
 test2:
 	qemu-system-x86_64 -smp 2 -m 512 \
 	-s -machine q35 -enable-kvm -cpu host -trace enable=usb* -device usb-ehci,id=ehci \

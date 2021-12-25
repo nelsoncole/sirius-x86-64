@@ -55,7 +55,6 @@ int stdgetc_r(FILE *fp)
 		fp->curp = (unsigned char*)(fp->buffer + fp->off2 - 1);
 		r = *(unsigned char*)(fp->curp) &0xff;
 			
-		
 		//call putc
 		//stdputc_r (r, stdout);
 		
@@ -225,6 +224,7 @@ int putc_r (int ch, FILE *fp)
 		//flush
 		flush_r(fp);
 		// novo bloco.
+        // TODO:
 		
 	}
 	

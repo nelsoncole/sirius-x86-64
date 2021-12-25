@@ -219,28 +219,6 @@ WINDOW *window(const char *title,int x, int y, int width, int height, int fg, in
 	return (w);
 }
 
-void update(const char *id, WINDOW *w )
-{
-	
-	int _x = w->area_x + w->width - 80;
-	int _y = w->area_y + w->height- 28;
-	
-	int width  = 10*8; 
-	int height = 20;
-	
-	int fg = 0;//-1; 
-	int bg = 0xe0e0e0;//0x80808080;
-	
-	//drawline(_x, _y, width, height, bg, w);
-	//drawrect(_x, _y, width, height, bg - 0x10101010, w );
-	
-	
-	// centro
-	int len = strlen(id);
-	drawstring(id, _x + ( width/2 - (len*8/2)), _y + (height/2 - 8), fg, bg, &w->font, w);
-	
-}
-
 
 void wcl(WINDOW *w) {
 

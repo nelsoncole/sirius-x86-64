@@ -6,8 +6,16 @@
 #include <file.h>
 
 
+int VERBOSE;
+
 int putchar(int c)
 {
+
+    if(!VERBOSE){
+        return 0;
+    }
+
+
 	return (glyph(c));
 
 }

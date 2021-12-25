@@ -179,10 +179,9 @@ void paint_desktop(void *bankbuffer) {
 	    if(paint->w != 0) {
 		    WINDOW *w = (WINDOW*) paint->w;
 		
-		    while(w->spinlock);
+		    while(w->spinlock != 0)__asm__ __volatile__("pause;");
 		    w->spinlock++;
-		
-		
+      
 		    unsigned long start  = (unsigned long) &w->start;
 		    unsigned long zbuf  = ( unsigned long) bankbuffer;
 		
@@ -204,11 +203,9 @@ void paint_desktop(void *bankbuffer) {
 		    }
 		
 		
-		    w->spinlock = 0;
-		
-		
 		    if( x > gui->pixels_per_scan_line ) {
 			    paint = paint->next;
+                w->spinlock = 0;
 			    continue;
 		    }
   		
@@ -241,9 +238,13 @@ void paint_desktop(void *bankbuffer) {
          		}
          		
          	}
+           
+            w->spinlock = 0;
        }
        	paint = paint->next;
     }
+
+
 	paint_ready_queue->spinlock = 0;
 }
 

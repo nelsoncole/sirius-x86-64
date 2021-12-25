@@ -34,11 +34,9 @@ bool putpixel(int x, int y, unsigned int c )
     return true;
 }
 
-
 // Algorítmo de bresenham
 void BRESENHAM_line(int x0, int y0, int x1, int y1, unsigned int color )
 {
-    int a, b;
     bool steep = false;
     if(abs(x0-x1) < abs(y0-y1)) {
         swap(&x0, &y0);

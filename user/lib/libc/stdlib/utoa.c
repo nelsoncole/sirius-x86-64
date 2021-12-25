@@ -4,7 +4,7 @@
 #include <limits.h>
 
 
-char *utoa_r (unsigned long long val, char *str) {
+static char *utoa_r (unsigned long long val, char *str) {
   	
 
 	char* valuestring = (char*) str;

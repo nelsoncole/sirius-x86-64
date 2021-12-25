@@ -7,7 +7,8 @@
 void *malloc(unsigned size);
 void free(void *ptr);
 
-void i2hex(unsigned int val, char* dest, int len);
+void i2hex(unsigned long long val, char* dest, int len);
+char *utoa(unsigned long long val, char *dst, int radix);
 char *itoa (int val, char *str);
 
 

@@ -16,8 +16,8 @@
 
 #define ID_MENU_HELP 	(0x20 + 0)
 
-#define X 500
-#define Y 400
+#define X 600
+#define Y 500
 
 char filename[128];
 HANDLE_T *edit;
@@ -46,7 +46,7 @@ void main() {
 	
 	save = 0;
 	
-	WINDOW *w = window("Editor",1, 40, X, Y, 0x067AB5 /*0x1f1f2f*/, 0xFFFFFF, 0, 0x10);
+	WINDOW *w = window("Editor",100, 40, X, Y, 0x067AB5 /*0x1f1f2f*/, 0xFFFFFF, 0, 0x10);
 	
 	edit = editbox(0, 0, X, Y, 0, 0xEFEFEF, w, ID_EDIT );
 	register_obj(edit); // registrar objecto

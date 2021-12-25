@@ -33,7 +33,7 @@ start:
 	
 	
 ; cmd
-	call cmd
+	;call cmd
 	cli
 	
 ; BIOSes Get Device Parameters
@@ -182,7 +182,7 @@ print32:
 _vmm dd 0xb8000
 
 ModoProtegido:
-    	mov eax,0x10
+    mov eax,0x10
 	mov ds,ax
 	mov es,ax
 	mov fs,ax
@@ -200,7 +200,7 @@ ModoProtegido:
 	push esp
 	pushf
 	push cs
-    	push eax
+    push eax
 	iretd
 		
 	hlt

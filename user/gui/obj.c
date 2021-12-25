@@ -46,6 +46,11 @@ int obj_focprocess()
 			if(obj == 0) break;
 			m_file_list(obj);
 		break;
+        case TYPE_TERMINALBOX:
+			if(obj == 0) break;
+            m_terminalbox(obj);
+			
+		break;
 	}
 
 	return 0;
@@ -104,9 +109,7 @@ int obj_process(int x, int y)
 			w = (WINDOW*) obj->w;
 			
 			msg_write (obj->id); // enviar mensagem
-			
 			ret = 0;
-			
 			foc =  TYPE_EDITBOX;
 			
 			while(mouse2->b&0x1);
@@ -128,21 +131,35 @@ int obj_process(int x, int y)
 			w = (WINDOW*) obj->w;
 			
 			msg_write (obj->id); // enviar mensagem
-			
 			ret = 0;
-			
 			foc =  TYPE_LISTBOX;
 			
 			while(mouse2->b&0x1);
 		break;
+        case TYPE_TERMINALBOX:
+            obj = (HANDLE_T *) ptr_obj[idx];
+			w = (WINDOW*) obj->w;
+            
+            msg_write (obj->id); // enviar mensagem
+            ret = 0;
+			foc =  TYPE_TERMINALBOX;
+            
+            // scroll
+            trminalscroll(obj, x, y);
+            while(mouse2->b&0x1){
+                // onclick
+                trminalscroll(obj, mouse2->x - w->pos_x, mouse2->y - w->pos_y);
+            }
+        break;
 		default:
 			while(mouse2->b&0x1); // espera soltar
+            foc = 0;
 			ret = 0;
 		return -1;
 	
 	}
 
-	if(ret != 0) {
+	if(ret != 0 && w != 0) {
 		while(w->spinlock)__asm__ __volatile__("pause;");
 		w->spinlock++;
 		

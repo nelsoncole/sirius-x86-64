@@ -25,30 +25,30 @@ start:
 
 global gdt_flush
 gdt_flush:
-    	push ebp
-	mov ebp, esp
-    	mov eax, [esp+8]
-    	lgdt [eax]
-    	jmp 0x08:.flush
+    push ebp
+    mov ebp, esp
+    mov eax, [esp+8]
+    lgdt [eax]
+    jmp 0x08:.flush
 .flush:
-    	mov ax, 0x10
-    	mov ds, ax
-    	mov es, ax
-    	mov fs, ax
-    	mov gs, ax
+    mov ax, 0x10
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
 	mov ss, ax
 
-    	mov esp, ebp
+    mov esp, ebp
 	pop ebp
-    	ret
+    ret
 
 global idt_flush
 idt_flush:
-    	push ebp
+    push ebp
 	mov ebp,esp
-    	mov eax, [esp+8]
-    	lidt [eax]
-    	mov esp,ebp
+    mov eax, [esp+8]
+    lidt [eax]
+    mov esp,ebp
 	pop ebp
     	ret
 
@@ -56,17 +56,17 @@ global long_mode
 long_mode:    
 	push ebp
 	mov ebp, esp
-    	mov eax, [esp + 0x08] ; GDTR
-    	mov edx, [esp + 0x0c] ; Kernel address = 0x401000
-    	mov ebx, [esp + 0x10] ; bootblock
-    	mov esp, ebp
+    mov eax, [esp + 0x08] ; GDTR
+    mov edx, [esp + 0x0c] ; Kernel address = 0x401000
+    mov ebx, [esp + 0x10] ; bootblock
+    mov esp, ebp
 	pop ebp
 	
 	
-    	cli
-    	lgdt [eax]
+    cli
+    lgdt [eax]
     	
-    	jmp 0x08: start64
+    jmp 0x08: start64
     	
 global file_sector_count
 file_sector_count dd 0

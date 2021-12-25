@@ -22,6 +22,7 @@ int vsprintf(char * str,const char * fmt, va_list ap)
 	int index = 0;
 	unsigned char u;	
 	int d;
+    unsigned long long lu;
 	char c, *s;
 	char buffer[256];
 
@@ -59,8 +60,8 @@ int vsprintf(char * str,const char * fmt, va_list ap)
 
 			case 'X':
 			case 'x':
-				d = va_arg (ap, int);
-				i2hex(d, buffer,8);
+				lu = va_arg (ap, unsigned long long);
+                utoa(lu, buffer, 16);
 				str_tmp  = _vsputs_r(str_tmp,buffer);
 				break;
 			

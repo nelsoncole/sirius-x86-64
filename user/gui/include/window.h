@@ -19,6 +19,7 @@
 #define TYPE_EDITBOX 2
 #define TYPE_LISTBOX 3
 #define TYPE_FILE_LISTBOX 4
+#define TYPE_TERMINALBOX 5
 
 #define MSG_MAX 10
 
@@ -66,6 +67,7 @@ typedef struct _HANDLE {
 	unsigned int	offset;
 	unsigned int 	len;
 	unsigned int 	bytes;
+    unsigned int 	scroll;
 	unsigned long	addr;
 	unsigned long	w;
 }__attribute__ ((packed)) HANDLE_T;
@@ -149,5 +151,9 @@ void border(int top, int bottom, int left, int right, WINDOW *w);
 
 HANDLE_T *file_listbox(int x, int y, int width, int height, int fg, int bg, WINDOW *w, unsigned int id);
 int m_file_list(HANDLE_T *obj);
+
+HANDLE_T *terminalbox(int x, int y, int width, int height, int fg, int bg, WINDOW *w, unsigned int id);
+void trminalscroll(HANDLE_T *obj, int mouse_x, int mouse_y);
+void m_terminalbox(HANDLE_T *obj);
 
 #endif

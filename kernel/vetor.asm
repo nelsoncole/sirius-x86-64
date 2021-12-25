@@ -642,18 +642,14 @@ irq_jmp:
       	
    	;PUSH_FPU
 	;PUSH_XMM
-	fxsave [SavedFloats2]
-	
+	;fxsave [SavedFloats2]
 	
 	mov rdi, [rsp + 0x90]
 	call irq_function
 	
-	
-	
-	
 	;POP_XMM
 	;POP_FPU
-	fxrstor [SavedFloats2]
+	;fxrstor [SavedFloats2]
 
 	pop rax
 	pop rcx

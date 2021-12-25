@@ -6,6 +6,8 @@
 
 #include <data.h>
 
+#include <io.h>
+
 extern void irq0();	extern void irq10();	extern void irq20();
 extern void irq1();	extern void irq11();	extern void irq21();
 extern void irq2();	extern void irq12();	extern void irq22();
@@ -69,6 +71,10 @@ void irq_function(unsigned int n){
     if(n == 1 || n == 12){
         interrupt_status = 1;
     }
+
+    /*
+    outportb(0xA0,0x20);
+	outportb(0x20,0x20); */
 	
 	
 }

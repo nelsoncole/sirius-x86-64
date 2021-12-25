@@ -97,7 +97,6 @@ FILE *fopen (const char *path,const char *mode);
 int fclose(FILE *fp);
 int fputc (int ch, FILE *fp);
 int fgetc (FILE *fp);
-size_t fread (void *buffer,size_t size, size_t count, FILE *fp);
-
+size_t fread (void *buffer,size_t size, size_t count, FILE *fp); 
 
 #endif

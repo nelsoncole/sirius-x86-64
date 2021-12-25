@@ -22,15 +22,11 @@ void free(void *ptr) {
 	free_pages(ptr);
 }
 
-
-#define HEX_LEN 8
-
-void i2hex(unsigned int val, char* dest, int len)
+void i2hex(unsigned long long val, char* dest, int len)
 {
-
 	char* cp;
 	int i, x;
-	unsigned n;
+	unsigned long long n;
 	
 	if(val == 0) {
 		cp = &dest[0];
@@ -46,7 +42,7 @@ void i2hex(unsigned int val, char* dest, int len)
 	{
 		x = n & 0xF;
 		n >>= 4;
-		*--cp = x + ((x > (HEX_LEN+1)) ? 'A' - 10 : '0');
+		*--cp = x + ((x > 9) ? 'A' - 10 : '0');
 	}
     
 	dest[len]='\0';
@@ -66,7 +62,50 @@ void i2hex(unsigned int val, char* dest, int len)
 
 	cp = &dest[0];
 	n = strlen(cp);
-	memset(dest + n,0,8-n);
+	memset(dest + n,0,len-n);
+}
+
+static char *utoa_r (unsigned long long val, char *str) {
+  	
+
+	char* valuestring = (char*) str;
+	unsigned long long value = val;
+  	char swap, *p;
+
+  	p = valuestring;
+
+  	do
+  	{
+    		*p++ = (char)(value % 10) + '0';
+    		value /= 10;
+  	} while (value);
+
+  	*p-- = '\0';
+
+  	while (p > valuestring)
+  	{
+    		swap = *valuestring;
+    		*valuestring++ = *p;
+    		*p-- = swap;
+  	}
+
+	return str;
+}
+
+char *utoa(unsigned long long val, char *dst, int radix)
+{
+        char* cp = (char*) dst;
+
+        unsigned long long lu = (unsigned long long)val;
+
+	if(radix == 16)
+		i2hex(lu, cp, 16);
+	else 
+		utoa_r (lu, cp);
+		
+        return dst;
+
+	return dst;
 }
 
 char *itoa (int val, char *str) 
