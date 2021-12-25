@@ -1,3 +1,10 @@
+/*
+ * Credits:
+ *      Sander de Regt 
+ *
+ */
+
+
 #include <ethernet.h>
 #include <pci.h>
 #include <stdio.h>

@@ -224,7 +224,7 @@ int e1000_send_package(ethernet_package_descriptor_t desc){
     unsigned long long dest = tx_memory.start + (tx_memory.blocksize*tx_cur);
 
     if(desc.buffersize > tx_memory.blocksize){
-        printf("Package size is error\n");
+        printf("The package is too big\n");
         return 2;
     }
 
