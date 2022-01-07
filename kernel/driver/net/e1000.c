@@ -9,7 +9,6 @@
 
 static unsigned long base_addr;
 static unsigned char mac_address[6];
-static unsigned volatile long e1000_package_recieved_ack = 0;
 
 static int rx_cur;
 static int tx_cur;
@@ -21,6 +20,7 @@ struct e1000_rx_memory tx_memory;
 
 int e1000_send_package(ethernet_package_descriptor_t desc);
 ethernet_package_descriptor_t e1000_recieve_package();
+ethernet_package_descriptor_t e1000_receive_package_handler();
 
 
 unsigned int e1000_read_command(unsigned short addr){
@@ -69,9 +69,9 @@ void irq_e1000(){
         unsigned long ty = e1000_read_command(0);
         e1000_write_command(0, ty | 0x40);
     }else if(to&0x80){
-        printf("[E1000] Package recieved!\n");
-		((unsigned volatile long*)((unsigned volatile long)&e1000_package_recieved_ack))[0] = 1;
-
+        //printf("[E1000] Package recieved!\n");
+        // call ethernet package received
+        handler_ethernet_package_received();
     }else if(to&0x10){
         printf("[E1000] Good threshold!\n");
     }else{
@@ -84,13 +84,13 @@ void init_e1000(int bus,int slot,int function){
     base_addr = pci_read_config_dword(bus,slot,function,0x10) & 0xFFFFFFFE;
     printf("[E1000] Base physical address: %x \n",base_addr);
 	unsigned long usbint = pci_read_config_dword(bus,slot,function,0x3C) & 0x000000FF;
-    printf("[E1000] USBINT %d \n",usbint);
-    
     if(usbint == 9) {
         // TODO improviso para VirtualBox
         // IRQ19 
         usbint += 10;
     }
+
+    printf("[E1000] USBINT %d \n",usbint);
 
     // Configurar IRQ Handler
     fnvetors_handler[usbint] = &irq_e1000;
@@ -216,7 +216,8 @@ void init_e1000(int bus,int slot,int function){
     e1000_link_up();
 
     // register driver
-    register_ethernet_device((unsigned long)&e1000_send_package,(unsigned long)&e1000_recieve_package,mac_address);
+    register_ethernet_device((unsigned long)&e1000_send_package,(unsigned long)&e1000_recieve_package,
+    (unsigned long)&e1000_receive_package_handler,mac_address);
 }
 
 int e1000_send_package(ethernet_package_descriptor_t desc){
@@ -239,15 +240,16 @@ int e1000_send_package(ethernet_package_descriptor_t desc){
 
     e1000_write_command(REG_TXDESCTAIL, tx_cur);
 
-    int to = 0;
+    unsigned int spin = 1000;
     while(!(tx_descs[old_cur]->status & 0xff)){
 
-        sleep(10);
-        to++;
-        if(to>500){
+        //sleep(10);
+
+        /*__asm__ __volatile__("nop; nop;");
+        if(spin--){
             printf("No send package\n");
             return 1;
-        }
+        } */
     }     
    
 
@@ -257,23 +259,58 @@ int e1000_send_package(ethernet_package_descriptor_t desc){
 ethernet_package_descriptor_t e1000_recieve_package(){
     ethernet_package_descriptor_t desc;
 
-    while(1){
-        for(int i = 0 ; i < E1000_NUM_RX_DESC; i++){
+    desc.flag = -1;
+    desc.buffersize = 0;
+    desc.buf = (void*)0;
+    
+    for(int i = 0 ; i < E1000_NUM_RX_DESC; i++){
 
-            if((rx_descs[i]->status & 0x1))
-            {
-                unsigned long long addr = rx_memory.start + (rx_memory.blocksize*i);
-                unsigned short len = rx_descs[i]->length;
+        if((rx_descs[i]->status & 0x1))
+        {
+            unsigned long long addr = rx_memory.start + (rx_memory.blocksize*i);
+            unsigned short len = rx_descs[i]->length;
 
-                desc.buffersize = len;
-                desc.buf = (void*) addr;
+            desc.buffersize = len;
+            desc.buf = (void*) addr;
+            
+            desc.flag = 0;
 
-                rx_descs[i]->status &= ~1;
-                e1000_write_command(REG_RXDESCTAIL, i );
-                return desc;
-            }
+            rx_descs[i]->status &= ~1;
+            e1000_write_command(REG_RXDESCTAIL, i );
+            return desc;
         }
     }
 
+    return desc;
+}
+
+ethernet_package_descriptor_t e1000_receive_package_handler(){
+    ethernet_package_descriptor_t desc;
+
+    desc.flag = -1;
+    desc.buffersize = 0;
+    desc.buf = (void*)0;
+
+
+    unsigned char old_cur = rx_cur;
+    rx_cur = (rx_cur + 1) % E1000_NUM_RX_DESC;
+    
+    if((rx_descs[old_cur]->status & 0x1))
+    {
+        unsigned long long addr = rx_memory.start + (rx_memory.blocksize*old_cur);
+        unsigned short len = rx_descs[old_cur]->length;
+
+        desc.buffersize = len;
+        desc.buf = (void*) addr;
+
+        desc.flag = 0;
+    
+        //rx_descs[old_cur]->status &= ~1;
+        e1000_write_command(REG_RXDESCTAIL, old_cur );
+        return desc;
+    }
+
+    return desc;
+    
 }
 
