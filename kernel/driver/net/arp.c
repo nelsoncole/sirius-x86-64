@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sleep.h>
+
+#include "arp.h"
 
 arp_cache_t arp_cache[1024];
 
@@ -11,7 +14,9 @@ void init_arp()
 
     memset(arp_cache, 0, sizeof(arp_cache_t)*1024);
     // ARP breadcast
+    printf("[ARP] Breadcast\n");
     arp_request(default_ethernet_device.server_ip, everyone);
+    sleep(1000);
 }
 
 int arp_save_address(unsigned char *ip, unsigned char *mac)
@@ -93,11 +98,7 @@ void arp_request(unsigned char *ip, unsigned char *mac)
     fillIP(arp->dest_ip, ip);
 
     // send package
-    ethernet_package_descriptor_t dsc;
-    dsc.buffersize = sizeof( arp_header_t );
-    dsc.buf = (void*) arp;
-
-    if( send_ethernet_package(dsc) ){
+    if( send_ethernet_package(arp, sizeof(arp_header_t)) ){
         printf("[ETH] ARP request error\n");
     }
 
@@ -134,11 +135,7 @@ void arp_replay(unsigned char *ip, unsigned char *mac)
     fillIP(arp->dest_ip, ip);
 
     // send package
-    ethernet_package_descriptor_t dsc;
-    dsc.buffersize = sizeof( arp_header_t );
-    dsc.buf = (void*) arp;
-
-    if( send_ethernet_package(dsc) ){
+    if( send_ethernet_package(arp, sizeof( arp_header_t )) ){
         printf("[ETH] ARP replay error\n");
     }
 

@@ -20,7 +20,6 @@ struct e1000_rx_memory tx_memory;
 
 int e1000_send_package(ethernet_package_descriptor_t desc);
 ethernet_package_descriptor_t e1000_recieve_package();
-ethernet_package_descriptor_t e1000_receive_package_handler();
 
 
 unsigned int e1000_read_command(unsigned short addr){
@@ -57,7 +56,7 @@ void e1000_link_up(){
 
 void irq_e1000(){
 	//printf("[E1000] Interrupt detected\n");
-    e1000_write_command(0xD0,1);
+    e1000_write_command(REG_IMASK, 0x1);
     unsigned int to = e1000_read_command(0xC0);
     if(to&0x01){
         printf("[E1000] Transmit completed!\n");
@@ -69,7 +68,7 @@ void irq_e1000(){
         unsigned long ty = e1000_read_command(0);
         e1000_write_command(0, ty | 0x40);
     }else if(to&0x80){
-        //printf("[E1000] Package recieved!\n");
+        printf("[E1000] Package recieved!\n");
         // call ethernet package received
         handler_ethernet_package_received();
     }else if(to&0x10){
@@ -77,6 +76,7 @@ void irq_e1000(){
     }else{
         printf("[E1000] Unknown interrupt: %x !\n",to);
     }
+   
 }
 
 void init_e1000(int bus,int slot,int function){
@@ -103,13 +103,16 @@ void init_e1000(int bus,int slot,int function){
      // Alloc memory
     // Set virtual address
     // Get physical address
-    // 8KiB por descritor
-    alloc_pages(0, 66, (unsigned long*)&virt_addr); //256 + 8 = 304KIB
+
+    // 12KiB por descritor
+    alloc_pages(0, 98, (unsigned long*)&virt_addr); //384 + 8 = 392KIB
     rx_memory.vmem = virt_addr;
     rx_memory.phymem = get_phy_addr(rx_memory.vmem);
     rx_memory.descsize = 0x2000;
-    rx_memory.blocksize = 0x2000; // 8KiB
+    rx_memory.blocksize = 0x3000; // 12KiB
     rx_memory.start = rx_memory.vmem + rx_memory.descsize;
+
+    // 8KiB por descritor
     alloc_pages(0, 18, (unsigned long*)&virt_addr); //64 + 8 = 72KiB
     tx_memory.vmem = virt_addr;
     tx_memory.phymem = get_phy_addr(tx_memory.vmem);
@@ -118,7 +121,7 @@ void init_e1000(int bus,int slot,int function){
     tx_memory.start = tx_memory.vmem + tx_memory.descsize;
 
     // limpar memória
-    memset((char*)rx_memory.vmem, 0, 66*0x1000);
+    memset((char*)rx_memory.vmem, 0, 98*0x1000);
     memset((char*)tx_memory.vmem, 0, 18*0x1000);
 
     if( e1000_is_eeprom() ){
@@ -170,7 +173,7 @@ void init_e1000(int bus,int slot,int function){
         rx_descs[i]->addr_1 = addr;
         rx_descs[i]->addr_2 = addr >> 32;
         rx_descs[i]->status = 0;
-        rx_descs[i]->length = rx_memory.blocksize;
+        rx_descs[i]->length = 0; //rx_memory.blocksize;
     }
 
     e1000_write_command(REG_RXDESCLO, (unsigned int) rx_memory.phymem);
@@ -178,8 +181,20 @@ void init_e1000(int bus,int slot,int function){
     e1000_write_command(REG_RXDESCLEN, E1000_NUM_RX_DESC * 16);
     e1000_write_command(REG_RXDESCHEAD, 0);
     e1000_write_command(REG_RXDESCTAIL, E1000_NUM_RX_DESC - 1);
+    // Buffer Size = 8KiB
+    unsigned int rctl = 0; //e1000_read_command(REG_RCTRL);
+    rctl |= RCTL_EN;
+    rctl |= RCTL_SBP;
+    rctl |= RCTL_BAM;
+    rctl |= RCTL_SECRC;
+    rctl |= RCTL_UPE;
+    rctl |= RCTL_MPE;
+    rctl |= RCTL_LBM_NONE;
+    rctl |= RTCL_RDMTS_HALF;
+    rctl |= RCTL_BSIZE_8192;
+    e1000_write_command(REG_RCTRL, rctl);
 
-    e1000_write_command(REG_RCTRL, RCTL_EN| RCTL_SBP| RCTL_UPE | RCTL_MPE | RCTL_LBM_NONE | RTCL_RDMTS_HALF | RCTL_BAM | RCTL_SECRC  | RCTL_BSIZE_8192);
+    e1000_write_command(REG_RDTR, 0);
 
     rx_cur = 0;
 
@@ -201,10 +216,19 @@ void init_e1000(int bus,int slot,int function){
     e1000_write_command(REG_TXDESCHI, (unsigned int) (tx_memory.phymem >> 32));
     e1000_write_command(REG_TXDESCLEN, E1000_NUM_TX_DESC * 16);
     e1000_write_command( REG_TXDESCHEAD, 0);
-    e1000_write_command( REG_TXDESCTAIL, 7);
-
+    e1000_write_command( REG_TXDESCTAIL, 0);
+   
     e1000_write_command(0x3828,  (0x01000000 | 0x003F0000));
+
+    e1000_write_command(REG_TCTRL,  (TCTL_EN | TCTL_PSP | (15 << TCTL_CT_SHIFT) | (64 << TCTL_COLD_SHIFT) | TCTL_RTLC));
+    /*
+    // for the e1000e
+    e1000_write_command(REG_TCTRL,  ( 0b0110000000000111111000011111010));
+    */
+    /*
+    // oder e1000 
     e1000_write_command(REG_TCTRL,  ( 0x00000ff0 | 0x003ff000 | 0x8 | 0x2));
+    */
     e1000_write_command(REG_TIPG,  0x0060200A);
 
     tx_cur = 0;
@@ -216,8 +240,7 @@ void init_e1000(int bus,int slot,int function){
     e1000_link_up();
 
     // register driver
-    register_ethernet_device((unsigned long)&e1000_send_package,(unsigned long)&e1000_recieve_package,
-    (unsigned long)&e1000_receive_package_handler,mac_address);
+    register_ethernet_device((unsigned long)&e1000_send_package,(unsigned long)&e1000_recieve_package,mac_address);
 }
 
 int e1000_send_package(ethernet_package_descriptor_t desc){
@@ -240,19 +263,11 @@ int e1000_send_package(ethernet_package_descriptor_t desc){
 
     e1000_write_command(REG_TXDESCTAIL, tx_cur);
 
-    unsigned int spin = 1000;
+    int  nop = 0;
     while(!(tx_descs[old_cur]->status & 0xff)){
-
-        //sleep(10);
-
-        /*__asm__ __volatile__("nop; nop;");
-        if(spin--){
-            printf("No send package\n");
-            return 1;
-        } */
+        nop++;
     }     
    
-
     return 0;
 }
 
@@ -263,7 +278,7 @@ ethernet_package_descriptor_t e1000_recieve_package(){
     desc.buffersize = 0;
     desc.buf = (void*)0;
     
-    for(int i = 0 ; i < E1000_NUM_RX_DESC; i++){
+    /*for(int i = 0 ; i < E1000_NUM_RX_DESC; i++){
 
         if((rx_descs[i]->status & 0x1))
         {
@@ -281,22 +296,15 @@ ethernet_package_descriptor_t e1000_recieve_package(){
         }
     }
 
-    return desc;
-}
+    return desc; */
 
-ethernet_package_descriptor_t e1000_receive_package_handler(){
-    ethernet_package_descriptor_t desc;
-
-    desc.flag = -1;
-    desc.buffersize = 0;
-    desc.buf = (void*)0;
-
-
-    unsigned char old_cur = rx_cur;
-    rx_cur = (rx_cur + 1) % E1000_NUM_RX_DESC;
-    
-    if((rx_descs[old_cur]->status & 0x1))
+    unsigned char old_cur;
+ 
+    while( (rx_descs[rx_cur]->status & 0x1) )
     {
+        old_cur = rx_cur;
+        rx_cur = (rx_cur + 1) % E1000_NUM_RX_DESC;
+
         unsigned long long addr = rx_memory.start + (rx_memory.blocksize*old_cur);
         unsigned short len = rx_descs[old_cur]->length;
 
@@ -304,13 +312,10 @@ ethernet_package_descriptor_t e1000_receive_package_handler(){
         desc.buf = (void*) addr;
 
         desc.flag = 0;
-    
-        //rx_descs[old_cur]->status &= ~1;
-        e1000_write_command(REG_RXDESCTAIL, old_cur );
-        return desc;
+
+        rx_descs[old_cur]->status &= ~1;
+        e1000_write_command(REG_RXDESCTAIL, old_cur);
     }
 
     return desc;
-    
 }
-

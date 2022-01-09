@@ -12,6 +12,11 @@
 #include <string.h>
 #include <sleep.h>
 
+#include "udp.h"
+#include "ipv4.h"
+#include "arp.h"
+#include "dhcp.h"
+
 
 int ethernet_filtr(unsigned char *mac);
 
@@ -39,11 +44,9 @@ void ethernet_set_link_status(unsigned long a){
 }
 
 
-void register_ethernet_device(unsigned long send_package,unsigned long receive_package,
-unsigned long receive_package_handler, unsigned char mac[SIZE_OF_MAC])
+void register_ethernet_device(unsigned long send_package,unsigned long receive_package,unsigned char mac[SIZE_OF_MAC])
 {
     default_ethernet_device.receive_package = receive_package;
-    default_ethernet_device.receive_package_handler = receive_package_handler;
     default_ethernet_device.send_package = send_package;
     
     default_ethernet_device.is_enabled = 1;
@@ -53,20 +56,18 @@ unsigned long receive_package_handler, unsigned char mac[SIZE_OF_MAC])
     }
 }
 
-
-
-ethernet_package_descriptor_t get_ethernet_package_handler(){
-    ethernet_package_descriptor_t (*get_package)() = (void*)default_ethernet_device.receive_package_handler;
-    return get_package();
-}
-
 ethernet_package_descriptor_t get_ethernet_package(){
     ethernet_package_descriptor_t (*get_package)() = (void*)default_ethernet_device.receive_package;
     return get_package();
 }
 
-int send_ethernet_package(ethernet_package_descriptor_t desc){
-    int (*send_package)(ethernet_package_descriptor_t desc) = (void*)default_ethernet_device.send_package;
+int send_ethernet_package(const void *buf, size_t size){
+    int (*send_package)(ethernet_package_descriptor_t) = (void*)default_ethernet_device.send_package;
+
+    ethernet_package_descriptor_t desc;
+    desc.buffersize = size;
+    desc.buf = (void*) buf;
+
     return send_package(desc);
 }
 
@@ -83,6 +84,7 @@ void handler_ethernet_package_received(){
     char buf[256];
     char *data;
     int len;
+    unsigned int src_ip = 0;
     char string[] = "Nelson";
 
     unsigned char mac[SIZE_OF_MAC] = {0x00,0x00,0x00,0x00,0x00,0x00};
@@ -91,9 +93,10 @@ void handler_ethernet_package_received(){
     package_recieved_ack = 0;
 
     ethernet_package_descriptor_t prd;
-    prd = get_ethernet_package_handler();
+    prd = get_ethernet_package();
 
     if(prd.buf == 0 || prd.buffersize == 0) return;
+    
 
     eh = (ether_header_t*) prd.buf;
     
@@ -113,41 +116,44 @@ void handler_ethernet_package_received(){
                     printf("ARP REPLAY\n");
                     arp_save_address( ip, mac);
                     break;
+                default:
+                    printf("ARP UNKNOWN %x\n", htons(arp->operation) );
+                    break;
             }   
             break;
         case ET_IPV4:
-
-            /*if( ethernet_filtr( eh->dst) ){
+            /*
+            if( ethernet_filtr( eh->dst) ){
                 return;
-            } */
+            }*/
 
             ipv4 = (ipv4_header_t*) prd.buf;
             switch( ipv4->protocol){
                 case IP_PROTOCOL_ICMP:
-                    printf("IPV4 ICMP\n");
+                    printf("IPv4 ICMP\n");
                     break;
                 case IP_PROTOCOL_TCP:
-                    printf("IPV4 TCP\n");
+                    printf("IPv4 TCP\n");
                     break;
                 case IP_PROTOCOL_UDP:
-                    printf("IPV4 UDP\n");
+                    printf("IPv4 UDP\n");
                     udp = (udp_header_t*) ((unsigned long)prd.buf + sizeof(ipv4_header_t));
                     data = (char*) udp;
                     data += sizeof(udp_header_t);
 
-                    memset(buf, 0, 256);
+                    //memset(buf, 0, 256);
                     len = htons(udp->length) - sizeof(udp_header_t);
-                    memcpy(buf, data , len);
+                    //memcpy(buf, data , len);
 
                     fillIP(ip, (unsigned char*)&ipv4->src);
-                    printf("Client IP address: %d.%d.%d.%d UDP Source Port address: %d\n",ip[0],ip[1],ip[2],ip[3],
-                    htons(udp->src_port));
-
-                    
-                    //udp_send( ipv4->src, htons(udp->src_port), string, 6);
-
-                    printf("Data: %s\n", buf);
-
+                    printf("Client IP address: %d.%d.%d.%d UDP Source Port address: %d,len: %d bytes\n",ip[0],ip[1],ip[2],ip[3],
+                    htons(udp->src_port), len);
+                    //printf("Data: %s\n", buf);
+                    //fillIP((unsigned char*)&src_ip, default_ethernet_device.client_ip);
+                    //udp_send( src_ip, ipv4->src, 5000, htons(udp->src_port), string, 6);
+                    break;
+                default:
+                    printf("IPv4 UNKNOWN %x\n", ipv4->protocol );
                     break;
             }
 
@@ -229,16 +235,16 @@ unsigned short length,unsigned char protocol,unsigned int from, unsigned int to)
     ipv4header->source_addr = from;
     ipv4header->dest_addr = to;
 
-    unsigned int checksum = 0;
+    unsigned long checksum = 0;
     checksum += 0x4500;
     checksum += length;
     checksum += 1;
     checksum += 0x4000;
     checksum += 0x4000 + protocol;
-    checksum += (from >> 16) & 0xFFFF;
-    checksum += from & 0xFFFF; 
-    checksum += (to >> 16) & 0xFFFF;
-    checksum += to & 0xFFFF;
+    checksum += switch_endian16((from >> 16) & 0xFFFF);
+    checksum += switch_endian16(from & 0xFFFF); 
+    checksum += switch_endian16((to >> 16) & 0xFFFF);
+    checksum += switch_endian16(to & 0xFFFF);
     checksum = (checksum >> 16) + (checksum & 0xffff);
     checksum += (checksum >> 16);
     ipv4header->checksum = switch_endian16((unsigned short) (~checksum));
@@ -314,15 +320,9 @@ unsigned char* getIpAddressFromDHCPServer(){
     dhcpheader->options[75] = 0xFF;
     
     fillDhcpDiscoverHeader(dhcpheader);
-    ethernet_package_descriptor_t sec;
-    sec.buffersize = sizeof(struct DHCPDISCOVERHeader);
-    // TODO
-    // Modificado por mim
-    unsigned long long addr = (unsigned long long)dhcpheader;
-    sec.buf = (void*) addr;
 
     printf("[ETH] Send DHCP Discover\n");
-    int res_fs = send_ethernet_package(sec); // send package
+    int res_fs = send_ethernet_package(dhcpheader, sizeof(struct DHCPDISCOVERHeader)); // send package
     if(res_fs){
         free(dhcpheader);
 
@@ -388,13 +388,8 @@ unsigned char* getIpAddressFromDHCPServer(){
 
     fillDhcpRequestHeader(dhcp2header);
 
-    ethernet_package_descriptor_t s3c;
-    s3c.buffersize = sizeof(struct DHCPREQUESTHeader);
-    addr = (unsigned long long)dhcp2header;
-    s3c.buf = (void*)addr;
-
     printf("[ETH] Send DHCP Request\n");
-    if( send_ethernet_package(s3c) ) { // send package
+    if( send_ethernet_package(dhcp2header, sizeof(struct DHCPREQUESTHeader)) ) { // send package
         free(dhcp2header);
         printf("Error\n");
         return offeredip;
@@ -432,6 +427,18 @@ void initialise_ethernet(){
     printf("[ETH] Ethernet module reached!\n");
     ethernet_device_t ed = get_default_ethernet_device();
     if(ed.is_enabled){
+        ethernet_set_link_status(1);
+        dhcp_send(DHCP_DISCOVER);
+        sleep(2000);
+        dhcp_send(DHCP_REQUEST);
+        sleep(2000);
+        dhcp_send(DHCP_REQUEST);
+        sleep(2000);
+        dhcp_send(DHCP_REQUEST);
+        sleep(2000);
+        dhcp_send(DHCP_REQUEST);
+        for(;;);
+
         printf("[ETH] There is a ethernet device present on the system!\n");
         printf("[ETH] Asking DHCP server for our address....\n");
         unsigned char *dhcpid = getIpAddressFromDHCPServer();
@@ -450,19 +457,27 @@ void initialise_ethernet(){
         fillIP((unsigned char*)&our_ip,(unsigned char*)&default_ethernet_device.server_ip);
         printf("[ETH] Server IP %d.%d.%d.%d \n",our_ip[0], our_ip[1], our_ip[2], our_ip[3]);
 
+        
+
+        dhcp_send(DHCP_DISCOVER);
+        sleep(1000);
+        dhcp_send(DHCP_REQUEST);
+        for(;;);
+
         ethernet_set_link_status(1);
 
         // ARP CACHE
         init_arp();
-        sleep(2000);
 
-        unsigned char ip[SIZE_OF_IP] = {192,168,43,1}; //{100,68,106,99};
+       
+        unsigned char ip[SIZE_OF_IP] =  {192,168,43,1};//{100,70,239,249}; {187,101,150,138};
         unsigned int dest_ip = 0;
+        unsigned int src_ip = 0;
         fillIP((unsigned char*)&dest_ip, ip);
+        fillIP((unsigned char*)&src_ip, default_ethernet_device.client_ip);
      
-        char string[] = "Nelson";
-        udp_send( dest_ip, 20001, string, 6);
-
+        char string[] = "Hello Sirius Operating System!\0";
+        udp_send(src_ip, dest_ip, 5000, 20001, string, strlen(string));
     }
 }
 

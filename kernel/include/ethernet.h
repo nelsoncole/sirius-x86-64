@@ -39,6 +39,13 @@ static inline unsigned short htons(unsigned short nb)
     return (nb>>8) | (nb<<8);
 }
 
+static inline unsigned int htonl(unsigned int nb) {
+       return ((nb>>24)&0xff)      |
+              ((nb<<8)&0xff0000)   |
+              ((nb>>8)&0xff00)     |
+              ((nb<<24)&0xff000000);
+}
+
 // DRIVER
 typedef struct _ethernet_device{
     unsigned char mac[6];
@@ -49,7 +56,6 @@ typedef struct _ethernet_device{
     //
     unsigned long send_package;
     unsigned long receive_package;
-    unsigned long receive_package_handler;
 
 }__attribute__((packed)) ethernet_device_t;
 
@@ -98,60 +104,6 @@ struct IPv4Header{
     unsigned int source_addr;
     unsigned int dest_addr;
 } __attribute__ ((packed));
-
-typedef struct __ether_header {
-
-	unsigned char   dst[SIZE_OF_MAC];
-	unsigned char   src[SIZE_OF_MAC];
-	unsigned short  type;
-
-} __attribute__((packed)) ether_header_t;
-
-typedef struct __arp_header{
-    ether_header_t  eh;
-    unsigned short  hardware_type;
-    unsigned short  protocol_type;
-    unsigned char   hardware_size;
-    unsigned char   protocol_size;
-    unsigned short  operation;
-
-    unsigned char   source_mac[SIZE_OF_MAC];
-    unsigned char   source_ip[SIZE_OF_IP];
-
-    unsigned char   dest_mac[SIZE_OF_MAC];
-    unsigned char   dest_ip[SIZE_OF_IP];
-
-} __attribute__ ((packed)) arp_header_t;
-
-typedef struct __arp_cache{
-    unsigned char   mac[SIZE_OF_MAC];
-    unsigned char   ip[SIZE_OF_IP];
-} __attribute__ ((packed)) arp_cache_t;
-extern arp_cache_t arp_cache[1024];
-
-
-
-typedef struct __ipv4_header{
-    ether_header_t  eh;
-    unsigned char   verIhl;
-    unsigned char   tos;
-    unsigned short  len;
-    unsigned short  id;
-    unsigned short  offset;
-    unsigned char   ttl;
-    unsigned char   protocol;
-    unsigned short  checksum;
-    unsigned int    src;
-    unsigned int    dst;
-} __attribute__ ((packed)) ipv4_header_t;
-
-typedef struct __udp_header{
-    unsigned short src_port;
-    unsigned short dst_port;
-    unsigned short length;
-    unsigned short checksum;
-} __attribute__ ((packed)) udp_header_t;
-
 
 struct UDPHeader{
     struct IPv4Header ipv4header;
@@ -221,13 +173,12 @@ void fillDhcpRequestHeader(struct DHCPREQUESTHeader *dhcpheader);
 extern ethernet_device_t default_ethernet_device;
 
 ethernet_package_descriptor_t get_ethernet_package();
-int send_ethernet_package(ethernet_package_descriptor_t desc);
+int send_ethernet_package(const void *buf, size_t size);
 void handler_ethernet_package_received();
 
 void init_e1000(int bus,int slot,int function);
 int int_ethernet();
-void register_ethernet_device(unsigned long send_package,unsigned long receive_package,
-unsigned long receive_package_handler, unsigned char mac[SIZE_OF_MAC]);
+void register_ethernet_device(unsigned long send_package,unsigned long receive_package,unsigned char mac[SIZE_OF_MAC]);
 void initialise_ethernet();
 
 //
@@ -236,13 +187,16 @@ int arp_save_address(unsigned char *ip, unsigned char *mac);
 unsigned char *arp_get_address(unsigned char *mac, unsigned char *ip);
 void arp_request(unsigned char *ip, unsigned char *mac);
 void arp_replay(unsigned char *ip, unsigned char *mac);
-void arp_hexdump(arp_header_t *arp);
 
 
 int ipv4_send(void *buf, unsigned char protocol, unsigned char *mac, unsigned int src_address, unsigned int dst_address, unsigned length);
 unsigned short net_checksum(const unsigned char *data, const unsigned char *end);
 
-int udp_send(unsigned int dst_address, unsigned short dst_port, const void *data, size_t length);
+int udp_send(unsigned int src_address, unsigned int dst_address, unsigned short src_port, unsigned short dst_port, const void *data, size_t length);
+
+
+//
+int dhcp_send(unsigned char message_type);
 
 
 
