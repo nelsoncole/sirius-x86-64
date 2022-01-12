@@ -9,7 +9,7 @@ LD=ld
 
 
 GUI = gui.o compositor.o font8x16.o
-FILE = std.o cfs.o pipe.o
+FILE = std.o cfs.o pipe.o socket.o
 DRIVER = pci.o  i965.o cursor.o acpi.o hpet.o lpc.o pit.o ps2.o mouse.o keyboard.o ahci.o ide.o \
 storage.o rtc.o hda.o speaker.o e1000.o ethernet.o arp.o udp.o ipv4.o dhcp.o
 LIB = string.o vsprintf.o stdio.o stdlib.o

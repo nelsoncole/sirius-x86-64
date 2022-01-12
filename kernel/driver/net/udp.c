@@ -7,6 +7,7 @@
 #include "udp.h"
 #include "ipv4.h"
 
+
 int udp_send(unsigned int src_address, unsigned int dst_address, unsigned short src_port, unsigned short dst_port, const void *data, size_t length)
 {
     unsigned len = sizeof(ipv4_header_t) + sizeof(udp_header_t) + length;
@@ -14,12 +15,18 @@ int udp_send(unsigned int src_address, unsigned int dst_address, unsigned short 
     udp_header_t *udp = (udp_header_t*) (buf + sizeof(ipv4_header_t));
 
     unsigned char mac[SIZE_OF_MAC] ={0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
-   
+
     if(dst_address != 0xFFFFFFFF){
         // get mac
 
-        for(int i=0; i < 4; i++) {
-            if( !arp_get_address(mac, (unsigned char *)&dst_address) ) {
+        for(int i=0; i < 2; i++) {
+            if( !arp_get_address(mac, router_ip) ) {
+
+                if(i == 1) {
+                    printf("ARP request error\n");
+                    free(buf);
+                    return 0; 
+                }
                 // broadcast
                 mac[0] = 0xFF;mac[1] = 0xFF;mac[2] = 0xFF;
                 mac[3] = 0xFF;mac[4] = 0xFF;mac[5] = 0xFF;
@@ -27,13 +34,6 @@ int udp_send(unsigned int src_address, unsigned int dst_address, unsigned short 
                 sleep(1000);
             }else {
                 break;
-            }
-
-            if(i == 3) {
-                for(int t=0; t < 6; t++)printf("%x:",mac[t]);
-                printf("arp request error\n");
-                free(buf);
-                return 0; 
             }
         }
     }else{ 
@@ -55,3 +55,49 @@ int udp_send(unsigned int src_address, unsigned int dst_address, unsigned short 
  
     return length;
 }
+
+
+int udp_receive(void *data, size_t length){
+
+    ethernet_package_descriptor_t prd;
+    ipv4_header_t *hdr;
+
+    while(1){
+        prd = get_ethernet_package();
+        // pooling
+        if(prd.flag) {
+            continue;
+        }
+
+        hdr =(ipv4_header_t*) prd.buf;
+        if(htons(hdr->eh.type) == ET_IPV4) {
+            if(hdr->protocol == IP_PROTOCOL_UDP){
+                break;
+            }
+
+        }
+
+    }
+
+    hdr++;
+    udp_header_t *udp = (udp_header_t*)hdr;
+    udp++;
+    unsigned char *payload = (unsigned char*)udp;
+    udp--;
+
+
+    int len;
+
+    if(htons(udp->length) > length)
+        len = length;
+    else
+        len = htons(udp->length);
+
+    memcpy(data, payload , len);
+
+    return len;    
+}
+
+
+
+

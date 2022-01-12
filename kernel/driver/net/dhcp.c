@@ -8,11 +8,13 @@
 #include "dhcp.h"
 
 
-int dhcp_send(unsigned char message_type)
-{
+const char *string_dhcp_message[9]={
+0,"DHCP DISCOVER", "DHCP OFFER","DHCP REQUEST", "DHCP DECLINE",
+"DHCP ACK", "DHCP NAK", "DHCP RELEASE", "DHCP INFORM"};
 
-    unsigned char yourIP[4] = {192,168,43,251};
-    unsigned char serverID[4] = {192,168,43,1};
+
+int dhcp_send(unsigned char *your_ip, unsigned char *server_ip, unsigned char message_type)
+{
     int opt_size = 0;
     dhcp_header_t *dhcp = (dhcp_header_t*)malloc(sizeof(dhcp_header_t));
 
@@ -57,17 +59,17 @@ int dhcp_send(unsigned char message_type)
             // Requested IP address
             dhcp->options[3] = OPT_REQUESTED_IP_ADDR;
             dhcp->options[4] = SIZE_OF_IP;
-            dhcp->options[5] = yourIP[0];
-            dhcp->options[6] = yourIP[1];
-            dhcp->options[7] = yourIP[2];
-            dhcp->options[8] = yourIP[3];
+            dhcp->options[5] = your_ip[0];
+            dhcp->options[6] = your_ip[1];
+            dhcp->options[7] = your_ip[2];
+            dhcp->options[8] = your_ip[3];
             // Server Identifier
             dhcp->options[9] = OPT_SERVER_ID;
             dhcp->options[10]= SIZE_OF_IP;
-            dhcp->options[11]= serverID[0];
-            dhcp->options[12]= serverID[1];
-            dhcp->options[13]= serverID[2];
-            dhcp->options[14]= serverID[3];
+            dhcp->options[11]= server_ip[0];
+            dhcp->options[12]= server_ip[1];
+            dhcp->options[13]= server_ip[2];
+            dhcp->options[14]= server_ip[3];
             // Parameter Request list 
             dhcp->options[15]= OPT_PARAMETER_REQUEST;
             dhcp->options[16]= 3;
@@ -91,4 +93,64 @@ int dhcp_send(unsigned char message_type)
 
     free(dhcp);
     return len;
+}
+
+
+int dhcp_parse_options(const void *buf){
+    dhcp_header_t *dhcp = (dhcp_header_t *)buf;
+    
+    if(htonl(dhcp->magic_cookie) != 0x63825363) return -1;
+
+    int ip_size;
+    unsigned char opt_type;
+    fillIP((unsigned char*)&our_ip,(unsigned char*)&dhcp->yiaddr);
+    int i =0;
+    while(1){
+        opt_type = dhcp->options[i++];
+        if(/*opt_type == OPT_END ||*/ i >= 308 ) break;
+
+        // GATEWAY
+        if(opt_type == OPT_ROUTER){
+            ip_size = dhcp->options[i++];
+            switch(ip_size){
+                case 4:
+                    fillIP((unsigned char*)&router_ip, (unsigned char*)&dhcp->options[i]);
+                    break;  
+                default:
+                    printf("No IPv4 is %d\n", ip_size);
+                    break;
+            }
+            i += ip_size;
+        }
+       
+        // DNS
+        if(opt_type == OPT_DNS){
+            ip_size = dhcp->options[i++];
+            switch(ip_size){
+                case 4:
+                    fillIP((unsigned char*)&dns_ip, (unsigned char*)&dhcp->options[i]);
+                    break;  
+                default:
+                    printf("No IPv4 is %d\n", ip_size);
+                    break;
+            }
+            i += ip_size;
+        }
+    
+        // DHCP
+        if(opt_type == OPT_SERVER_ID){
+            ip_size = dhcp->options[i++];
+            switch(ip_size){
+                case 4:
+                    fillIP((unsigned char*)&dhcp_ip, (unsigned char*)&dhcp->options[i]);
+                    break;  
+                default:
+                    printf("No IPv4 is %d\n", ip_size);
+                    break;
+            }
+            i += ip_size;
+        }
+    }
+
+    return 0;
 }

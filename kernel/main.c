@@ -32,6 +32,8 @@
 
 #include <ethernet.h>
 
+#include <socket.h>
+
 #define false 0
 #define true 1
 
@@ -120,12 +122,9 @@ void main(unsigned long entry_pointer_info)
 	
 	printf("Sirius OS (Kernel mode: AMD64 or x86_64)\nCPU: %s\n",cpu_name);
 	
-	_stdin = stdin = fopen (0, "stdin");
-	
+	_stdin = stdin = fopen (0, "stdin");	
 	_stdout = stdout = fopen (0, "stdout");
-	
 	_stderr = stderr = fopen (0, "stderr");
-	
 	
 	// TODO drivers de interface
 	printf("Setup drivers de interface ...\\\\\n");
@@ -137,25 +136,32 @@ void main(unsigned long entry_pointer_info)
 	printf("ATA ...\\\\\n"); 
 	ata_initialize();
 
-
-	/* Testing
-    */
-	clears_creen();
-	//setup_hda();
-	int_ethernet();
+    printf("Ethernet ...\\\\\n");
+    int_ethernet_device();
+    
+    // TODO initialize ethernet
     sti();
     initialise_ethernet();
-    for(;;);
+    cli();
+
+	/* Testing
+    
+	clears_creen();
+	//setup_hda();
+    for(;;); */
 	
 	user = (user_t*)malloc(sizeof(user_t));
 	user->mouse = (unsigned long) mouse;
 	user->clock = (unsigned long) clock;
-	
-	cli();
-	
-	printf("Done\n"); 
 
+    //
+    if(init_socket(AF_LOCAL, SOCK_STREAM, 0) < 0){
+        printf("Cannot create socket\n");
+    }
 	
+	cli();	
+	printf("Done\n");
+
 	thread_setup();
 	mult_task = 1;
 	
@@ -222,8 +228,10 @@ void main(unsigned long entry_pointer_info)
 		" pushq %%rax;     		\n"
 		" iretq;				\n"::"D"(entry), "S"(rsp));*/
 		
-	//play_speaker(0x10000);	
-		
+	//play_speaker(0x10000);
+
+
+    // TODO initialize service
 	server(entry_pointer_info);
 	
 		

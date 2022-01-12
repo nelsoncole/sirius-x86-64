@@ -9,7 +9,7 @@ int ipv4_send(void *buf, unsigned char protocol, unsigned char *mac, unsigned in
     // Ethernet header
     fillMac((unsigned char*)&hdr->eh.dst, mac);
     fillMac((unsigned char*)&hdr->eh.src, (unsigned char*)&default_ethernet_device.mac);
-    hdr->eh.type = ETHERNET_TYPE_IP4;
+    hdr->eh.type = htons(ET_IPV4);
 
 
     unsigned len = length + (sizeof(ipv4_header_t) - sizeof(ether_header_t));

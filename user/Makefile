@@ -8,7 +8,7 @@ AS=nasm
 CC=gcc
 LD=ld
 
-sys = file.o cfs.o alloc.o pipe.o path.o
+sys = file.o cfs.o alloc.o pipe.o path.o socket.o
 time = time.o gmtime.o localtime.o strftime.o clock.o
 errno = errno.o 
 stdlib = itoa.o i2hex.o malloc.o calloc.o free.o realloc.o div.o ldiv.o lldiv.o strtol.o atoi.o atol.o strtoul.o\
@@ -96,7 +96,7 @@ NANOJPEG = $(HEADER) nanojpeg.o $(sys) $(GUI) $(LIBC)
 NASM = $(HEADER) $(NASM_OBJS) $(sys) $(GUI) $(LIBC)
 
 .PHONY: all term.bin shell.bin explore.bin editor.bin cat.bin test.bin lua.bin nasm.bin nanojpeg.bin pci.bin png
-all: launcher.bin term.bin shell.bin explore.bin editor.bin cat.bin test.bin nanojpeg.bin pci.bin lua.bin
+all: launcher.bin term.bin shell.bin explore.bin editor.bin cat.bin test.bin nanojpeg.bin pci.bin #lua.bin
 
 launcher.bin: $(LAUNCHER)
 	$(LD) $(LDFLAGS64) -o $@ $^
@@ -133,8 +133,8 @@ test.bin: $(TEST)
 	#rm *.o
 pci.bin: $(PCI)
 	$(LD) $(LDFLAGS64) -o $@ $^
-	#mv *.bin ../bin
-	#rm *.o
+	mv *.bin ../bin
+	rm *.o
 	
 nasm.bin: $(NASM)
 	$(LD) $(LDFLAGS64) -o $@ $^
@@ -199,6 +199,9 @@ lua.bin: $(LUA)
 	$(CC) $(CFLAGS64) -c -o $@ $<
 	
 %.o: lib/sys/%.c
+	$(CC) $(CFLAGS64) -c -o $@ $<
+
+%.o: lib/sys/socket/%.c
 	$(CC) $(CFLAGS64) -c -o $@ $<
 	
 #%.o: lua3/%.c

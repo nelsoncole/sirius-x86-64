@@ -13,8 +13,10 @@
 
 #include <gui.h>
 
+#include <socket.h>
 
-#define SYSCALL_TABLE 15
+
+#define SYSCALL_TABLE 16
 
 unsigned long ret;
 
@@ -168,6 +170,14 @@ void syscall_get_thread_id()
     ret = current_thread->id;
 }
 
+void syscall_create_socket(unsigned long rdi, unsigned long rsi, unsigned long rdx, unsigned long rcx){
+    int domain = (int) rdi;
+    int type = (int) rsi;
+    int protocol =(int) rcx;
+
+    ret = (unsigned long)socket(domain, type, protocol);
+}
+
 
 void *fnvetors_syscall[SYSCALL_TABLE] = {
 	&default_syscall, 	    // 0
@@ -185,6 +195,7 @@ void *fnvetors_syscall[SYSCALL_TABLE] = {
     &syscall_get_pipe_launcher, // 12
     &syscall_get_paint_list, // 13
     &syscall_get_thread_id, // 14
+    &syscall_create_socket, // 15
     
 };
 

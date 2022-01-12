@@ -42,5 +42,7 @@ typedef struct __dhcp_header{
     unsigned char   options[312 - 4];
 } __attribute__ ((packed)) dhcp_header_t;
 
+extern const char *string_dhcp_message[9];
+
 
 #endif

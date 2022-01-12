@@ -24,6 +24,11 @@ ethernet_device_t default_ethernet_device;
 unsigned long package_recieved_ack = 0;
 ethernet_package_descriptor_t default_ethernet_package_descriptor;
 
+unsigned char our_ip[SIZE_OF_IP];
+unsigned char router_ip[SIZE_OF_IP];
+unsigned char dns_ip[SIZE_OF_IP];
+unsigned char dhcp_ip[SIZE_OF_IP];
+
 unsigned short switch_endian16(unsigned short nb) {
     return (nb>>8) | (nb<<8);
 }
@@ -141,14 +146,14 @@ void handler_ethernet_package_received(){
                     data = (char*) udp;
                     data += sizeof(udp_header_t);
 
-                    //memset(buf, 0, 256);
+                    memset(buf, 0, 256);
                     len = htons(udp->length) - sizeof(udp_header_t);
-                    //memcpy(buf, data , len);
+                    memcpy(buf, data , len);
 
                     fillIP(ip, (unsigned char*)&ipv4->src);
                     printf("Client IP address: %d.%d.%d.%d UDP Source Port address: %d,len: %d bytes\n",ip[0],ip[1],ip[2],ip[3],
                     htons(udp->src_port), len);
-                    //printf("Data: %s\n", buf);
+                    printf("Data: %s\n", buf);
                     //fillIP((unsigned char*)&src_ip, default_ethernet_device.client_ip);
                     //udp_send( src_ip, ipv4->src, 5000, htons(udp->src_port), string, 6);
                     break;
@@ -168,7 +173,7 @@ void handler_ethernet_package_received(){
     
 }
 
-int int_ethernet()
+int int_ethernet_device()
 {
     int bus, slot, function;
     unsigned short device, vendor;
@@ -191,7 +196,7 @@ int int_ethernet()
     vendor = data &0xFFFF;
     
     
-    if( (device == 0x100e) || (device == 0x153A) || (device == 0x10EA) /*|| (vendor == 0x8086)*/) {
+    if( (device == 0x100e) || (device == 0x153A) || (device == 0x10EA)) {
         init_e1000( bus, slot, function );
     } else {
         printf("Unknown ethernet device\n");
@@ -213,272 +218,75 @@ void fillIP(unsigned char* to,unsigned char* from){
     }
 }
 
-void fillEthernetHeader(struct EthernetHeader* eh, unsigned char* dest_mac,unsigned short type){
-    fillMac((unsigned char*)&eh->to,dest_mac);
-    fillMac((unsigned char*)&eh->from,(unsigned char*)&default_ethernet_device.mac);
-    eh->type = type;
-}
-
-void fillIpv4Header(struct IPv4Header *ipv4header, unsigned char* destmac, 
-unsigned short length,unsigned char protocol,unsigned int from, unsigned int to){
-    fillEthernetHeader((struct EthernetHeader*)&ipv4header->ethernetheader,destmac,ETHERNET_TYPE_IP4);
-    ipv4header->version = 4;
-    ipv4header->internet_header_length = 5;
-    ipv4header->type_of_service = 0;
-    ipv4header->total_length = switch_endian16( length );
-    ipv4header->id = switch_endian16(1);
-    ipv4header->flags = 0;
-    ipv4header->fragment_offset= 0b01000;
-    ipv4header->time_to_live = 64;
-    ipv4header->protocol = protocol;
-    ipv4header->checksum = 0;
-    ipv4header->source_addr = from;
-    ipv4header->dest_addr = to;
-
-    unsigned long checksum = 0;
-    checksum += 0x4500;
-    checksum += length;
-    checksum += 1;
-    checksum += 0x4000;
-    checksum += 0x4000 + protocol;
-    checksum += switch_endian16((from >> 16) & 0xFFFF);
-    checksum += switch_endian16(from & 0xFFFF); 
-    checksum += switch_endian16((to >> 16) & 0xFFFF);
-    checksum += switch_endian16(to & 0xFFFF);
-    checksum = (checksum >> 16) + (checksum & 0xffff);
-    checksum += (checksum >> 16);
-    ipv4header->checksum = switch_endian16((unsigned short) (~checksum));
-}
-
-void fillUdpHeader(struct UDPHeader *udpheader, unsigned char *destmac, unsigned short size,
-unsigned int from, unsigned int to,unsigned short source_port, unsigned short destination_port){
-    fillIpv4Header((struct IPv4Header*)&udpheader->ipv4header,destmac,size,17,from,to);
-
-    udpheader->length = switch_endian16(size - (sizeof(struct IPv4Header)-sizeof(struct EthernetHeader)));
-    udpheader->destination_port = switch_endian16(destination_port);
-    udpheader->source_port = switch_endian16(source_port);
-
-    unsigned short checksum = 0;
-    udpheader->checksum = checksum;
-}
-
-void fillDhcpDiscoverHeader(struct DHCPDISCOVERHeader *dhcpheader){
-    unsigned char destmac[SIZE_OF_MAC] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
-    unsigned short size = sizeof(struct DHCPDISCOVERHeader) - sizeof(struct EthernetHeader);
-    fillUdpHeader((struct UDPHeader*)&dhcpheader->udpheader,(unsigned char*)&destmac,size,0,0xFFFFFFFF,68,67);
-}
-
-void fillDhcpRequestHeader(struct DHCPREQUESTHeader *dhcpheader){
-    unsigned char destmac[SIZE_OF_MAC] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
-    unsigned short size = sizeof(struct DHCPREQUESTHeader) - sizeof(struct EthernetHeader);
-    fillUdpHeader((struct UDPHeader*)&dhcpheader->udpheader,(unsigned char*)&destmac,size,0,0xFFFFFFFF,68,67);
-}
-
-/*
-`* |-------------------------------------|
- * |Ethernet header (14 bytes)           |
- * |-------------------------------------|
- * |IPv4 header (20 bytes)               |
- * |-------------------------------------|
- * |UDP header (8 bytes)                 |
- * |-------------------------------------|
- * |The DHCP request (300 bytes payload) |
- * |-------------------------------------|
- */
-unsigned char* getIpAddressFromDHCPServer(){
-    struct DHCPDISCOVERHeader *dhcpheader = (struct DHCPDISCOVERHeader *)malloc(sizeof(struct DHCPDISCOVERHeader));
-    dhcpheader->op = 1;
-    dhcpheader->htype = 1;
-    dhcpheader->hlen = 6;
-    dhcpheader->hops = 0;
-    dhcpheader->xid = 0x26F30339;
-    dhcpheader->timing = 0;
-    dhcpheader->flags = switch_endian16(0x8000);
-
-    fillMac((unsigned char*)&dhcpheader->client_mac_addr,(unsigned char*)&default_ethernet_device.mac);
-    dhcpheader->magic_cookie = 0x63538263;
-    // DHCP Message Type
-    dhcpheader->options[0] = 0x35;
-    dhcpheader->options[1] = 0x01;
-    dhcpheader->options[2] = 0x01;
-    // parameter request list
-    dhcpheader->options[3] = 0x37;
-    dhcpheader->options[4] = 0x40;
-    dhcpheader->options[5] = 0xfc;
-    for(unsigned char i = 1 ; i < 0x43 ; i++){
-        dhcpheader->options[5+i] = i;
-    }
-    // dhcpheader->options[68] = 0x00;
-    // ip address lease time
-    dhcpheader->options[69] = 0x33;
-    dhcpheader->options[70] = 0x04;
-    dhcpheader->options[71] = 0x00;
-    dhcpheader->options[72] = 0x00;
-    dhcpheader->options[73] = 0x00;
-    dhcpheader->options[74] = 0x01;
-    // end
-    dhcpheader->options[75] = 0xFF;
-    
-    fillDhcpDiscoverHeader(dhcpheader);
-
-    printf("[ETH] Send DHCP Discover\n");
-    int res_fs = send_ethernet_package(dhcpheader, sizeof(struct DHCPDISCOVERHeader)); // send package
-    if(res_fs){
-        free(dhcpheader);
-
-        printf("Error\n");
-        return 0;
-    }
-
-    ethernet_package_descriptor_t prd;
-    while(1){
-        prd = get_ethernet_package();
-        if(prd.flag) {
-            continue;
-        } 
-        struct EthernetHeader *eh = (struct EthernetHeader*) prd.buf;
-        if(eh->type==ETHERNET_TYPE_IP4){
-            struct DHCPDISCOVERHeader *hd5 = ( struct DHCPDISCOVERHeader*) prd.buf;
-            if(hd5->options[2]==2&&hd5->xid==dhcpheader->xid){
-                break;
-            }
-        } 
-    }
-    printf("[ETH] DHCP Offer\n");
-    struct DHCPDISCOVERHeader *hd = ( struct DHCPDISCOVERHeader*) prd.buf;
-    unsigned char* offeredip = (unsigned char*) &hd->dhcp_offered_machine;
-
-    // Configure IP device
-    // Nelson
-    fillIP((unsigned char*)&default_ethernet_device.client_ip,(unsigned char*)&hd->dhcp_offered_machine);
-    fillIP((unsigned char*)&default_ethernet_device.server_ip,(unsigned char*)&hd->ip_addr_of_dhcp_server);
-
-    free(dhcpheader);
-
-    struct DHCPREQUESTHeader *dhcp2header = (struct DHCPREQUESTHeader *)malloc(sizeof(struct DHCPREQUESTHeader));
-    dhcp2header->op = 1;
-    dhcp2header->htype = 1;
-    dhcp2header->hlen = 6;
-    dhcp2header->hops = 0;
-    dhcp2header->xid = 0x2CF30339;
-    dhcp2header->timing = 0;
-    dhcp2header->flags = switch_endian16(0x8000);
-
-    fillMac((unsigned char*)&dhcp2header->client_mac_addr,(unsigned char*)&default_ethernet_device.mac);
-    dhcp2header->magic_cookie = 0x63538263;
-
-    // DHCP Message Type
-    dhcp2header->options[0] = 0x35;
-    dhcp2header->options[1] = 0x01;
-    dhcp2header->options[2] = 0x03;
-    // Client identifier
-    dhcp2header->options[3] = 0x3d;
-    dhcp2header->options[4] = 0x07;
-    dhcp2header->options[5] = 0x01;
-    fillMac((unsigned char*)(&dhcp2header->options)+6,(unsigned char*)&default_ethernet_device.mac);
-    // Requested IP addr
-    dhcp2header->options[12] = 0x32;
-    dhcp2header->options[13] = 0x04;
-    fillMac((unsigned char*)(&dhcp2header->options)+14,offeredip);
-    // DHCP Server identifier
-    dhcp2header->options[18] = 0x36;
-    dhcp2header->options[19] = 0x04;
-    fillMac((unsigned char*)(&dhcp2header->options)+20,(unsigned char*)&hd->ip_addr_of_dhcp_server);
-    dhcp2header->options[24] = 0xFF;
-
-    fillDhcpRequestHeader(dhcp2header);
-
-    printf("[ETH] Send DHCP Request\n");
-    if( send_ethernet_package(dhcp2header, sizeof(struct DHCPREQUESTHeader)) ) { // send package
-        free(dhcp2header);
-        printf("Error\n");
-        return offeredip;
-    }
-
-    ethernet_package_descriptor_t p3d;
-    while(1){
-        p3d = get_ethernet_package();
-        if(p3d.flag) {
-            continue;
-        }
- 
-        struct EthernetHeader *eh = (struct EthernetHeader*) p3d.buf;
-        if(eh->type==ETHERNET_TYPE_IP4){
-            struct DHCPDISCOVERHeader *hd5 = ( struct DHCPDISCOVERHeader*) p3d.buf;
-            if(hd5->options[2]==5&&hd5->xid==dhcp2header->xid){
-                break;
-            }
-        } 
-    }
-
-    free(dhcp2header);
-
-    return offeredip;
-}
-
-
 
 void initialise_ethernet(){
 
-    unsigned char our_ip[SIZE_OF_IP];
-
+    dhcp_header_t *dhcp = (dhcp_header_t *)malloc(sizeof(dhcp_header_t)); 
     package_recieved_ack = 1;
 
     printf("[ETH] Ethernet module reached!\n");
     ethernet_device_t ed = get_default_ethernet_device();
     if(ed.is_enabled){
-        ethernet_set_link_status(1);
-        dhcp_send(DHCP_DISCOVER);
-        sleep(2000);
-        dhcp_send(DHCP_REQUEST);
-        sleep(2000);
-        dhcp_send(DHCP_REQUEST);
-        sleep(2000);
-        dhcp_send(DHCP_REQUEST);
-        sleep(2000);
-        dhcp_send(DHCP_REQUEST);
-        for(;;);
 
-        printf("[ETH] There is a ethernet device present on the system!\n");
-        printf("[ETH] Asking DHCP server for our address....\n");
-        unsigned char *dhcpid = getIpAddressFromDHCPServer();
-        if(dhcpid){
-            fillIP((unsigned char*)&our_ip,dhcpid);
-            printf("[ETH] DHCP is present\n");
-        }else{
-            printf("[ETH] No DHCP server present here, using static address\n");
-            unsigned char dinges[8] = {0,0,0,0};   
-            fillIP((unsigned char*)&our_ip,(unsigned char*)&dinges);
+        memset(dhcp, 0, sizeof(dhcp_header_t));
+        dhcp_send(our_ip, dhcp_ip, DHCP_DISCOVER);
+        if( udp_receive(dhcp, sizeof(dhcp_header_t)) ){
+            if(htonl(dhcp->magic_cookie) != 0x63825363) {
+                printf("No DHCP\n");
+                for(;;);
+            }
+            printf("%s\n", string_dhcp_message[dhcp->options[2]]);
+            dhcp_parse_options(dhcp);
         }
 
+        printf("Your    IP %d.%d.%d.%d \n",our_ip[0],our_ip[1],our_ip[2],our_ip[3]);
+        printf("Gateway IP %d.%d.%d.%d \n",router_ip[0],router_ip[1],router_ip[2],router_ip[3]);
+        printf("DNS     IP %d.%d.%d.%d \n",dns_ip[0],dns_ip[1],dns_ip[2],dns_ip[3]);
+        printf("DHCP    IP %d.%d.%d.%d \n",dhcp_ip[0],dhcp_ip[1],dhcp_ip[2],dhcp_ip[3]);    
 
-        fillIP((unsigned char*)&our_ip,(unsigned char*)&default_ethernet_device.client_ip);
-        printf("[ETH] Client IP %d.%d.%d.%d \n",our_ip[0], our_ip[1], our_ip[2], our_ip[3]);
-        fillIP((unsigned char*)&our_ip,(unsigned char*)&default_ethernet_device.server_ip);
-        printf("[ETH] Server IP %d.%d.%d.%d \n",our_ip[0], our_ip[1], our_ip[2], our_ip[3]);
+        memset(dhcp, 0, sizeof(dhcp_header_t));
+        dhcp_send(our_ip, dhcp_ip, DHCP_REQUEST);
+        if( udp_receive(dhcp, sizeof(dhcp_header_t)) ){
+            if(htonl(dhcp->magic_cookie) != 0x63825363) {
+                printf("No DHCP\n");
+                free(dhcp);
+                return;
+            }
+
+            if(dhcp->options[2] != DHCP_ACK){
+                printf("%s\n", string_dhcp_message[dhcp->options[2]]);
+                free(dhcp);
+                return;
+            }
+
+            printf("%s\n", string_dhcp_message[dhcp->options[2]]);
+        }
+
+        fillIP((unsigned char*)& default_ethernet_device.client_ip,(unsigned char*)&our_ip);
+        fillIP((unsigned char*)&default_ethernet_device.server_ip,(unsigned char*)&dhcp_ip);
 
         
-
-        dhcp_send(DHCP_DISCOVER);
-        sleep(1000);
-        dhcp_send(DHCP_REQUEST);
-        for(;;);
-
         ethernet_set_link_status(1);
-
-        // ARP CACHE
-        init_arp();
-
-       
-        unsigned char ip[SIZE_OF_IP] =  {192,168,43,1};//{100,70,239,249}; {187,101,150,138};
-        unsigned int dest_ip = 0;
-        unsigned int src_ip = 0;
-        fillIP((unsigned char*)&dest_ip, ip);
-        fillIP((unsigned char*)&src_ip, default_ethernet_device.client_ip);
-     
-        char string[] = "Hello Sirius Operating System!\0";
-        udp_send(src_ip, dest_ip, 5000, 20001, string, strlen(string));
+        free(dhcp);
+    }else {
+            printf("Internet device not found!\n");
+            free(dhcp);
+            return;
     }
+
+    // ARP CACHE
+    init_arp();
+
+    /*    
+    unsigned char ip[SIZE_OF_IP] =  {192,168,43,1};//{192,168,43,1};//{100,70,239,249};
+    unsigned int dest_ip = 0;
+    unsigned int src_ip = 0;
+    fillIP((unsigned char*)&dest_ip, ip);
+    fillIP((unsigned char*)&src_ip, our_ip);
+    char string[] = "Ola Mundo!\0";
+    udp_send(src_ip, dest_ip, 5000, 20001, string, strlen(string)); 
+
+    */
 }
 
 int ethernet_filtr(unsigned char *mac)

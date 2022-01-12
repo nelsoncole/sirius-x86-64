@@ -15,8 +15,8 @@ void init_arp()
     memset(arp_cache, 0, sizeof(arp_cache_t)*1024);
     // ARP breadcast
     printf("[ARP] Breadcast\n");
-    arp_request(default_ethernet_device.server_ip, everyone);
-    sleep(1000);
+    arp_request(router_ip, everyone);
+    sleep(2000);
 }
 
 int arp_save_address(unsigned char *ip, unsigned char *mac)
@@ -128,7 +128,7 @@ void arp_replay(unsigned char *ip, unsigned char *mac)
     // Sender MAC Address
     fillMac(arp->source_mac, default_ethernet_device.mac);
     // Sender IP Address
-    fillIP(arp->source_ip, default_ethernet_device.client_ip);
+    fillIP(arp->source_ip, our_ip);
     // Target MAC Address
     fillMac(arp->dest_mac, mac);
     // Target IP Address
