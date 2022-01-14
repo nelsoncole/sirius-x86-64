@@ -113,17 +113,13 @@ vesa_vbe_mode:
 	 ;ret	
 ;   Define modo de video 
     
-    	xor ebx,ebx
+    xor ebx,ebx
 	mov bx,word[vesa_var0]
-    	or bx, 0x4000
-    	call vbe_define_mode
-    	cmp ax,0x004F
-    	jne vesa_error
-
-
-    	ret
-
-
+    or bx, 0x4000
+    call vbe_define_mode
+    cmp ax,0x004F
+    jne vesa_error
+    ret
 
 
 ; Obtém infos, sobre o cartão VBE

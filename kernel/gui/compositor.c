@@ -329,7 +329,8 @@ void compose()
         // 40 fps
         // o pit deve ser divido por 100 = 10ms
         while( timer_ticks%2 != 0 && 1) {
-            __asm__ __volatile__ ("nop;" :: );
+            __asm__ __volatile__ ("sti; hlt;" :: );
+            __asm__ __volatile__ ("sti; hlt;" :: );
         }
     
         // fazer refresh por segundo quando não houver nenhuma interrupção
@@ -337,6 +338,7 @@ void compose()
         if(!interrupt_status){
 
             while( !interrupt_status && timer_ticks%50 != 0 ){
+                __asm__ __volatile__ ("sti; hlt;" :: );
                 __asm__ __volatile__ ("sti; hlt;" :: );
 
             }

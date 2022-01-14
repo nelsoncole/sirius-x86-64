@@ -11,44 +11,40 @@
 #define SOCK_DGRAM        	2
 #define SOCK_SEQPACKET    	3
 
-struct socket_client
-{
-    int id;
-    int domain;
-    int type;
-    int protocol;
-    unsigned short  address_port;
-    unsigned int    address_ip;
-
-    unsigned char   flags;
-    unsigned int    length;
-    unsigned long   buf;
-
-    struct socket_client *next;
-}__attribute__((packed));
-
-
 struct socket
 {
     int id;
     int domain;
     int type;
     int protocol;
-    unsigned short  address_port;
-    unsigned int    address_ip;
+    unsigned short  src_port;
+    unsigned int    src_ip;
+
+    unsigned short  dest_port;
+    unsigned int    dest_ip;
 
     unsigned char   flags;
-    unsigned int    length;
-    unsigned long   buf;
+    unsigned int    length1;
+    unsigned int    length2;
+    unsigned long   buf1;
+    unsigned long   buf2;
 
     unsigned char   num_client;   
-    struct socket_client *client;
+    struct socket *client;
 
     struct socket *next;
 }__attribute__((packed));
 
+
+extern struct socket *current_saddr, *saddr_ready_queue;
+void socket_server_transmit();
+void socket_server_receive(unsigned int src_ip, unsigned int dest_ip, unsigned short src_port, unsigned short dest_port,
+    const void *buffer, unsigned length);
+
 int init_socket(int domain, int type, int protocol);
 int socket(int domain, int type, int protocol);
+
+
 
 
 

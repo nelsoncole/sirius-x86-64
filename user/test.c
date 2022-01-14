@@ -5,8 +5,6 @@
 #include <stdbool.h>
 #include <gui.h>
 
-#include <sys/socket.h>
-
 extern unsigned long __window;
 
 void swap( int *a, int *b)
@@ -106,14 +104,11 @@ int main(int argc, char **argv) {
 //    DDA_line(400, 100, 500, 300, 0xFFFFFF);
 
 //    DDA_line(400, 100, 600, 300, 0xFFFFFF);
-/*    int x = 100;
+    int x = 100;
     int y = 200;
-    DDA_line(x + 10, y + 300, x, y + 100, 0xFF0000);*/
+    DDA_line(x + 10, y + 300, x, y + 100, 0xFF0000);
 
-    printf("%d\n", socket(AF_LOCAL, SOCK_STREAM, 0));
-    printf("%d\n", socket(AF_INET, SOCK_SEQPACKET, 0));
-    printf("%d\n", socket(AF_INET, SOCK_DGRAM, 0));
-    printf("%d\n", socket(AF_INET, SOCK_STREAM, 0));
+    
 
 	return 0;
 }

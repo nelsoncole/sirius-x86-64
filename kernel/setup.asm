@@ -11,9 +11,6 @@ start:
 	mov rax, (KERNELSTACK - 0x100000) ; - 1MiB
 	mov qword[_rsp0], rax
 	
-	mov rax, APsSTACK
-	mov qword[_ap_stack], rax
-	
 	xor rdi,rdi
 	mov edi,ebx
 	call main
@@ -23,8 +20,8 @@ L1:	hlt
 
 global gdt_flush
 gdt_flush:
-    	mov rax, rdi
-    	lgdt [rax]
+    mov rax, rdi
+    lgdt [rax]
 	
 	;Set IA32_FMASK (flags mask)
 	mov ecx, 0xC0000084
@@ -39,15 +36,13 @@ gdt_flush:
 	; Kernel CS (and kernel DS/SS - 8), user CS
 	mov edx, 0x8 | (0x1B << 16)
 	wrmsr
-	
-    	ret
+	ret
 
 global idt_flush
 idt_flush:
    	mov rax, rdi
-    	lidt [rax]
-
-    	ret
+    lidt [rax]
+    ret
     	
 ; call em x86_64 (RDI, RSI, RDX, RCX, R8 e R9)	
 global call_function
@@ -86,8 +81,8 @@ copymem:
 	
 	loop .loop
 
-    	pop rbx
-    	sti
+    pop rbx
+    sti
 	ret
 	
 [global DisableSSE]
@@ -117,8 +112,6 @@ section .data
 	
 global _rsp0
 _rsp0: dq 0
-global _ap_stack
-_ap_stack: dq 0
 
 section .bss
 	resb 0x20000 ;128KiB

@@ -48,7 +48,7 @@ extern void setup_smp();
 extern void done();
 extern unsigned long gid;
 extern int tmpnam;
-extern int VERBOSE;
+
 int no;
 user_t *user;
 char *syspwd;
@@ -97,7 +97,8 @@ void main(unsigned long entry_pointer_info)
 	setup_acpi();
 	setup_apic();
 	setup_ioapic();
-	
+
+
 	printf("Setup SMP ...\\\\\n"); 
 	setup_smp();
 	
@@ -136,6 +137,7 @@ void main(unsigned long entry_pointer_info)
 	printf("ATA ...\\\\\n"); 
 	ata_initialize();
 
+    clears_creen();
     printf("Ethernet ...\\\\\n");
     int_ethernet_device();
     
@@ -148,7 +150,7 @@ void main(unsigned long entry_pointer_info)
     
 	clears_creen();
 	//setup_hda();
-    for(;;); */
+     for(;;) __asm__ __volatile__("hlt"); */
 	
 	user = (user_t*)malloc(sizeof(user_t));
 	user->mouse = (unsigned long) mouse;
@@ -157,6 +159,7 @@ void main(unsigned long entry_pointer_info)
     //
     if(init_socket(AF_LOCAL, SOCK_STREAM, 0) < 0){
         printf("Cannot create socket\n");
+        for(;;);
     }
 	
 	cli();	
@@ -230,6 +233,7 @@ void main(unsigned long entry_pointer_info)
 		
 	//play_speaker(0x10000);
 
+    VERBOSE = 0;
 
     // TODO initialize service
 	server(entry_pointer_info);

@@ -7,6 +7,8 @@
 
 #include <data.h>
 
+#include <socket.h>
+
 unsigned long thread_id;
 unsigned long server_id[6];
 
@@ -144,6 +146,11 @@ loop:
 			break;
 	}
 
+    // processar socket
+    socket_server_transmit();
+
+    __asm__ __volatile__("sti; hlt;");    
+    __asm__ __volatile__("sti; hlt;");
 	goto loop;
 }
 

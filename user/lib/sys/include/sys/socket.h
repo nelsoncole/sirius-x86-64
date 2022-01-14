@@ -1,27 +1,6 @@
 #ifndef __SOCKET_H
 #define __SOCKET_H
 
-/*
-       SOCK_STREAM     Provides sequenced, reliable, two-way, connection-
-                       based byte streams.  An out-of-band data transmission
-                       mechanism may be supported.
-
-       SOCK_DGRAM      Supports datagrams (connectionless, unreliable
-                       messages of a fixed maximum length).
-
-       SOCK_SEQPACKET  Provides a sequenced, reliable, two-way connection-
-                       based data transmission path for datagrams of fixed
-                       maximum length; a consumer is required to read an
-                       entire packet with each input system call.
-
-       SOCK_RAW        Provides raw network protocol access.
-
-       SOCK_RDM        Provides a reliable datagram layer that does not
-                       guarantee ordering.
-
-       SOCK_PACKET     Obsolete and should not be used in new programs;
-*/
-
 #define SOCK_STREAM       	1
 #define SOCK_DGRAM        	2
 #define SOCK_SEQPACKET    	3
@@ -106,7 +85,11 @@ struct linger
 int bind(int socket, const struct sockaddr *address,
              socklen_t address_len);
 ssize_t recv(int socket, void *buffer, size_t length, int flags);
+ssize_t recvfrom(int socket, void *buffer, size_t length,
+             int flags, struct sockaddr *address, socklen_t *address_len);
 ssize_t send(int socket, const void *message, size_t length, int flags);
+ssize_t sendto(int socket, const void *message, size_t length, int flags,
+             const struct sockaddr *dest_addr, socklen_t dest_len);
 int shutdown(int socket, int how);
 int socket(int domain, int type, int protocol);
 

@@ -1,15 +1,14 @@
 [bits 16]
 [org 0x8000]	
 	jmp 0:code
-
-times 0x8 -($-$$) db 0
+align 16
 spinlock: 	dd 0	
 aprunning: 	dd 0
-stack: 	    dq 0
+stack: 	dq 0
 COPY_GDTR: 	dq 0
 COPY_IDTR: 	dq 0
-PML4E: 	    dq 0
-func_enter: dq 0
+PML4E: 	dq 0
+func_enter: 	dq 0
 
 align 16
 gdt:
@@ -59,6 +58,7 @@ start32:
     	
     xor	    ebp, ebp
     mov 	esp, dword[stack]
+    	
     	
     lock    inc dword[aprunning]
     	
@@ -118,7 +118,14 @@ start32:
 	
 	mov 	eax, 12345
 	mov 	dword[0xFEE00000 + 0x380], eax
-	  	    	
+	  	
+    	    	
+; spinlock, wait for the BSP to finish
+.loop:  
+	pause
+    cmp 	byte[spinlock], 0 
+    jz      .loop
+    	
 	; PAE
 	mov 	eax, cr4
     or	    eax, 0x20	
@@ -143,7 +150,7 @@ start32:
 	jmp 8:start64
 align 16	
 [bits 64]
-start64: 
+start64:
 
 	xor 	rax, rax
 	mov 	ds, ax
@@ -153,8 +160,8 @@ start64:
     mov 	ss, ax
    
     ; carregar o stack
-	;xor 	rbp, rbp
-    ;mov	    rsp, qword[stack]
+	xor 	rbp, rbp
+    mov	    rsp, qword[stack]
 	
 	
 	mov	rax, qword[COPY_GDTR]
@@ -204,12 +211,7 @@ start64:
 	mov rax, cr0
 	and ax, ~(1 << 3)	; Clear TS
 	mov cr0, rax
-
- ; spinlock, wait for the BSP to finish
-;.loop:  
-;	pause
-;    cmp 	byte[spinlock], 0 
-;    jz      .loop
+ 
     
     sti
 L1:	

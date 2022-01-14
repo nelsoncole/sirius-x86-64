@@ -16,7 +16,7 @@ void init_arp()
     // ARP breadcast
     printf("[ARP] Breadcast\n");
     arp_request(router_ip, everyone);
-    sleep(2000);
+    sleep(1000);
 }
 
 int arp_save_address(unsigned char *ip, unsigned char *mac)

@@ -19,10 +19,10 @@ int udp_send(unsigned int src_address, unsigned int dst_address, unsigned short 
     if(dst_address != 0xFFFFFFFF){
         // get mac
 
-        for(int i=0; i < 2; i++) {
+        for(int i=0; i < 4; i++) {
             if( !arp_get_address(mac, router_ip) ) {
 
-                if(i == 1) {
+                if(i == 3) {
                     printf("ARP request error\n");
                     free(buf);
                     return 0; 

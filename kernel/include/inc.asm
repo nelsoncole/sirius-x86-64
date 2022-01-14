@@ -1,5 +1,4 @@
 KERNELSTACK 	equ 0x01400000
-APsSTACK 	equ 0x02000000 - 8
 
 
 %macro SAVE_GPR 1

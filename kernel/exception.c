@@ -101,6 +101,8 @@ void fault_exception(int  n)
 
 	unsigned long cr2,cr3,cr4;
 	puts(exception_mensagem[n]);
+
+    VERBOSE = 1;
 	
 
 	if(n == 14)

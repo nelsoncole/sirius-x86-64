@@ -31,18 +31,13 @@ isr_jmp:
 	push rdx
 	push rcx
 	push rax
-      	
-    ;PUSH_FPU
-	;PUSH_XMM
+
 	fxsave [SavedFloats2]
-	
 	
 	mov rdi, [rsp + 0x90]
 	
 	call fault_exception
-	
-	;POP_XMM
-	;POP_FPU
+
 	fxrstor [SavedFloats2]
 
 	pop rax
@@ -221,16 +216,11 @@ lvt_jmp:
 	push rcx
 	push rax
       	
-      
-    ;PUSH_FPU
-	;PUSH_XMM
 	;fxsave [SavedFloats2]
 	
 	mov rdi, [rsp + 0x90]
 	call lvt_function
-	
-	;POP_XMM
-	;POP_FPU
+
 	;fxrstor [SavedFloats2]
 
 	pop rax
@@ -278,17 +268,11 @@ lvt_jmp2:
 	push rcx
 	push rax
       	
- 	;PUSH_FPU
-	;PUSH_XMM
 	;fxsave [SavedFloats2]
 
-	
-	
 	mov rdi, [rsp + 0x90]
 	call lvt_function
-	
-	;POP_XMM
-	;POP_FPU
+
 	;fxrstor [SavedFloats2]
 
 	pop rax
@@ -638,17 +622,12 @@ irq_jmp:
 	push rdx
 	push rcx
 	push rax
-      	
-      	
-   	;PUSH_FPU
-	;PUSH_XMM
+
 	;fxsave [SavedFloats2]
 	
 	mov rdi, [rsp + 0x90]
 	call irq_function
-	
-	;POP_XMM
-	;POP_FPU
+
 	;fxrstor [SavedFloats2]
 
 	pop rax
@@ -794,6 +773,123 @@ irq23:
 	push qword 0
 	push qword 87 
 	jmp irq_jmp
+
+
+global intr255
+extern intr_function
+intr_jmp:
+
+	push gs
+	push fs
+	
+	push r15
+	push r14
+	push r13
+	push r12
+	push r11
+	push r10
+	push r9
+	push r8
+	push rdi
+	push rsi
+	push rbp
+	push rsp
+	push rbx
+	push rdx
+	push rcx
+	push rax
+      	
+	fxsave [SavedFloats2]
+	
+	mov rdi, [rsp + 0x90]
+	
+	call intr_function
+	
+	fxrstor [SavedFloats2]
+
+	pop rax
+	pop rcx
+	pop rdx
+	pop rbx
+	pop rsp
+	pop rbp
+	pop rsi
+	pop rdi
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+	pop r12
+	pop r13
+	pop r14
+	pop r15
+	
+	pop fs
+	pop gs
+	
+	
+	add rsp, 16
+	iretq
+
+intr255:
+	push qword 0
+	push qword 255
+	jmp intr_jmp
+
+
+global intr_null
+extern intr_null_function
+intr_null:
+	push gs
+	push fs
+	
+	push r15
+	push r14
+	push r13
+	push r12
+	push r11
+	push r10
+	push r9
+	push r8
+	push rdi
+	push rsi
+	push rbp
+	push rsp
+	push rbx
+	push rdx
+	push rcx
+	push rax
+      	
+	fxsave [SavedFloats2]
+	
+	mov rdi, [rsp + 0x90]
+	
+	call intr_null_function
+	
+	fxrstor [SavedFloats2]
+
+	pop rax
+	pop rcx
+	pop rdx
+	pop rbx
+	pop rsp
+	pop rbp
+	pop rsi
+	pop rdi
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+	pop r12
+	pop r13
+	pop r14
+	pop r15
+	
+	pop fs
+	pop gs
+	
+	iretq
+
 	
 segment .data
 global SavedFloats

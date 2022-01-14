@@ -43,6 +43,7 @@ mout_vhd:
 	./fs -g bmp/file.bmp disk.vhd
 	./fs -g bmp/text.bmp disk.vhd
 	./fs -g bin/test.bin disk.vhd
+	./fs -g bin/chat.bin disk.vhd
 	./fs -g bin/pci.bin disk.vhd
 	./fs -g bin/cat.bin disk.vhd
 	./fs -g bin/lua.bin disk.vhd
@@ -65,7 +66,7 @@ clean:
 
 test:
 	qemu-system-x86_64 -m 512 \
-	-smp 2 -s -machine q35 -enable-kvm -cpu host -drive file=disk.vhd,format=raw,bus=0 \
+	-smp 4 -s -machine q35 -enable-kvm -cpu host -drive file=disk.vhd,format=raw,bus=0 \
 	-device ich9-intel-hda -device hda-duplex -net nic,model=e1000 -net user
 test2:
 	qemu-system-x86_64 -smp 2 -m 512 \

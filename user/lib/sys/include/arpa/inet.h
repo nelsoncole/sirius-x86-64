@@ -28,11 +28,11 @@ static inline unsigned int ntohl(unsigned int nb) {
 }
 
 
-extern in_addr_t	inet_addr(const char *cp);
-extern in_addr_t	inet_lnaof(struct in_addr in);
-extern struct in_addr	inet_makeaddr(in_addr_t net, in_addr_t lna);
-extern in_addr_t	inet_netof(struct in_addr in);
-extern in_addr_t	inet_network(const char *cp);
-extern char	*inet_ntoa(struct in_addr in);
+in_addr_t	inet_addr(const char *cp);
+in_addr_t	inet_lnaof(struct in_addr in);
+struct in_addr	inet_makeaddr(in_addr_t net, in_addr_t lna);
+in_addr_t	inet_netof(struct in_addr in);
+in_addr_t	inet_network(const char *cp);
+char	*inet_ntoa(struct in_addr in);
 
 #endif

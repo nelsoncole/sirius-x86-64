@@ -21,7 +21,7 @@ static void loop(WINDOW *w);
 
 void main() {
 	
-	WINDOW *w = window("@~Terminal",100, 20, 500, 480, 0x1f1f2f, 0x80101020, 0xFFFFFF, 0x10);
+	WINDOW *w = window("@~Terminal",100, 20, 500, 400, 0x1f1f2f, 0x80101020, 0xFFFFFF, 0x10);
 
     w->style |= 0x80000000; 
 	

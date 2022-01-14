@@ -12,13 +12,12 @@
 #include <string.h>
 #include <sleep.h>
 
+#include <socket.h>
+
 #include "udp.h"
 #include "ipv4.h"
 #include "arp.h"
 #include "dhcp.h"
-
-
-int ethernet_filtr(unsigned char *mac);
 
 ethernet_device_t default_ethernet_device;
 unsigned long package_recieved_ack = 0;
@@ -28,17 +27,6 @@ unsigned char our_ip[SIZE_OF_IP];
 unsigned char router_ip[SIZE_OF_IP];
 unsigned char dns_ip[SIZE_OF_IP];
 unsigned char dhcp_ip[SIZE_OF_IP];
-
-unsigned short switch_endian16(unsigned short nb) {
-    return (nb>>8) | (nb<<8);
-}
-
-unsigned int switch_endian32(unsigned int nb) {
-       return ((nb>>24)&0xff)      |
-              ((nb<<8)&0xff0000)   |
-              ((nb>>8)&0xff00)     |
-              ((nb<<24)&0xff000000);
-   }
 
 ethernet_device_t get_default_ethernet_device(){
     return default_ethernet_device;
@@ -86,11 +74,8 @@ void handler_ethernet_package_received(){
     ipv4_header_t *ipv4;
     udp_header_t *udp;
 
-    char buf[256];
     char *data;
     int len;
-    unsigned int src_ip = 0;
-    char string[] = "Nelson";
 
     unsigned char mac[SIZE_OF_MAC] = {0x00,0x00,0x00,0x00,0x00,0x00};
     unsigned char ip[SIZE_OF_IP] = {0,0,0,0};
@@ -127,10 +112,6 @@ void handler_ethernet_package_received(){
             }   
             break;
         case ET_IPV4:
-            /*
-            if( ethernet_filtr( eh->dst) ){
-                return;
-            }*/
 
             ipv4 = (ipv4_header_t*) prd.buf;
             switch( ipv4->protocol){
@@ -146,16 +127,19 @@ void handler_ethernet_package_received(){
                     data = (char*) udp;
                     data += sizeof(udp_header_t);
 
-                    memset(buf, 0, 256);
                     len = htons(udp->length) - sizeof(udp_header_t);
+
+                    socket_server_receive( ipv4->src, ipv4->dst, udp->src_port, udp->dst_port, data, len);
+                    /*
+                    memset(buf, 0, 256);
                     memcpy(buf, data , len);
 
                     fillIP(ip, (unsigned char*)&ipv4->src);
                     printf("Client IP address: %d.%d.%d.%d UDP Source Port address: %d,len: %d bytes\n",ip[0],ip[1],ip[2],ip[3],
                     htons(udp->src_port), len);
-                    printf("Data: %s\n", buf);
-                    //fillIP((unsigned char*)&src_ip, default_ethernet_device.client_ip);
-                    //udp_send( src_ip, ipv4->src, 5000, htons(udp->src_port), string, 6);
+                    printf("UDP Destination Port address: %d\n", htons(udp->dst_port));
+                    printf("Data: %s\n", buf); */
+                
                     break;
                 default:
                     printf("IPv4 UNKNOWN %x\n", ipv4->protocol );
@@ -277,7 +261,7 @@ void initialise_ethernet(){
     // ARP CACHE
     init_arp();
 
-    /*    
+    /*  
     unsigned char ip[SIZE_OF_IP] =  {192,168,43,1};//{192,168,43,1};//{100,70,239,249};
     unsigned int dest_ip = 0;
     unsigned int src_ip = 0;
@@ -285,19 +269,5 @@ void initialise_ethernet(){
     fillIP((unsigned char*)&src_ip, our_ip);
     char string[] = "Ola Mundo!\0";
     udp_send(src_ip, dest_ip, 5000, 20001, string, strlen(string)); 
-
-    */
-}
-
-int ethernet_filtr(unsigned char *mac)
-{
-    if((default_ethernet_device.mac[0] == mac[0]) && (default_ethernet_device.mac[1] == mac[1])\
-    && (default_ethernet_device.mac[2] == mac[2]) && (default_ethernet_device.mac[3] == mac[3])\
-    && (default_ethernet_device.mac[4] == mac[4]) && (default_ethernet_device.mac[5] == mac[5])){
-
-        return 0;
-    }
-
-    
-    return -1;
+    for(;;); */
 }
