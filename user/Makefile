@@ -8,7 +8,8 @@ AS=nasm
 CC=gcc
 LD=ld
 
-sys = file.o cfs.o alloc.o pipe.o path.o socket.o inet.o
+net = dns.o
+sys = file.o cfs.o alloc.o pipe.o path.o socket.o inet.o $(net)
 time = time.o gmtime.o localtime.o strftime.o clock.o
 errno = errno.o 
 stdlib = itoa.o i2hex.o malloc.o calloc.o free.o realloc.o div.o ldiv.o lldiv.o strtol.o atoi.o atol.o strtoul.o\
@@ -212,6 +213,9 @@ lua.bin: $(LUA)
 	$(CC) $(CFLAGS64) -c -o $@ $<
 
 %.o: lib/sys/arpa/%.c
+	$(CC) $(CFLAGS64) -c -o $@ $<
+
+%.o: lib/sys/net/%.c
 	$(CC) $(CFLAGS64) -c -o $@ $<
 	
 #%.o: lua3/%.c

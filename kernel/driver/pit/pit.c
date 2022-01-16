@@ -1,7 +1,7 @@
 #include <pit.h>
 #include <io.h>
 #include <irq.h>
-
+#include <ethernet.h>
 unsigned long timer_ticks;
 unsigned long eticks;
 
@@ -13,7 +13,7 @@ static void pit_handler()
 	if(eticks)--eticks;
 	
 	rtc_handler();
-
+    //handler_ethernet_package_received();
 }
 
 void pit_set_frequencia(unsigned int freq)

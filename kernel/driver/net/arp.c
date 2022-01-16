@@ -11,7 +11,7 @@ arp_cache_t arp_cache[1024];
 void init_arp()
 {
     unsigned char everyone[SIZE_OF_MAC] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
-
+    //unsigned char ip[4]={208,67,222,222};
     memset(arp_cache, 0, sizeof(arp_cache_t)*1024);
     // ARP breadcast
     printf("[ARP] Breadcast\n");
@@ -74,8 +74,8 @@ void arp_request(unsigned char *ip, unsigned char *mac)
     unsigned char empty[SIZE_OF_MAC] = {0x00,0x00,0x00,0x00,0x00,0x00};
 
     // Ethernet header
-    fillMac((unsigned char*)&arp->eh.dst, mac);
-    fillMac((unsigned char*)&arp->eh.src, (unsigned char*)&default_ethernet_device.mac);
+    fillMac(arp->eh.dst, mac);
+    fillMac(arp->eh.src, default_ethernet_device.mac);
     arp->eh.type = htons(ET_ARP);
 
     // arp header
@@ -91,7 +91,7 @@ void arp_request(unsigned char *ip, unsigned char *mac)
     // Sender MAC Address
     fillMac(arp->source_mac, default_ethernet_device.mac);
     // Sender IP Address
-    fillIP(arp->source_ip, default_ethernet_device.client_ip);
+    fillIP(arp->source_ip, our_ip);
     // Target MAC Address
     fillMac(arp->dest_mac, empty);
     // Target IP Address
@@ -109,10 +109,9 @@ void arp_request(unsigned char *ip, unsigned char *mac)
 void arp_replay(unsigned char *ip, unsigned char *mac)
 {
     arp_header_t *arp = (arp_header_t*) malloc(sizeof(arp_header_t));
-
     // Ethernet header
-    fillMac((unsigned char*)&arp->eh.dst, mac);
-    fillMac((unsigned char*)&arp->eh.src, (unsigned char*)&default_ethernet_device.mac);
+    fillMac(arp->eh.dst, mac);
+    fillMac(arp->eh.src,default_ethernet_device.mac);
     arp->eh.type = htons(ET_ARP);
 
     // arp header
@@ -133,6 +132,41 @@ void arp_replay(unsigned char *ip, unsigned char *mac)
     fillMac(arp->dest_mac, mac);
     // Target IP Address
     fillIP(arp->dest_ip, ip);
+
+    // send package
+    if( send_ethernet_package(arp, sizeof( arp_header_t )) ){
+        printf("[ETH] ARP replay error\n");
+    }
+
+    free(arp);
+}
+
+void arp_replay2(unsigned char *src_ip, unsigned char *dest_ip, unsigned char *dest_mac)
+{
+    arp_header_t *arp = (arp_header_t*) malloc(sizeof(arp_header_t));
+    // Ethernet header
+    fillMac(arp->eh.dst, dest_mac);
+    fillMac(arp->eh.src,default_ethernet_device.mac);
+    arp->eh.type = htons(ET_ARP);
+
+    // arp header
+    arp->hardware_type = htons(0x0001);
+    arp->protocol_type = htons(ET_IPV4);
+    //Hardware address length (MAC)
+    arp->hardware_size = 6;
+    //Protocol address length (IP)    
+    arp->protocol_size = 4;
+    // Replay (2)
+    arp->operation = htons(ARP_OPC_REPLY);
+
+    // Sender MAC Address
+    fillMac(arp->source_mac, default_ethernet_device.mac);
+    // Sender IP Address
+    fillIP(arp->source_ip, src_ip);
+    // Target MAC Address
+    fillMac(arp->dest_mac, dest_mac);
+    // Target IP Address
+    fillIP(arp->dest_ip, dest_ip);
 
     // send package
     if( send_ethernet_package(arp, sizeof( arp_header_t )) ){

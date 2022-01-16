@@ -12,12 +12,17 @@
 #include <string.h>
 #include <sleep.h>
 
+#include <io.h>
+
 #include <socket.h>
 
 #include "udp.h"
 #include "ipv4.h"
 #include "arp.h"
 #include "dhcp.h"
+
+
+ethernet_package_descriptor_t packege_desc_buffer[32];
 
 ethernet_device_t default_ethernet_device;
 unsigned long package_recieved_ack = 0;
@@ -49,8 +54,8 @@ void register_ethernet_device(unsigned long send_package,unsigned long receive_p
     }
 }
 
-ethernet_package_descriptor_t get_ethernet_package(){
-    ethernet_package_descriptor_t (*get_package)() = (void*)default_ethernet_device.receive_package;
+ethernet_package_descriptor_t *get_ethernet_package(){
+    ethernet_package_descriptor_t *(*get_package)() = (void*)default_ethernet_device.receive_package;
     return get_package();
 }
 
@@ -63,7 +68,6 @@ int send_ethernet_package(const void *buf, size_t size){
 
     return send_package(desc);
 }
-
 
 void handler_ethernet_package_received(){
 
@@ -79,28 +83,39 @@ void handler_ethernet_package_received(){
 
     unsigned char mac[SIZE_OF_MAC] = {0x00,0x00,0x00,0x00,0x00,0x00};
     unsigned char ip[SIZE_OF_IP] = {0,0,0,0};
+    unsigned char target_ip[SIZE_OF_IP] = {0,0,0,0};
 
     package_recieved_ack = 0;
 
-    ethernet_package_descriptor_t prd;
+    ethernet_package_descriptor_t *prd;
     prd = get_ethernet_package();
 
-    if(prd.buf == 0 || prd.buffersize == 0) return;
-    
+    int count = (int) prd->count;
 
-    eh = (ether_header_t*) prd.buf;
-    
+loop:
+
+    if(prd->buf == 0 || prd->buffersize == 0) return;
+
+    eh = (ether_header_t*) prd->buf;
+    arp = (arp_header_t*) prd->buf;
+
     switch( htons(eh->type) ){
         case ET_ARP:
-            arp = (arp_header_t*) prd.buf;
+            arp = (arp_header_t*) prd->buf;
             fillMac(mac, arp->source_mac);
             fillIP(ip, arp->source_ip);
-
+            fillIP(target_ip, arp->dest_ip);
             switch( htons(arp->operation) ){
                 case ARP_OPC_REQUEST:
                     printf("ARP REQUEST\n");
                     arp_save_address( ip, mac);
-                    arp_replay(ip, mac);
+                    arp_replay2(target_ip, ip, mac);
+                    //arp_request(ip, mac);
+                    //repaly packet
+                    if((ipv4_cache->dst == *(unsigned int*)target_ip) && (ipv4_cache->checksum != 0)){
+                        send_ethernet_package( ipv4_cache, htons(ipv4_cache->len) + sizeof(ether_header_t));
+                        ipv4_cache->checksum = 0;
+                    }
                     break;
                 case ARP_OPC_REPLY:
                     printf("ARP REPLAY\n");
@@ -112,8 +127,7 @@ void handler_ethernet_package_received(){
             }   
             break;
         case ET_IPV4:
-
-            ipv4 = (ipv4_header_t*) prd.buf;
+            ipv4 = (ipv4_header_t*) prd->buf;
             switch( ipv4->protocol){
                 case IP_PROTOCOL_ICMP:
                     printf("IPv4 ICMP\n");
@@ -123,7 +137,7 @@ void handler_ethernet_package_received(){
                     break;
                 case IP_PROTOCOL_UDP:
                     printf("IPv4 UDP\n");
-                    udp = (udp_header_t*) ((unsigned long)prd.buf + sizeof(ipv4_header_t));
+                    udp = (udp_header_t*) ((unsigned long)prd->buf + sizeof(ipv4_header_t));
                     data = (char*) udp;
                     data += sizeof(udp_header_t);
 
@@ -139,6 +153,10 @@ void handler_ethernet_package_received(){
                     htons(udp->src_port), len);
                     printf("UDP Destination Port address: %d\n", htons(udp->dst_port));
                     printf("Data: %s\n", buf); */
+
+               
+    
+           
                 
                     break;
                 default:
@@ -154,7 +172,11 @@ void handler_ethernet_package_received(){
             printf("Packege Receive: ethernet type =%x\n", htons(eh->type) );
             break;
     }
-    
+
+    prd++;
+    count--;
+
+    if(count > 0) goto loop;
 }
 
 int int_ethernet_device()
@@ -205,8 +227,11 @@ void fillIP(unsigned char* to,unsigned char* from){
 
 void initialise_ethernet(){
 
+    ipv4_cache = (ipv4_header_t *)malloc(0x10000); // 64KiB
     dhcp_header_t *dhcp = (dhcp_header_t *)malloc(sizeof(dhcp_header_t)); 
     package_recieved_ack = 1;
+
+    memset(ipv4_cache, 0, 0x10000);
 
     printf("[ETH] Ethernet module reached!\n");
     ethernet_device_t ed = get_default_ethernet_device();

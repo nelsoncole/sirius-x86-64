@@ -15,9 +15,11 @@ int udp_send(unsigned int src_address, unsigned int dst_address, unsigned short 
     udp_header_t *udp = (udp_header_t*) (buf + sizeof(ipv4_header_t));
 
     unsigned char mac[SIZE_OF_MAC] ={0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
-
+    
     if(dst_address != 0xFFFFFFFF){
         // get mac
+        /*arp_request((unsigned char*)&dst_address, mac);
+        sleep(2000);*/
 
         for(int i=0; i < 4; i++) {
             if( !arp_get_address(mac, router_ip) ) {
@@ -59,17 +61,17 @@ int udp_send(unsigned int src_address, unsigned int dst_address, unsigned short 
 
 int udp_receive(void *data, size_t length){
 
-    ethernet_package_descriptor_t prd;
+    ethernet_package_descriptor_t *prd;
     ipv4_header_t *hdr;
 
     while(1){
         prd = get_ethernet_package();
         // pooling
-        if(prd.flag) {
+        if(prd->flag) {
             continue;
         }
 
-        hdr =(ipv4_header_t*) prd.buf;
+        hdr =(ipv4_header_t*) prd->buf;
         if(htons(hdr->eh.type) == ET_IPV4) {
             if(hdr->protocol == IP_PROTOCOL_UDP){
                 break;

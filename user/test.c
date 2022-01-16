@@ -99,16 +99,19 @@ void DDA_line(int x0, int y0, int x1, int y1, unsigned int color )
     }
 }
 
+
+extern unsigned char* get_ip_from_name(const char *name , int query_type);
+
 int main(int argc, char **argv) {
 
 //    DDA_line(400, 100, 500, 300, 0xFFFFFF);
 
 //    DDA_line(400, 100, 600, 300, 0xFFFFFF);
-    int x = 100;
+/*    int x = 100;
     int y = 200;
-    DDA_line(x + 10, y + 300, x, y + 100, 0xFF0000);
+    DDA_line(x + 10, y + 300, x, y + 100, 0xFF0000); */
 
-    
+    get_ip_from_name("www.google.com", 1);
 
 	return 0;
 }

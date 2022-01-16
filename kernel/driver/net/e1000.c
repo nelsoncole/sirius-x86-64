@@ -19,7 +19,7 @@ struct e1000_rx_memory rx_memory;
 struct e1000_rx_memory tx_memory;
 
 int e1000_send_package(ethernet_package_descriptor_t desc);
-ethernet_package_descriptor_t e1000_recieve_package();
+ethernet_package_descriptor_t *e1000_recieve_package();
 
 
 unsigned int e1000_read_command(unsigned short addr){
@@ -55,6 +55,7 @@ void e1000_link_up(){
 }
 
 void irq_e1000(){
+    
 	//printf("[E1000] Interrupt detected\n");
     e1000_write_command(REG_IMASK, 0x1);
     unsigned int to = e1000_read_command(0xC0);
@@ -76,7 +77,6 @@ void irq_e1000(){
     }else{
         printf("[E1000] Unknown interrupt: %x !\n",to);
     }
-   
 }
 
 void init_e1000(int bus,int slot,int function){
@@ -141,7 +141,8 @@ void init_e1000(int bus,int slot,int function){
         mac_address[4] = ((data & 0x000000FF)>>0) & 0xFF;
         mac_address[5] = ((data & 0x0000FF00)>>8) & 0xFF;
     }
-    printf("[E1000] MAC: %x:%x:%x:%x:%x:%x \n",mac_address[0],mac_address[1],mac_address[2],mac_address[3],mac_address[4],mac_address[5]);
+    printf("[E1000] MAC: %x:%x:%x:%x:%x:%x \n",mac_address[0],mac_address[1],
+    mac_address[2],mac_address[3],mac_address[4],mac_address[5]);
 
 
     // Habilitar o PCI Busmastering DMA
@@ -263,41 +264,44 @@ int e1000_send_package(ethernet_package_descriptor_t desc){
 
     e1000_write_command(REG_TXDESCTAIL, tx_cur);
 
-    int  nop = 0;
     while(!(tx_descs[old_cur]->status & 0xff)){
-        nop++;
+        __asm__ __volatile__("pause;");
     }     
    
     return 0;
 }
 
-ethernet_package_descriptor_t e1000_recieve_package(){
-    ethernet_package_descriptor_t desc;
+ethernet_package_descriptor_t *e1000_recieve_package(){
+    ethernet_package_descriptor_t *desc = (ethernet_package_descriptor_t *)&packege_desc_buffer;
 
-    desc.flag = -1;
-    desc.buffersize = 0;
-    desc.buf = (void*)0;
-    
-    /*for(int i = 0 ; i < E1000_NUM_RX_DESC; i++){
+    ethernet_package_descriptor_t *first_desc = desc; 
+
+    desc->flag = -1;
+    desc->count = 0;
+    desc->buffersize = 0;
+    desc->buf = (void*)0;
+    /*
+    for(int i = 0 ; i < E1000_NUM_RX_DESC; i++){
 
         if((rx_descs[i]->status & 0x1))
         {
             unsigned long long addr = rx_memory.start + (rx_memory.blocksize*i);
             unsigned short len = rx_descs[i]->length;
 
-            desc.buffersize = len;
-            desc.buf = (void*) addr;
-            
-            desc.flag = 0;
+            desc->buffersize = len;
+            desc->buf = (void*) addr;
+
+            desc->flag = 0;
 
             rx_descs[i]->status &= ~1;
             e1000_write_command(REG_RXDESCTAIL, i );
-            return desc;
+            first_desc->count++;
+            desc++;
         }
     }
 
-    return desc; */
-
+    return first_desc;*/
+    
     unsigned char old_cur;
  
     while( (rx_descs[rx_cur]->status & 0x1) )
@@ -308,14 +312,18 @@ ethernet_package_descriptor_t e1000_recieve_package(){
         unsigned long long addr = rx_memory.start + (rx_memory.blocksize*old_cur);
         unsigned short len = rx_descs[old_cur]->length;
 
-        desc.buffersize = len;
-        desc.buf = (void*) addr;
+        desc->buffersize = len;
+        desc->buf = (void*) addr;
 
-        desc.flag = 0;
+        desc->flag = 0;
 
         rx_descs[old_cur]->status &= ~1;
         e1000_write_command(REG_RXDESCTAIL, old_cur);
+
+        first_desc->count++;
+
+        desc++;
     }
 
-    return desc;
+    return first_desc;
 }

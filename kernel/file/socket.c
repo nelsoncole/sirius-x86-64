@@ -10,11 +10,11 @@
 
 int socket_next_id;
 
-
+static unsigned short port;
 struct socket *current_saddr, *saddr_ready_queue;
 
 int init_socket(int domain, int type, int protocol){
-
+    port = 1024;
     current_saddr = saddr_ready_queue = 0;
     socket_next_id = 1;
     
@@ -96,6 +96,11 @@ void socket_server_transmit(){
 
                 if(!src_ip) {
                     fillIP((unsigned char*)&src_ip, our_ip);
+                }
+
+                if(!src_port) {
+                    if(port < 1024) port = 1024;
+                    src_port = current_saddr->src_port = htons(port++);
                 }
 
                 switch(current_saddr->type){

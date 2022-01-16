@@ -17,7 +17,9 @@ typedef struct __ipv4_header{
     unsigned short  checksum;
     unsigned int    src;
     unsigned int    dst;
+
 } __attribute__ ((packed)) ipv4_header_t;
 
+extern ipv4_header_t *ipv4_cache;
 
 #endif

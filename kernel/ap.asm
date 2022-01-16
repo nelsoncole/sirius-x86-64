@@ -206,10 +206,10 @@ start64:
 	mov cr0, rax
 
  ; spinlock, wait for the BSP to finish
-;.loop:  
-;	pause
-;    cmp 	byte[spinlock], 0 
-;    jz      .loop
+.loop:  
+	pause
+    cmp 	byte[spinlock], 0 
+    jz      .loop
     
     sti
 L1:	

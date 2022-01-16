@@ -1,6 +1,10 @@
 #include <ethernet.h>
+#include <string.h>
 
 #include "ipv4.h"
+
+
+ipv4_header_t *ipv4_cache;
 
 int ipv4_send(void *buf, unsigned char protocol, unsigned char *mac, unsigned int src_address, unsigned int dst_address, unsigned length)
 {
@@ -44,6 +48,8 @@ int ipv4_send(void *buf, unsigned char protocol, unsigned char *mac, unsigned in
     // Hardware
     if(send_ethernet_package( hdr,length + sizeof(ipv4_header_t))) 
         return 1;
+
+    memcpy(ipv4_cache, hdr , length + sizeof(ipv4_header_t));
 
     return 0;
 }

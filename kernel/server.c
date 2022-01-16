@@ -143,11 +143,10 @@ loop:
 			sti();
 			break;
 		default: 
+            // processar socket
+            socket_server_transmit();
 			break;
 	}
-
-    // processar socket
-    socket_server_transmit();
 
     __asm__ __volatile__("sti; hlt;");    
     __asm__ __volatile__("sti; hlt;");

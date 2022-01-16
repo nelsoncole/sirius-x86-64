@@ -62,17 +62,17 @@ typedef struct _ethernet_device{
 
 typedef struct _ethernet_package_descriptor{
     unsigned int flag;
+    unsigned int count;
 	unsigned int buffersize;
 	void *buf;
-    
+
 }__attribute__((packed)) ethernet_package_descriptor_t;
 
 // ETHERNET
 
 
 ///
-unsigned short switch_endian16(unsigned short nb);
-unsigned int switch_endian32(unsigned int nb);
+extern ethernet_package_descriptor_t packege_desc_buffer[32];
 
 
 ///
@@ -81,7 +81,7 @@ void fillIP(unsigned char* to,unsigned char* from);
 
 extern ethernet_device_t default_ethernet_device;
 
-ethernet_package_descriptor_t get_ethernet_package();
+ethernet_package_descriptor_t *get_ethernet_package();
 int send_ethernet_package(const void *buf, size_t size);
 void handler_ethernet_package_received();
 
@@ -96,7 +96,7 @@ int arp_save_address(unsigned char *ip, unsigned char *mac);
 unsigned char *arp_get_address(unsigned char *mac, unsigned char *ip);
 void arp_request(unsigned char *ip, unsigned char *mac);
 void arp_replay(unsigned char *ip, unsigned char *mac);
-
+void arp_replay2(unsigned char *src_ip, unsigned char *dest_ip, unsigned char *dest_mac);
 
 int ipv4_send(void *buf, unsigned char protocol, unsigned char *mac, unsigned int src_address, unsigned int dst_address, unsigned length);
 unsigned short net_checksum(const unsigned char *data, const unsigned char *end);

@@ -4,6 +4,13 @@
 
 #include <sys/socket.h>
 
+#define IPPROTO_IP      0
+#define IPPROTO_ICMP    1
+#define IPPROTO_IGMP    2
+#define IPPROTO_TCP     6
+#define IPPROTO_UDP     17
+#define IPPROTO_IPV6    41
+
 typedef unsigned int in_addr_t;
 
 struct in_addr

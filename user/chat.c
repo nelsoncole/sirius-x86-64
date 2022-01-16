@@ -4,6 +4,12 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 int main(int argc, char **argv) {
+
+    if(argc < 3) {
+        printf("Chat error\n");
+        return 0;
+    }
+
     struct sockaddr_in sera;
     struct sockaddr_in serb;
     sera.sin_family        = AF_INET;
@@ -11,8 +17,8 @@ int main(int argc, char **argv) {
     sera.sin_port  = htons(5000);
 
     serb.sin_family        = AF_INET;
-    serb.sin_addr.s_addr = inet_addr("192.168.43.23");
-    serb.sin_port  = htons(20001);
+    serb.sin_addr.s_addr = inet_addr(argv[1]);
+    serb.sin_port  = htons(strtoul (argv[2], 0, 10) );
 
     int socketid = socket(AF_INET, SOCK_DGRAM, 0);
     if(socketid < 0) {
@@ -31,7 +37,7 @@ int main(int argc, char **argv) {
         ssize_t count = sendto(socketid, message, strlen(message), 0, (struct sockaddr*)&serb, sizeof(struct sockaddr_in));
         memset(message, 0, 256);
         printf("< ");
-        socklen_t len;
+        socklen_t len = sizeof(serb);
         count = recvfrom(socketid, message, 256, 0, (struct sockaddr*)&serb, &len);    
         printf("%s\n",message);
     }
