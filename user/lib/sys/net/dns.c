@@ -10,6 +10,20 @@
 unsigned char dns_buf[16];
 
 
+struct ANSWER
+{
+    unsigned short  name;
+    unsigned short  type;
+    unsigned short  class;
+    unsigned int    ttl;
+    unsigned short  data_len;
+    unsigned char   address[4];
+
+}__attribute__ ((packed));
+
+// OpenDNS's
+char dns_servers[10][128] ={ "208.67.222.222", "208.67.222.220", "10.172.224.10", "10.0.2.3"};
+
 void changeto_dns_name_format(unsigned char *name, int size) 
 {
     unsigned char *cp = name+1;
@@ -39,7 +53,7 @@ unsigned char* get_ip_from_name(const char *name , int query_type){
     int dns_size = sizeof(struct DNS_HEADER) + name_size + 6;
     struct DNS_HEADER *dns = (struct DNS_HEADER*) malloc(dns_size + 0x1000);
 
-    dns->id = htons(0x1);
+    dns->id = htons(0x1234);
     dns->flags = htons(0x0100);
     dns->q_count = htons(1); //we have only 1 question
     dns->answer_rr = htons(0);
@@ -66,7 +80,7 @@ unsigned char* get_ip_from_name(const char *name , int query_type){
     src.sin_port = htons(0);
 
     dest.sin_family = AF_INET;
-    dest.sin_addr.s_addr = /*inet_addr("10.0.2.3");*/inet_addr("208.67.222.222"); //dns ip
+    dest.sin_addr.s_addr = inet_addr(dns_servers[2]); //dns ip
     dest.sin_port = htons(53);
 
     int socketid = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -80,19 +94,29 @@ unsigned char* get_ip_from_name(const char *name , int query_type){
         return 0;
     }
 
-    printf("Sending Packet...");
+
     if( sendto(socketid, dns, dns_size, 0, (struct sockaddr*)&dest, sizeof(dest)) < 0 ){
-        perror("sendto failed");   
+        printf("sendto failed\n"); 
+        return 0;  
     }
-    printf("Done\n");
+
+
+    memset(dns, 0, sizeof(struct DNS_HEADER));
 
     socklen_t len = sizeof(dest);
-    printf("\nReceiving answer...");
-    if( recvfrom(socketid, dns, 0x1000, 0, (struct sockaddr*)&dest, &len) < 0 ){
-        perror("recvfrom failed\n");
+    int count = recvfrom(socketid, dns, 0x1000, 0, (struct sockaddr*)&dest, &len);
+    if( count < 1 ){
+        printf("recvfrom failed\n");
+        return 0;
     }
 
-    printf("Done\n");
+    int question_size = name_size + 6;
+    if( htons(dns->answer_rr)&0x3 ) {
+        //struct ANSWER *answer = (struct ANSWER*)((unsigned long)dns + sizeof(struct DNS_HEADER) + question_size);
+        struct ANSWER *answer = (struct ANSWER*)((unsigned long)dns + (count-sizeof(struct ANSWER)));
+        printf("IP %d.%d.%d.%d\n", answer->address[0],answer->address[1],answer->address[2],answer->address[3]);
+    }
+    
 
     shutdown(socketid, 0);
 

@@ -111,7 +111,11 @@ int main(int argc, char **argv) {
     int y = 200;
     DDA_line(x + 10, y + 300, x, y + 100, 0xFF0000); */
 
-    get_ip_from_name("www.google.com", 1);
+    if(argc < 2) {
+        printf("Definir argumento\n");
+        return 0;
+    }
+    get_ip_from_name(argv[1], 1);
 
 	return 0;
 }
