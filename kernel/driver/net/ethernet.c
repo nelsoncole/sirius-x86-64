@@ -105,12 +105,13 @@ loop:
             fillMac(mac, arp->source_mac);
             fillIP(ip, arp->source_ip);
             fillIP(target_ip, arp->dest_ip);
+
             switch( htons(arp->operation) ){
                 case ARP_OPC_REQUEST:
                     printf("ARP REQUEST\n");
                     arp_save_address( ip, mac);
+                    //arp_replay(ip, mac);
                     arp_replay2(target_ip, ip, mac);
-                    //arp_request(ip, mac);
                     //repaly packet
                     if((ipv4_cache->dst == *(unsigned int*)target_ip) && (ipv4_cache->checksum != 0)){
                         send_ethernet_package( ipv4_cache, htons(ipv4_cache->len) + sizeof(ether_header_t));
@@ -154,9 +155,6 @@ loop:
                     printf("UDP Destination Port address: %d\n", htons(udp->dst_port));
                     printf("Data: %s\n", buf); */
 
-               
-    
-           
                 
                     break;
                 default:

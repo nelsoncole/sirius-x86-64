@@ -100,7 +100,7 @@ void DDA_line(int x0, int y0, int x1, int y1, unsigned int color )
 }
 
 
-extern unsigned char* get_ip_from_name(const char *name , int query_type);
+extern unsigned char* get_ip_from_name(unsigned char *addr, const char *name , int query_type);
 
 int main(int argc, char **argv) {
 
@@ -115,7 +115,11 @@ int main(int argc, char **argv) {
         printf("Definir argumento\n");
         return 0;
     }
-    get_ip_from_name(argv[1], 1);
+
+    unsigned char ip[10];
+    get_ip_from_name(ip, argv[1], 1);
+
+    printf("IP %d.%d.%d.%d\n", ip[0], ip[1], ip[2], ip[3]);
 
 	return 0;
 }

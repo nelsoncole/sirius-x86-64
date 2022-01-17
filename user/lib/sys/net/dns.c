@@ -7,7 +7,6 @@
 #include<netinet/in.h>
 
 #include "dns.h"
-unsigned char dns_buf[16];
 
 
 struct ANSWER
@@ -21,8 +20,9 @@ struct ANSWER
 
 }__attribute__ ((packed));
 
-// OpenDNS's
-char dns_servers[10][128] ={ "208.67.222.222", "208.67.222.220", "10.172.224.10", "10.0.2.3"};
+
+char dns_servers[10][128] ={/*OpenDNS*/"208.67.222.222", "208.67.222.220", /*UNITEL DNS*/"10.172.224.10",
+/*VM DNS*/ "10.0.2.3",/*Google DNS*/ "8.8.8.8", "8.8.8.8"};
 
 void changeto_dns_name_format(unsigned char *name, int size) 
 {
@@ -46,9 +46,8 @@ void changeto_dns_name_format(unsigned char *name, int size)
     name[size+1] ='\0';
 }
 
-unsigned char* get_ip_from_name(const char *name , int query_type){
+unsigned char* get_ip_from_name(unsigned char *addr, const char *name , int query_type){
 
-    memset(dns_buf, 0, 16);
     int name_size = strlen(name);
     int dns_size = sizeof(struct DNS_HEADER) + name_size + 6;
     struct DNS_HEADER *dns = (struct DNS_HEADER*) malloc(dns_size + 0x1000);
@@ -114,11 +113,18 @@ unsigned char* get_ip_from_name(const char *name , int query_type){
     if( htons(dns->answer_rr)&0x3 ) {
         //struct ANSWER *answer = (struct ANSWER*)((unsigned long)dns + sizeof(struct DNS_HEADER) + question_size);
         struct ANSWER *answer = (struct ANSWER*)((unsigned long)dns + (count-sizeof(struct ANSWER)));
-        printf("IP %d.%d.%d.%d\n", answer->address[0],answer->address[1],answer->address[2],answer->address[3]);
+        //printf("IP %d.%d.%d.%d\n", answer->address[0],answer->address[1],answer->address[2],answer->address[3]);
+
+        addr[0] = answer->address[0];
+        addr[1] = answer->address[1];
+        addr[2] = answer->address[2];
+        addr[3] = answer->address[3];
+        addr[4] = 0;
+     
     }
     
 
     shutdown(socketid, 0);
 
-    return dns_buf;
+    return addr;
 }

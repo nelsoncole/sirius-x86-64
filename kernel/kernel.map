@@ -777,42 +777,42 @@ Linker script and memory map
                 0x000000000041ce5e                pipe_open_file
                 0x000000000041cf4a                pipe_write
                 0x000000000041d046                pipe_read
- .text          0x000000000041d13b      0x720 socket.o
+ .text          0x000000000041d13b      0x745 socket.o
                 0x000000000041d17a                init_socket
                 0x000000000041d33d                socket
                 0x000000000041d4bc                socket_server_transmit
-                0x000000000041d759                socket_server_receive
- .text          0x000000000041d85b      0x2b0 string.o
-                0x000000000041d85b                memset
-                0x000000000041d8bd                memcpy
-                0x000000000041d934                strcpy
-                0x000000000041d9af                strlen
-                0x000000000041d9fb                strcmp
-                0x000000000041da95                memcmp
- .text          0x000000000041db0b      0x4e4 vsprintf.o
-                0x000000000041db77                vsprintf
- .text          0x000000000041dfef      0x818 stdio.o
-                0x000000000041dfef                putchar
-                0x000000000041e04f                puts
-                0x000000000041e0df                printf
-                0x000000000041e20c                fopen
-                0x000000000041e32d                fclose
-                0x000000000041e3d1                rewind
-                0x000000000041e43a                fseek
-                0x000000000041e518                ftell
-                0x000000000041e559                fputc
-                0x000000000041e5d7                fgetc
-                0x000000000041e74a                fread
- .text          0x000000000041e807      0x4fb stdlib.o
-                0x000000000041e807                malloc
-                0x000000000041e876                free
-                0x000000000041e8c2                i2hex
-                0x000000000041eb30                utoa
-                0x000000000041ebbb                itoa
- .text          0x000000000041ed02      0x19a sse_memcpy.o
-                0x000000000041ed02                sse_memcpy
+                0x000000000041d77e                socket_server_receive
+ .text          0x000000000041d880      0x2b0 string.o
+                0x000000000041d880                memset
+                0x000000000041d8e2                memcpy
+                0x000000000041d959                strcpy
+                0x000000000041d9d4                strlen
+                0x000000000041da20                strcmp
+                0x000000000041daba                memcmp
+ .text          0x000000000041db30      0x4e4 vsprintf.o
+                0x000000000041db9c                vsprintf
+ .text          0x000000000041e014      0x818 stdio.o
+                0x000000000041e014                putchar
+                0x000000000041e074                puts
+                0x000000000041e104                printf
+                0x000000000041e231                fopen
+                0x000000000041e352                fclose
+                0x000000000041e3f6                rewind
+                0x000000000041e45f                fseek
+                0x000000000041e53d                ftell
+                0x000000000041e57e                fputc
+                0x000000000041e5fc                fgetc
+                0x000000000041e76f                fread
+ .text          0x000000000041e82c      0x4fb stdlib.o
+                0x000000000041e82c                malloc
+                0x000000000041e89b                free
+                0x000000000041e8e7                i2hex
+                0x000000000041eb55                utoa
+                0x000000000041ebe0                itoa
+ .text          0x000000000041ed27      0x19a sse_memcpy.o
+                0x000000000041ed27                sse_memcpy
                 0x000000000041f000                . = ALIGN (0x1000)
- *fill*         0x000000000041ee9c      0x164 
+ *fill*         0x000000000041eec1      0x13f 
 
 .iplt           0x000000000041f000        0x0
  .iplt          0x000000000041f000        0x0 setup.o

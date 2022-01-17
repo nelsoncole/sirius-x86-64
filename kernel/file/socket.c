@@ -14,7 +14,7 @@ static unsigned short port;
 struct socket *current_saddr, *saddr_ready_queue;
 
 int init_socket(int domain, int type, int protocol){
-    port = 1024;
+    port = 2000;
     current_saddr = saddr_ready_queue = 0;
     socket_next_id = 1;
     
@@ -99,8 +99,9 @@ void socket_server_transmit(){
                 }
 
                 if(!src_port) {
-                    if(port < 1024) port = 1024;
-                    src_port = current_saddr->src_port = htons(port++);
+                    if(port < 2000) port = 2000;
+                    current_saddr->src_port = htons(port++);
+                    src_port = htons(current_saddr->src_port);
                 }
 
                 switch(current_saddr->type){
