@@ -20,7 +20,8 @@ int udp_send(unsigned int src_address, unsigned int dst_address, unsigned short 
     udp->checksum = 0;
 
     // data
-    memcpy((unsigned char*)udp + sizeof(udp_header_t), data, length);
+    if(data != 0 || length > 0 )
+        memcpy((unsigned char*)udp + sizeof(udp_header_t), data, length);
     // 
     len = sizeof(udp_header_t) + length;
     ipv4_send(buf, IP_PROTOCOL_UDP, src_address, dst_address, len);

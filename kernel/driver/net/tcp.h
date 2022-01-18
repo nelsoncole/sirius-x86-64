@@ -9,6 +9,12 @@
 #define TCP_ACK     (1 << 4)
 #define TCP_URG     (1 << 5)
 
+// Options
+#define TCP_OPT_END     0
+#define TCP_OPT_NOP     1
+#define TCP_OPT_MSS     2
+#define TCP_OPT_SACK    4
+
 #define TCP_WINDOW_SIZE 8192
 
 typedef struct __tcp_header

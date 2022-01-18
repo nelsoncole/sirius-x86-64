@@ -17,6 +17,7 @@
 #include <socket.h>
 
 #include "udp.h"
+#include "tcp.h"
 #include "ipv4.h"
 #include "arp.h"
 #include "dhcp.h"
@@ -275,13 +276,14 @@ void initialise_ethernet(){
     // ARP CACHE
     init_arp();
 
-    /*  
-    unsigned char ip[SIZE_OF_IP] =  {192,168,43,1};//{192,168,43,1};//{100,70,239,249};
-    unsigned int dest_ip = 0;
+    printf("TEST TCP\n");
+    unsigned int dst_ip = 0;
     unsigned int src_ip = 0;
-    fillIP((unsigned char*)&dest_ip, ip);
+    unsigned char ip[SIZE_OF_IP] =  {192,168,43,1};
     fillIP((unsigned char*)&src_ip, our_ip);
-    char string[] = "Ola Mundo!\0";
-    udp_send(src_ip, dest_ip, 5000, 20001, string, strlen(string)); 
-    for(;;); */
+    fillIP((unsigned char*)&dst_ip, ip);
+    tcp_send(src_ip, dst_ip, 20001, 20003, 0xc5460604, TCP_SYN, 0, 0);
+
+    for(;;);
+
 }

@@ -1,10 +1,11 @@
+#include <ethernet.h>
 #include "checksum.h"
 
 unsigned short net_checksum(const unsigned char *start, const unsigned char *end)
 {
 
-    unsigned checksum = 0;
-    unsigned len = end - start;
+    unsigned int checksum = 0;
+    unsigned int len = end - start;
     unsigned short *p = (unsigned short *)start;
 
     // acc
@@ -23,5 +24,5 @@ unsigned short net_checksum(const unsigned char *start, const unsigned char *end
 
     unsigned short final = ~checksum;
 
-    return ((final & 0x00ff) << 8) | ((final & 0xff00) >> 8); // swap
+    return htons(final);
 }
