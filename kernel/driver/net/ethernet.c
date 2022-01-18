@@ -282,8 +282,8 @@ void initialise_ethernet(){
     unsigned char ip[SIZE_OF_IP] =  {192,168,43,1};
     fillIP((unsigned char*)&src_ip, our_ip);
     fillIP((unsigned char*)&dst_ip, ip);
-    tcp_send(src_ip, dst_ip, 20001, 20003, 0xc5460604, TCP_SYN, 0, 0);
+    tcp_send(src_ip, dst_ip, 20001, 20003, 0 /*0xc5460604*/, TCP_SYN, 0, 0);
 
-    for(;;);
+    for(;;)__asm__ __volatile__("hlt");
 
 }
