@@ -68,7 +68,7 @@ int send_ethernet_package(const void *buf, size_t size){
 
     return send_package(desc);
 }
-
+extern int screan_spin_lock;
 void handler_ethernet_package_received(){
 
     if(!default_ethernet_device.is_online) return;
@@ -76,6 +76,7 @@ void handler_ethernet_package_received(){
     ether_header_t *eh;
     arp_header_t *arp;
     ipv4_header_t *ipv4;
+    ipv4_header_t *ipv4_cp;
     udp_header_t *udp;
 
     char *data;
@@ -96,12 +97,10 @@ loop:
 
     if(prd->buf == 0 || prd->buffersize == 0) return;
 
-    eh = (ether_header_t*) prd->buf;
-    arp = (arp_header_t*) prd->buf;
-
+    eh = (ether_header_t*) prd->buf;    
     switch( htons(eh->type) ){
         case ET_ARP:
-            arp = (arp_header_t*) prd->buf;
+            arp = (arp_header_t*) (prd->buf + sizeof(ether_header_t) );
             fillMac(mac, arp->source_mac);
             fillIP(ip, arp->source_ip);
             fillIP(target_ip, arp->dest_ip);
@@ -113,9 +112,11 @@ loop:
                     //arp_replay(ip, mac);
                     arp_replay2(target_ip, ip, mac);
                     //repaly packet
-                    if((ipv4_cache->dst == *(unsigned int*)target_ip) && (ipv4_cache->checksum != 0)){
-                        send_ethernet_package( ipv4_cache, htons(ipv4_cache->len) + sizeof(ether_header_t));
-                        ipv4_cache->checksum = 0;
+                    data = (char*)ipv4_cache;
+                    ipv4_cp = (ipv4_header_t*)(ipv4_cache + sizeof(ether_header_t));
+                    if((ipv4_cp->dst == *(unsigned int*)target_ip) && (ipv4_cp->checksum != 0)){
+                        send_ethernet_package(data, htons(ipv4_cp->len) + sizeof(ether_header_t));
+                        ipv4_cp->checksum = 0;
                     }
                     break;
                 case ARP_OPC_REPLY:
@@ -128,7 +129,7 @@ loop:
             }   
             break;
         case ET_IPV4:
-            ipv4 = (ipv4_header_t*) prd->buf;
+            ipv4 = (ipv4_header_t*) (prd->buf + sizeof(ether_header_t) );
             switch( ipv4->protocol){
                 case IP_PROTOCOL_ICMP:
                     printf("IPv4 ICMP\n");
@@ -138,24 +139,14 @@ loop:
                     break;
                 case IP_PROTOCOL_UDP:
                     printf("IPv4 UDP\n");
-                    udp = (udp_header_t*) ((unsigned long)prd->buf + sizeof(ipv4_header_t));
+                    udp = (udp_header_t*) ((unsigned long)(prd->buf + sizeof(ipv4_header_t) + sizeof(ether_header_t)));
                     data = (char*) udp;
                     data += sizeof(udp_header_t);
 
                     len = htons(udp->length) - sizeof(udp_header_t);
 
                     socket_server_receive( ipv4->src, ipv4->dst, udp->src_port, udp->dst_port, data, len);
-                    /*
-                    memset(buf, 0, 256);
-                    memcpy(buf, data , len);
-
-                    fillIP(ip, (unsigned char*)&ipv4->src);
-                    printf("Client IP address: %d.%d.%d.%d UDP Source Port address: %d,len: %d bytes\n",ip[0],ip[1],ip[2],ip[3],
-                    htons(udp->src_port), len);
-                    printf("UDP Destination Port address: %d\n", htons(udp->dst_port));
-                    printf("Data: %s\n", buf); */
-
-                
+                  
                     break;
                 default:
                     printf("IPv4 UNKNOWN %x\n", ipv4->protocol );
@@ -225,7 +216,7 @@ void fillIP(unsigned char* to,unsigned char* from){
 
 void initialise_ethernet(){
 
-    ipv4_cache = (ipv4_header_t *)malloc(0x10000); // 64KiB
+    ipv4_cache = (unsigned char *)malloc(0x10000); // 64KiB
     dhcp_header_t *dhcp = (dhcp_header_t *)malloc(sizeof(dhcp_header_t)); 
     package_recieved_ack = 1;
 

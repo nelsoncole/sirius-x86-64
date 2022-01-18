@@ -1,10 +1,7 @@
 #ifndef __IPV4_H__
 #define __IPV4_H__
 
-#include "ether.h"
-
 typedef struct __ipv4_header{
-    ether_header_t  eh;
     unsigned char   ihl:4;
     unsigned char   ver:4;
     unsigned char   tos;
@@ -20,6 +17,6 @@ typedef struct __ipv4_header{
 
 } __attribute__ ((packed)) ipv4_header_t;
 
-extern ipv4_header_t *ipv4_cache;
+extern unsigned char *ipv4_cache;
 
 #endif

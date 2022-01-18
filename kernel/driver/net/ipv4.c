@@ -1,22 +1,37 @@
 #include <ethernet.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "ipv4.h"
+#include "ether.h"
 
 
-ipv4_header_t *ipv4_cache;
+unsigned char *ipv4_cache;
 
-int ipv4_send(void *buf, unsigned char protocol, unsigned char *mac, unsigned int src_address, unsigned int dst_address, unsigned length)
+int ipv4_send(void *buf, unsigned char protocol, unsigned int src_address, unsigned int dst_address, unsigned length)
 {
-    ipv4_header_t *hdr = (ipv4_header_t*)buf;
+
+    unsigned long addr = (unsigned long)buf;
+    ether_header_t *eh = (ether_header_t *)addr;
+    ipv4_header_t *hdr = (ipv4_header_t*)(addr + sizeof(ether_header_t));
+
+
+    unsigned char mac[SIZE_OF_MAC] ={0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
+    
+    if(dst_address != 0xFFFFFFFF){
+        if(get_hardwere_ethernet(mac)) {
+            printf("Hardware indefinido\n");
+                    return 0;
+        } 
+    }
 
     // Ethernet header
-    fillMac((unsigned char*)&hdr->eh.dst, mac);
-    fillMac((unsigned char*)&hdr->eh.src, (unsigned char*)&default_ethernet_device.mac);
-    hdr->eh.type = htons(ET_IPV4);
+    fillMac(eh->dst, mac);
+    fillMac(eh->src, default_ethernet_device.mac);
+    eh->type = htons(ET_IPV4);
 
 
-    unsigned len = length + (sizeof(ipv4_header_t) - sizeof(ether_header_t));
+    unsigned len = length + sizeof(ipv4_header_t);
 
     // Ipv4 header
     hdr->ihl = 5;
@@ -46,10 +61,10 @@ int ipv4_send(void *buf, unsigned char protocol, unsigned char *mac, unsigned in
     hdr->checksum = htons((unsigned short) (~checksum));
 
     // Hardware
-    if(send_ethernet_package( hdr,length + sizeof(ipv4_header_t))) 
+    if(send_ethernet_package( (void*)addr,length + sizeof(ipv4_header_t) + sizeof(ether_header_t)) ) 
         return 1;
 
-    memcpy(ipv4_cache, hdr , length + sizeof(ipv4_header_t));
+    memcpy(ipv4_cache, (void*)addr , length + sizeof(ipv4_header_t) + sizeof(ether_header_t));
 
     return 0;
 }

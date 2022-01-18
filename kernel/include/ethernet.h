@@ -93,14 +93,13 @@ void initialise_ethernet();
 //
 void init_arp();
 int arp_save_address(unsigned char *ip, unsigned char *mac);
-unsigned char *arp_get_address(unsigned char *mac, unsigned char *ip);
+int get_hardwere_ethernet(unsigned char *mac);
 void arp_request(unsigned char *ip, unsigned char *mac);
 void arp_replay(unsigned char *ip, unsigned char *mac);
 void arp_replay2(unsigned char *src_ip, unsigned char *dest_ip, unsigned char *dest_mac);
-
-int ipv4_send(void *buf, unsigned char protocol, unsigned char *mac, unsigned int src_address, unsigned int dst_address, unsigned length);
-unsigned short net_checksum(const unsigned char *data, const unsigned char *end);
-
+//
+int ipv4_send(void *buf, unsigned char protocol, unsigned int src_address, unsigned int dst_address, unsigned length);
+//
 int udp_send(unsigned int src_address, unsigned int dst_address, unsigned short src_port, unsigned short dst_port, const void *data, size_t length);
 int udp_receive(void *data, size_t length);
 

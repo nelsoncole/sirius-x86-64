@@ -316,7 +316,7 @@ int main()
 	
     // area 8ba8aa
 	drawline(w->pos_x ,w->pos_y, w->width, w->height, 0x2f2f,w);
-    wp("w.ppm");
+    //wp("w.ppm");
 
 	// barra
 	drawline(w->pos_x ,w->height-36, w->width, WMENU_BAR_SIZE, 0x808080,w);

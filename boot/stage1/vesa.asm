@@ -1,7 +1,7 @@
 str_vesa_error: 	db "VESA VBE ERROR",10,13,0
 vesa_var0:   dw 0
 vesa_var1:   db 32   ; BPB de pelomenos 32-bit
-vesa_var2:   dw 1024; 800 ; X Resolution de Pelomenos  => 1024 
+vesa_var2:   dw 800 ;1024 ; X Resolution de Pelomenos  => 1024 
 vesa_var3:   dw 0x118  ; Especil mode 
 
 vesa_vbe_mode:

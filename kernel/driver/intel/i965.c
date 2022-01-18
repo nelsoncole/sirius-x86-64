@@ -64,7 +64,7 @@ int setup_i965(){
 
 	i965_pci_init(data  >>  24 &0xff,data  >> 16  &0xff,data &0xffff);
 	
-	if((gtt->vid &0xffff) != 0x8086) { 
+	if((gtt->vid &0xffff) != 0x8086 || 1) { 
 		
 		printf("Graphic Native Intel, not found, device id %x, vendor id %x\n",gtt->did,gtt->vid);
 		

@@ -1,10 +1,7 @@
 #ifndef __ARP_H__
 #define __ARP_H__
-
 #include "ether.h"
-
 typedef struct __arp_header{
-    ether_header_t  eh;
     unsigned short  hardware_type;
     unsigned short  protocol_type;
     unsigned char   hardware_size;
@@ -26,6 +23,6 @@ typedef struct __arp_cache{
 
 extern arp_cache_t arp_cache[1024];
 
-void arp_hexdump(arp_header_t *arp);
+void arp_hexdump(arp_header_t *arp, ether_header_t *eh);
 
 #endif

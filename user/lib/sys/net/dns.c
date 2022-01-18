@@ -22,7 +22,7 @@ struct ANSWER
 
 
 char dns_servers[10][128] ={/*OpenDNS*/"208.67.222.222", "208.67.222.220", /*UNITEL DNS*/"10.172.224.10",
-/*VM DNS*/ "10.0.2.3",/*Google DNS*/ "8.8.8.8", "8.8.8.8"};
+/*VM DNS*/ "10.0.2.3",/*Google DNS*/ "8.8.8.8", "8.8.4.4"};
 
 void changeto_dns_name_format(unsigned char *name, int size) 
 {
@@ -46,7 +46,7 @@ void changeto_dns_name_format(unsigned char *name, int size)
     name[size+1] ='\0';
 }
 
-unsigned char* get_ip_from_name(unsigned char *addr, const char *name , int query_type){
+char* get_ip_from_name(char *addr, const char *name , int query_type){
 
     int name_size = strlen(name);
     int dns_size = sizeof(struct DNS_HEADER) + name_size + 6;
@@ -115,11 +115,9 @@ unsigned char* get_ip_from_name(unsigned char *addr, const char *name , int quer
         struct ANSWER *answer = (struct ANSWER*)((unsigned long)dns + (count-sizeof(struct ANSWER)));
         //printf("IP %d.%d.%d.%d\n", answer->address[0],answer->address[1],answer->address[2],answer->address[3]);
 
-        addr[0] = answer->address[0];
-        addr[1] = answer->address[1];
-        addr[2] = answer->address[2];
-        addr[3] = answer->address[3];
-        addr[4] = 0;
+
+        sprintf(addr, "%d.%d.%d.%d", (int)answer->address[0],
+        (int)answer->address[1],(int)answer->address[2],(int)answer->address[3]);
      
     }
     

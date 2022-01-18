@@ -4,7 +4,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
-extern unsigned char* get_ip_from_name(unsigned char *addr, const char *name , int query_type);
+extern char* get_ip_from_name(char *addr, const char *name , int query_type);
 int main(int argc, char **argv) {
 
     if(argc < 2) {
@@ -12,12 +12,12 @@ int main(int argc, char **argv) {
         return 0;
     }
 
-    unsigned char ip[10];
-    /*
+    char ip[18];
+   
     if(!get_ip_from_name(ip, argv[1], 1)){
-        printf("No IP...\n");
+        printf("DNS No IP...\n");
         return 0;
-    }*/
+    }
 
     struct sockaddr_in sera;
     struct sockaddr_in serb;
@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
     sera.sin_port  = htons(0);
 
     serb.sin_family        = AF_INET;
-    serb.sin_addr.s_addr = inet_addr("187.101.149.111" /*(const char*)ip*/);
+    serb.sin_addr.s_addr = inet_addr("192.168.43.1"/*(const char*)ip*/);
     serb.sin_port  = htons(20001);
 
     int socketid = socket(AF_INET, SOCK_DGRAM, 0);
