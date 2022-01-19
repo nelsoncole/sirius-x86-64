@@ -5,6 +5,9 @@
 #include <stdbool.h>
 #include <gui.h>
 
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
 extern unsigned long __window;
 
 void swap( int *a, int *b)
@@ -102,6 +105,9 @@ void DDA_line(int x0, int y0, int x1, int y1, unsigned int color )
 
 extern char* get_ip_from_name(char *addr, const char *name , int query_type);
 
+int connect(int socket, const struct sockaddr *address,
+             socklen_t address_len);
+
 int main(int argc, char **argv) {
 
 //    DDA_line(400, 100, 500, 300, 0xFFFFFF);
@@ -111,6 +117,7 @@ int main(int argc, char **argv) {
     int y = 200;
     DDA_line(x + 10, y + 300, x, y + 100, 0xFF0000); */
 
+    /*
     if(argc < 2) {
         printf("No address\n");
         return 0;
@@ -119,7 +126,38 @@ int main(int argc, char **argv) {
     char ip[18];
     get_ip_from_name(ip, argv[1], 1);
 
-    printf("IP %s\n", ip);
+    printf("IP %s\n", ip);*/
 
+    int client;
+    struct sockaddr_in  saddr;
+
+    saddr.sin_family = AF_INET;
+	saddr.sin_port = htons(20007);
+	saddr.sin_addr.s_addr = inet_addr("100.121.99.32");
+
+    client = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    printf("Socket criado\n");
+    
+    if( connect(client, (struct sockaddr*)&saddr, sizeof(saddr)) ){
+	    printf("Erro na concaxao\n");
+	    shutdown(client, 0);
+	    return (0);
+    }
+    printf("Conetado ao servidor\n");
+
+    printf("Send to string \'Hello TCP Server!\'\n");
+    send(client, "Hello TCP Server!",17 ,0);
+
+    char bf[1024];
+    memset(bf, 0, 1024);
+
+    int r = recv(client, bf, 1024, 0);
+ 
+    printf("%d %s\n", r, bf);
+
+    shutdown(client, 0);
 	return 0;
 }
+
+
+

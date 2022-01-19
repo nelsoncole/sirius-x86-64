@@ -104,7 +104,7 @@ int udp_send(unsigned int src_address, unsigned int dst_address, unsigned short 
 int udp_receive(void *data, size_t length);
 //
 int tcp_send(unsigned int src_address, unsigned int dst_address,
-unsigned short src_port, unsigned short dst_port, unsigned int seq, unsigned char flags, const void *data, size_t length);
+unsigned short src_port, unsigned short dst_port, unsigned int seq, unsigned int ack, unsigned char flags, const void *data, size_t length);
 
 //
 int dhcp_send(unsigned char *your_ip, unsigned char *server_ip, unsigned char message_type);

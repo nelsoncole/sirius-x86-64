@@ -12,7 +12,7 @@ typedef struct checksum_header
 }__attribute__((packed)) checksum_header_t;
 
 
-unsigned short net_checksum(const unsigned char *start, const unsigned char *end);
+unsigned short net_checksum(const unsigned char *phdr, int phdr_len, const unsigned char *start, const unsigned char *end);
 
 
 

@@ -23,6 +23,17 @@ struct socket
     unsigned short  dest_port;
     unsigned int    dest_ip;
 
+    // For TCP
+    unsigned int    seq;
+    unsigned int    ack;
+    unsigned char   protocol_flags;
+    unsigned short  src_win;
+    unsigned short  dst_win;
+
+    // cache
+    unsigned int    seq_x;
+    unsigned int    ack_x;
+
     unsigned char   flags;
     unsigned int    length1;
     unsigned int    length2;
@@ -38,8 +49,8 @@ struct socket
 
 extern struct socket *current_saddr, *saddr_ready_queue;
 void socket_server_transmit();
-void socket_server_receive(unsigned int src_ip, unsigned int dest_ip, unsigned short src_port, unsigned short dest_port,
-    const void *buffer, unsigned length);
+void socket_server_receive(int protocol, unsigned int src_ip, unsigned int dest_ip, unsigned short src_port, unsigned short dest_port,
+    const void *buffer, unsigned length, unsigned int seq, unsigned int ack, unsigned char flags);
 
 int init_socket(int domain, int type, int protocol);
 int socket(int domain, int type, int protocol);

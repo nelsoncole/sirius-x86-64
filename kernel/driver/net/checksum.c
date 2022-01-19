@@ -1,14 +1,22 @@
 #include <ethernet.h>
 #include "checksum.h"
 
-unsigned short net_checksum(const unsigned char *start, const unsigned char *end)
+unsigned short net_checksum(const unsigned char *phdr, int phdr_len, const unsigned char *start, const unsigned char *end)
 {
 
     unsigned int checksum = 0;
-    unsigned int len = end - start;
-    unsigned short *p = (unsigned short *)start;
+    unsigned int len = phdr_len;
+    unsigned short *p = (unsigned short *)phdr;
 
     // acc
+    // Pseudo Head
+    while (len > 1) {
+        checksum += *p++;
+        len -= 2;
+    }
+
+    len = end - start;
+    p = (unsigned short *)start;
     while (len > 1) {
         checksum += *p++;
         len -= 2;

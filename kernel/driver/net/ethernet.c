@@ -22,6 +22,8 @@
 #include "arp.h"
 #include "dhcp.h"
 
+unsigned int dst_ip = 0;
+unsigned int src_ip = 0;
 
 ethernet_package_descriptor_t packege_desc_buffer[32];
 
@@ -79,6 +81,7 @@ void handler_ethernet_package_received(){
     ipv4_header_t *ipv4;
     ipv4_header_t *ipv4_cp;
     udp_header_t *udp;
+    tcp_header_t *tcp;
 
     char *data;
     int len;
@@ -96,7 +99,7 @@ void handler_ethernet_package_received(){
 
 loop:
 
-    if(prd->buf == 0 || prd->buffersize == 0) return;
+    if(prd->buf == 0 || prd->buffersize == 0 || prd->flag) goto next;
 
     eh = (ether_header_t*) prd->buf;    
     switch( htons(eh->type) ){
@@ -116,7 +119,7 @@ loop:
                     data = (char*)ipv4_cache;
                     ipv4_cp = (ipv4_header_t*)(ipv4_cache + sizeof(ether_header_t));
                     if((ipv4_cp->dst == *(unsigned int*)target_ip) && (ipv4_cp->checksum != 0)){
-                        send_ethernet_package(data, htons(ipv4_cp->len) + sizeof(ether_header_t));
+                        //send_ethernet_package(data, htons(ipv4_cp->len) + sizeof(ether_header_t));
                         ipv4_cp->checksum = 0;
                     }
                     break;
@@ -137,16 +140,20 @@ loop:
                     break;
                 case IP_PROTOCOL_TCP:
                     printf("IPv4 TCP\n");
+                    tcp = (tcp_header_t*) ((unsigned long)(prd->buf + sizeof(ipv4_header_t) + sizeof(ether_header_t)));
+                    data = (char*) tcp;
+                    data += (tcp->off >>4)*4;
+                    len = 20;
+                    socket_server_receive( IP_PROTOCOL_TCP, ipv4->src, ipv4->dst, tcp->src_port,
+                    tcp->dst_port, data, len, tcp->seq, tcp->ack, tcp->flags);
                     break;
                 case IP_PROTOCOL_UDP:
                     printf("IPv4 UDP\n");
                     udp = (udp_header_t*) ((unsigned long)(prd->buf + sizeof(ipv4_header_t) + sizeof(ether_header_t)));
                     data = (char*) udp;
                     data += sizeof(udp_header_t);
-
                     len = htons(udp->length) - sizeof(udp_header_t);
-
-                    socket_server_receive( ipv4->src, ipv4->dst, udp->src_port, udp->dst_port, data, len);
+                    socket_server_receive(IP_PROTOCOL_UDP, ipv4->src, ipv4->dst, udp->src_port, udp->dst_port, data, len, 0, 0, 0);
                   
                     break;
                 default:
@@ -162,6 +169,8 @@ loop:
             printf("Packege Receive: ethernet type =%x\n", htons(eh->type) );
             break;
     }
+
+next:
 
     prd++;
     count--;
@@ -276,14 +285,11 @@ void initialise_ethernet(){
     // ARP CACHE
     init_arp();
 
-    printf("TEST TCP\n");
-    unsigned int dst_ip = 0;
-    unsigned int src_ip = 0;
     unsigned char ip[SIZE_OF_IP] =  {192,168,43,1};
     fillIP((unsigned char*)&src_ip, our_ip);
     fillIP((unsigned char*)&dst_ip, ip);
-    tcp_send(src_ip, dst_ip, 20001, 20003, 0 /*0xc5460604*/, TCP_SYN, 0, 0);
-
-    for(;;)__asm__ __volatile__("hlt");
+    /*tcp_send(src_ip, dst_ip, 20001, 20003, 0x1234, 0, TCP_SYN, 0, 0);
+    
+    for(;;)__asm__ __volatile__("hlt"); */
 
 }

@@ -9,27 +9,25 @@
 #include "checksum.h"
 
 int tcp_send(unsigned int src_address, unsigned int dst_address,
-unsigned short src_port, unsigned short dst_port, unsigned int seq, unsigned char flags, const void *data, size_t length)
+unsigned short src_port, unsigned short dst_port, unsigned int seq, unsigned int ack, unsigned char flags, const void *data, size_t length)
 {
     unsigned len = sizeof(ether_header_t) + sizeof(ipv4_header_t) + sizeof(tcp_header_t) + length;
     unsigned char *buf = (unsigned char*) malloc( len + 40);
     tcp_header_t *tcp = (tcp_header_t*) (buf + sizeof(ipv4_header_t) + sizeof(ether_header_t));
 
-    int rcvNxt = 0;
-
     tcp->dst_port = htons(dst_port);
     tcp->src_port = htons(src_port);
     tcp->seq = htonl(seq);
-    tcp->ack = htonl( flags & TCP_ACK ? rcvNxt : 0);
+    tcp->ack = htonl( flags & TCP_ACK ? ack : 0);
     tcp->off = 0 << 2;
     tcp->flags = flags;
     tcp->window_size = htons(TCP_WINDOW_SIZE); 
     tcp->checksum = htons(0);
     tcp->urgent = htons(0);
 
-    unsigned long start = (unsigned long)tcp;
+    unsigned char *start = (unsigned char *)tcp;
     
-    unsigned char *options = (unsigned char*)start;
+    unsigned char *options = start;
     options += sizeof(tcp_header_t);
 
     if (flags & TCP_SYN) {
@@ -38,31 +36,32 @@ unsigned short src_port, unsigned short dst_port, unsigned int seq, unsigned cha
         options[1] = 4;
         *(unsigned short *)(options + 2) = htons(1460);
         options += options[1];
-        
-        options[0] = TCP_OPT_SACK;
+        /*
+        options[0] = TCP_OPT_SACK; // SACK Permitted
         options[1] = 2;
-        options += options[1];
+        options += options[1]; */
         
 
     }
 
     // Option End
-    while ((options - (unsigned char*)start) & 3)
+    while ((options - start) & 3)
     {
         *options++ = 0;
     }
 
-    int hlen = (options - (unsigned char*)start);
+    int hlen = (options - start);
     tcp->off = hlen << 2;
 
     // data
     if(data != 0 || length > 0 )
         memcpy(options, data, length);
 
-    unsigned long end = start + (hlen + length);
+    unsigned char *end = (unsigned char *)(start + (hlen + length));
 
     // Pseudo Header
-    checksum_header_t *phdr = (checksum_header_t *)(start - sizeof(checksum_header_t));
+    checksum_header_t bphdr[1];
+    checksum_header_t *phdr = (checksum_header_t *)&bphdr;
     phdr->src = src_address;
     phdr->dst = dst_address;
     phdr->rsved = 0;
@@ -70,7 +69,7 @@ unsigned short src_port, unsigned short dst_port, unsigned int seq, unsigned cha
     phdr->len = htons(end - start);
 
     // Checksum
-    unsigned short checksum = net_checksum( (const unsigned char *)(start - sizeof(checksum_header_t)), (const unsigned char *)end);
+    unsigned short checksum = net_checksum((const unsigned char*)phdr, sizeof(checksum_header_t),(const unsigned char *)start, (const unsigned char *)end);
     tcp->checksum = htons(checksum);
 
     // 
