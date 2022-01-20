@@ -66,6 +66,11 @@ void *socket_address(int socket){
     return (void*)tmp;
 }
 
+int accept(int socket, struct sockaddr *address,
+             socklen_t *address_len){
+    return -1;
+}
+
 int bind(int socket, const struct sockaddr *address,
              socklen_t address_len){
 
@@ -101,6 +106,10 @@ int connect(int socket, const struct sockaddr *address,
 
     struct sockaddr_in saddr;
     memcpy((char*)&saddr, address, address_len);
+
+    // espera terminar
+    while(fd->flags&1);
+
     // Configurar o Server
     fd->dest_port = saddr.sin_port;
     fd->dest_ip = saddr.sin_addr.s_addr;
@@ -120,7 +129,7 @@ int connect(int socket, const struct sockaddr *address,
     fd->seq = seq;
     fd->ack = ack;
     fd->protocol_flags = TCP_SYN;
-    
+    fd->length2 = 0;
     // send packet
     fd->flags |= 0x1;
     // polling
@@ -141,20 +150,24 @@ int connect(int socket, const struct sockaddr *address,
         return -1;
     }
 
-    seq = fd->ack;
     fd->ack_x = fd->seq + 1;
-    fd->seq_x = seq;
+    fd->seq_x = fd->ack;
     // clean    
     fd->flags &=~0x2;
 
     fd->ack = fd->ack_x;
     fd->seq = fd->seq_x;
     fd->protocol_flags = TCP_ACK;
+    fd->length2 = 0;
     // send packet
     fd->flags |= 0x1;
     // polling
     while(fd->flags&0x1);
 
+    return 0;
+}
+
+int listen(int socket, int backlog){
     return 0;
 }
 
@@ -167,9 +180,17 @@ ssize_t recv(int socket, void *buffer, size_t length, int flags){
     if(!(fd->flags&0x80))
         return 0;
 
+    // espera terminar
+    while(fd->flags&1);
+
     // pooling
-    while(!(fd->flags&0x2));
-    // TODO verificar se a conexao foi encerrda
+    while(!(fd->flags&0x2)){
+        if(fd->protocol_flags == (TCP_FIN | TCP_ACK) && fd->flags == 2){
+            shutdown(socket, 0);
+            return 0;
+        }
+    }
+
     if(fd->protocol_flags != (TCP_PSH | TCP_ACK )) {
         // clean    
         fd->flags &=~0x2;
@@ -196,6 +217,7 @@ ssize_t recv(int socket, void *buffer, size_t length, int flags){
     fd->ack = fd->ack_x;
     fd->seq = fd->seq_x;
     fd->protocol_flags = TCP_ACK;
+    fd->length2 = 0;
     // send packet
     fd->flags |= 0x1;
     // polling
@@ -257,6 +279,9 @@ ssize_t send(int socket, const void *message, size_t length, int flags){
     if(!(fd->dest_ip | fd->dest_port))
         return 0;
 
+    // espera terminar
+    while(fd->flags&1);
+
     fd->length2 = length;
 
     if(fd->dst_win < length){
@@ -274,7 +299,12 @@ ssize_t send(int socket, const void *message, size_t length, int flags){
     // polling
     while(fd->flags&0x1);
     // wait packet
-    while(!(fd->flags&0x2));
+    while(!(fd->flags&0x2)){
+        if(fd->protocol_flags == (TCP_FIN | TCP_ACK) && fd->flags == 2){
+            shutdown(socket, 0);
+            return 0;
+        }
+    }
 
     if(fd->protocol_flags != TCP_ACK) {
         // clean    
@@ -316,6 +346,9 @@ ssize_t sendto(int socket, const void *message, size_t length, int flags,
     memcpy((char*)&saddr, dest_addr, dest_len);
 
 
+    // espera terminar
+    while(fd->flags&1);
+
     fd->dest_port = saddr.sin_port;
     fd->dest_ip = saddr.sin_addr.s_addr;
 
@@ -339,6 +372,56 @@ int shutdown(int socket, int how){
     struct socket *fd = (struct socket *)socket_address(socket);
     if(!fd)
         return -1;
+
+    if(!(fd->flags&0x80))
+        return -1;
+
+    // espera terminar
+    while(fd->flags&1);
+
+
+    if(fd->type == SOCK_STREAM) {
+        // verificar se FIN + ACK
+        if(fd->protocol_flags == (TCP_FIN | TCP_ACK) && fd->flags == 2){
+
+            fd->ack_x = fd->seq + 1;
+            fd->seq_x = fd->ack;
+            // enviar ACK
+            fd->seq = fd->seq_x;
+            fd->ack = fd->ack_x;
+            fd->protocol_flags = TCP_ACK;
+            fd->length2 = 0;
+            // send packet
+            fd->flags |= 0x1;
+            // polling
+            while(fd->flags&0x1);
+        
+        }
+
+        // clean    
+        fd->flags &=~0x2;
+
+        // TCP FIN + ACK
+        fd->seq = fd->seq_x;
+        fd->ack = fd->ack_x;
+        fd->protocol_flags = TCP_FIN | TCP_ACK;
+        fd->length2 = 0;
+        // send packet
+        fd->flags |= 0x1;
+        // polling
+        while(fd->flags&0x1);
+
+        // wait packet
+        while(!(fd->flags&0x2));
+
+        if(fd->protocol_flags == TCP_ACK) {
+            fd->seq_x = fd->ack + 1;
+            fd->ack_x = fd->seq;
+        }
+        // clean    
+        fd->flags &=~0x2;
+    }
+
 
     fd->flags = 0;
     

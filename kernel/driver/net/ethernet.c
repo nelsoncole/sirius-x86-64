@@ -4,7 +4,6 @@
  *
  */
 
-
 #include <ethernet.h>
 #include <pci.h>
 #include <stdio.h>
@@ -83,7 +82,7 @@ void handler_ethernet_package_received(){
     udp_header_t *udp;
     tcp_header_t *tcp;
 
-    char *data;
+    char *data, *end;
     int len;
 
     unsigned char mac[SIZE_OF_MAC] = {0x00,0x00,0x00,0x00,0x00,0x00};
@@ -101,7 +100,8 @@ loop:
 
     if(prd->buf == 0 || prd->buffersize == 0 || prd->flag) goto next;
 
-    eh = (ether_header_t*) prd->buf;    
+    eh = (ether_header_t*) prd->buf;
+ 
     switch( htons(eh->type) ){
         case ET_ARP:
             arp = (arp_header_t*) (prd->buf + sizeof(ether_header_t) );
@@ -143,8 +143,9 @@ loop:
                     tcp = (tcp_header_t*) ((unsigned long)(prd->buf + sizeof(ipv4_header_t) + sizeof(ether_header_t)));
                     data = (char*) tcp;
                     data += (tcp->off >>4)*4;
-                    len = 20;
-                    socket_server_receive( IP_PROTOCOL_TCP, ipv4->src, ipv4->dst, tcp->src_port,
+                    end = (char*)(prd->buf + prd->buffersize);
+                    len = end - data;
+                    socket_server_receive(0, IP_PROTOCOL_TCP, ipv4->src, ipv4->dst, tcp->src_port,
                     tcp->dst_port, data, len, tcp->seq, tcp->ack, tcp->flags);
                     break;
                 case IP_PROTOCOL_UDP:
@@ -153,7 +154,7 @@ loop:
                     data = (char*) udp;
                     data += sizeof(udp_header_t);
                     len = htons(udp->length) - sizeof(udp_header_t);
-                    socket_server_receive(IP_PROTOCOL_UDP, ipv4->src, ipv4->dst, udp->src_port, udp->dst_port, data, len, 0, 0, 0);
+                    socket_server_receive(0,IP_PROTOCOL_UDP, ipv4->src, ipv4->dst, udp->src_port, udp->dst_port, data, len, 0, 0, 0);
                   
                     break;
                 default:

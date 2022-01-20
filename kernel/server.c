@@ -145,6 +145,9 @@ loop:
 		default: 
             // processar socket
             socket_server_transmit();
+            cli();
+            socket_execute_row();
+            sti();
 			break;
 	}
 

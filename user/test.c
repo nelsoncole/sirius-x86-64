@@ -104,10 +104,7 @@ void DDA_line(int x0, int y0, int x1, int y1, unsigned int color )
 
 
 extern char* get_ip_from_name(char *addr, const char *name , int query_type);
-
-int connect(int socket, const struct sockaddr *address,
-             socklen_t address_len);
-
+char bf[128];
 int main(int argc, char **argv) {
 
 //    DDA_line(400, 100, 500, 300, 0xFFFFFF);
@@ -132,8 +129,8 @@ int main(int argc, char **argv) {
     struct sockaddr_in  saddr;
 
     saddr.sin_family = AF_INET;
-	saddr.sin_port = htons(20007);
-	saddr.sin_addr.s_addr = inet_addr("100.121.99.32");
+	saddr.sin_port = htons(20010);
+	saddr.sin_addr.s_addr = inet_addr("100.112.192.55");
 
     client = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     printf("Socket criado\n");
@@ -144,16 +141,15 @@ int main(int argc, char **argv) {
 	    return (0);
     }
     printf("Conetado ao servidor\n");
+    printf("Enviar: ");
+    fgets(bf,1024,stdin);
+    send(client, bf, strlen(bf)+1 ,0);
 
-    printf("Send to string \'Hello TCP Server!\'\n");
-    send(client, "Hello TCP Server!",17 ,0);
-
-    char bf[1024];
     memset(bf, 0, 1024);
-
+    printf("Receber: ");
     int r = recv(client, bf, 1024, 0);
  
-    printf("%d %s\n", r, bf);
+    printf("%s\n",bf);
 
     shutdown(client, 0);
 	return 0;

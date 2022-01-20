@@ -15,7 +15,7 @@
 #define TCP_OPT_MSS     2
 #define TCP_OPT_SACK    4
 
-#define TCP_WINDOW_SIZE 8192
+#define TCP_WINDOW_SIZE 4096
 
 typedef struct __tcp_header
 {
