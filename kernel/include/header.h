@@ -15,5 +15,15 @@ typedef struct _HEADER {
 }__attribute__((packed)) HEADER;
 
 
+typedef struct {
+
+	unsigned long	start;
+	unsigned long	entry;
+	unsigned long	end;
+    unsigned long	stack;
+
+}__attribute__((packed)) program_header_t;
+
+
 
 #endif

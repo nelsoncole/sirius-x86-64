@@ -337,7 +337,7 @@ void compose()
         // Isto deve refrescar a CPU
         if(!interrupt_status){
 
-            while( !interrupt_status && timer_ticks%50 != 0 ){
+            while( !interrupt_status && timer_ticks%30 != 0 ){
                 __asm__ __volatile__ ("sti; hlt;" :: );
                 __asm__ __volatile__ ("sti; hlt;" :: );
 

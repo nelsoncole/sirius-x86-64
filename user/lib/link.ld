@@ -41,32 +41,32 @@ SECTIONS {
 
 	end = .; _end = .; __end = .;
 }
-
-/*phys =  0x8000001000;
+/*
 
 SECTIONS
 {
-	_start = .;
-  	.text phys : AT(phys) 
-  	{
-    	code = .; _code = .; __code = .;
-    	*(.text)
-    	*(.rodata)
-    	. = ALIGN(4096);
-  	}
-  	.data : AT(phys + (data - code))
-  	{
-    	data = .;
-    	*(.data)
-    	. = ALIGN(4096);
-  	}
-  	.bss : AT(phys + (bss - code))
-  	{
-    	bss = .; _bss = .; __bss = .;
-		*(.bss)
+	. = 0x8000001000;
+    _start = .;
+	.text BLOCK(4K) : ALIGN(4K)
+	{
+		*(.text)
+	}
+ 
+	.rodata BLOCK(4K) : ALIGN(4K)
+	{
+		*(.rodata)
+	}
+ 
+	.data BLOCK(4K) : ALIGN(4K)
+	{
+		*(.data)
+	}
+ 
+	.bss BLOCK(4K) : ALIGN(4K)
+	{
 		*(COMMON)
-		. = ALIGN(4096);
-   
-  	}
-  	end = .; _end = .; __end = .;
-}*/
+		*(.bss)
+	}
+
+    end = .; _end = .;
+} */

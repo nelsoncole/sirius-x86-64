@@ -189,6 +189,7 @@ ssize_t recv(int socket, void *buffer, size_t length, int flags){
             shutdown(socket, 0);
             return 0;
         }
+        __asm__ __volatile__("pause");
     }
 
     if(fd->protocol_flags != (TCP_PSH | TCP_ACK )) {

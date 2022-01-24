@@ -55,7 +55,10 @@ char *syspwd;
 
 extern int setup_hda(void);
 
-extern play_speaker(unsigned short frequence);
+extern int play_speaker(unsigned short frequence);
+
+
+extern unsigned long __exectve(int argc, char **argv, char *pwd, void *buf);
 
 void main(unsigned long entry_pointer_info)
 {
@@ -191,7 +194,14 @@ void main(unsigned long entry_pointer_info)
 
 	FILE *fp = fopen("launcher.bin","r+b");
 	if(fp) {
-		exectve(0, 0, syspwd, fp);
+
+        fseek(fp,0,SEEK_END);
+	    int e = ftell(fp);
+	    rewind(fp);
+        char *bf = (char*)malloc(0x40000);
+        fread (bf, 1, e, fp);
+
+		exectve(0, 0, syspwd, bf);
 		fclose(fp);
 	}else {
 		printf("fopen error launcher.bin\n");

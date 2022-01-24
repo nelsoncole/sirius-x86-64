@@ -47,9 +47,8 @@ void foco_default()
 
 void server(unsigned long entry_pointer_info)
 {
+    char *buf;
 
-	
-	FILE *file;
 	char *path;
 	char *pwd;
 	unsigned long pid;
@@ -64,61 +63,43 @@ loop:
 	// wait
 	switch(*server_id) {
 		case 1:
-			path = (char*) server_id[1];
+            cli();
+			buf = (char*) server_id[1];
 			pid = server_id[4];
 			pwd = (char *) server_id[5];
 			unsigned long v = server_id[2];
-			cli();
-			file = fopen(path,"r+b");
-			if(!file){
-				printf("open error \"%s\"\n",path); 
-				
+			int argc = 0;
+			char **argv = 0;
+			if(v) { 
+				argc = *(int*)v;
+				v += 8;
+				argv = (char**) v;
+				v += 8*COUNT_ARGV;
+				for(int i=0; i < COUNT_ARGV; i ++)
+                {
+					argv[i] = (char*) v;
+					v += 256;
+				}
+	
+			}
+					
+			if(!exectve_child(argc, argv, pwd, buf, thread(pid)))
+            {
+				// error
 				thr = thread(pid);
 				pipe_write ( pipe, thr->pipe);
-				/* for(;;);*/ 
-			}else {
-			
-			
-				int argc = 0;
-				char **argv = 0;
-				if(v) { 
-					argc = *(int*)v;
-					v += 8;
-					argv = (char**) v;
-					v += 8*COUNT_ARGV;
-					for(int i=0; i < COUNT_ARGV; i ++){
-						argv[i] = (char*) v;
-						v += 256;
-					}
-	
-				}
-					
-				if(!exectve_child(argc, argv, pwd, file, thread(pid))){
-					// error
-					thr = thread(pid);
-					pipe_write ( pipe, thr->pipe);
-				}
-				fclose(file);
-				
 			}
+	
 			memset(server_id, 0, sizeof(unsigned long)*5);
 			sti();
 				break;
 		case 2:
-			path = (char*) server_id[1];
+            cli();
+			buf = (char*) server_id[1];
 			thread_id = server_id[2];
 			pwd = (char *) server_id[5];
-			
-			cli();
-			file = fopen(path,"r+b");
-			if(!file){printf("open error \"%s\"\n",path);  /*for(;;);*/ }
-			else {
-		
-				exectve(0, 0, pwd, file);
-				thread_id = 0;
-				fclose(file);
-				
-			}
+			exectve(0, 0, pwd, buf);
+			thread_id = 0;
 			memset(server_id, 0, sizeof(unsigned long)*5);
 			sti();
 				break;
@@ -144,10 +125,10 @@ loop:
 			break;
 		default: 
             // processar socket
+            //cli();
             socket_server_transmit();
-            cli();
             socket_execute_row();
-            sti();
+            //sti();
 			break;
 	}
 

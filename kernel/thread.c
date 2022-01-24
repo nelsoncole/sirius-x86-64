@@ -216,7 +216,6 @@ int pv,int argc, char **argv, char *pwd)
     }
     	
     tmp->next = new_thread;
-    	
     
    	return (new_thread);
 }

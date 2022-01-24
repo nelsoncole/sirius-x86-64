@@ -57,11 +57,17 @@ void register_ethernet_device(unsigned long send_package,unsigned long receive_p
 }
 
 ethernet_package_descriptor_t *get_ethernet_package(){
+    ethernet_device_t ed = get_default_ethernet_device();
+    if(!ed.is_enabled)return 0;
+
     ethernet_package_descriptor_t *(*get_package)() = (void*)default_ethernet_device.receive_package;
     return get_package();
 }
 
 int send_ethernet_package(const void *buf, size_t size){
+    ethernet_device_t ed = get_default_ethernet_device();
+    if(!ed.is_enabled)return 0;
+
     int (*send_package)(ethernet_package_descriptor_t) = (void*)default_ethernet_device.send_package;
 
     ethernet_package_descriptor_t desc;
@@ -70,7 +76,7 @@ int send_ethernet_package(const void *buf, size_t size){
 
     return send_package(desc);
 }
-extern int screan_spin_lock;
+
 void handler_ethernet_package_received(){
 
     if(!default_ethernet_device.is_online) return;
@@ -93,6 +99,8 @@ void handler_ethernet_package_received(){
 
     ethernet_package_descriptor_t *prd;
     prd = get_ethernet_package();
+    
+    if(!prd) return;
 
     int count = (int) prd->count;
 
@@ -289,8 +297,7 @@ void initialise_ethernet(){
     unsigned char ip[SIZE_OF_IP] =  {192,168,43,1};
     fillIP((unsigned char*)&src_ip, our_ip);
     fillIP((unsigned char*)&dst_ip, ip);
-    /*tcp_send(src_ip, dst_ip, 20001, 20003, 0x1234, 0, TCP_SYN, 0, 0);
     
-    for(;;)__asm__ __volatile__("hlt"); */
+    //for(;;)__asm__ __volatile__("hlt");
 
 }

@@ -18,7 +18,7 @@ unsigned short src_port, unsigned short dst_port, unsigned int seq, unsigned int
     tcp->dst_port = htons(dst_port);
     tcp->src_port = htons(src_port);
     tcp->seq = htonl(seq);
-    tcp->ack = htonl( flags & TCP_ACK ? ack : 0);
+    tcp->ack = htonl(ack);
     tcp->off = 0 << 2;
     tcp->flags = flags;
     tcp->window_size = htons(TCP_WINDOW_SIZE); 
@@ -30,16 +30,16 @@ unsigned short src_port, unsigned short dst_port, unsigned int seq, unsigned int
     unsigned char *options = start;
     options += sizeof(tcp_header_t);
 
-    if (flags & TCP_SYN) {
+   /* if (flags & TCP_SYN) {
 
         options[0] = TCP_OPT_MSS; // Maximum Segment Size (2)
         options[1] = 4;
         *(unsigned short *)(options + 2) = htons(1460);
         options += options[1];
-        /*
-        options[0] = TCP_OPT_SACK; // SACK Permitted
-        options[1] = 2;
-        options += options[1]; */
+       
+        //options[0] = TCP_OPT_SACK; // SACK Permitted
+        //options[1] = 2;
+        //options += options[1];
         
 
     }
@@ -48,7 +48,7 @@ unsigned short src_port, unsigned short dst_port, unsigned int seq, unsigned int
     while ((options - start) & 3)
     {
         *options++ = 0;
-    }
+    }*/
 
     int hlen = (options - start);
     tcp->off = hlen << 2;

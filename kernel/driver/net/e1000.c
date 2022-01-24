@@ -49,7 +49,7 @@ void e1000_enable_int(){
 }
 
 void e1000_link_up(){
-    unsigned long ty = e1000_read_command(0);
+    unsigned int ty = e1000_read_command(0);
     e1000_write_command(0, ty | 0x40);
     printf("[E1000] Link is up!\n");
 }
@@ -174,7 +174,7 @@ void init_e1000(int bus,int slot,int function){
         rx_descs[i]->addr_1 = addr;
         rx_descs[i]->addr_2 = addr >> 32;
         rx_descs[i]->status = 0;
-        rx_descs[i]->length = 0; //rx_memory.blocksize;
+        rx_descs[i]->length = 8192; //rx_memory.blocksize;
     }
 
     e1000_write_command(REG_RXDESCLO, (unsigned int) rx_memory.phymem);

@@ -13,7 +13,7 @@
 
 
 #define APP_LIST_SIZE 1024
-
+char *app_memory;
 
 typedef struct _PAINT
 {
@@ -212,10 +212,24 @@ static int app_execute(int index, WINDOW *w)
 
         strcpy( app_pathname , (char*)app[index].path_name_addr );
 
+
+        FILE *fp = fopen(app_pathname,"r+b");
+	    if(fp) {
+
+            fseek(fp,0,SEEK_END);
+	        int size = ftell(fp);
+	        rewind(fp);
+            fread (app_memory, 1, size, fp);
+		    fclose(fp);
+	    }else {
+		    printf("fopen error: \'%s\'\n", app_pathname);
+		    return -1;
+	    }
+
         // execute
 		__asm__ __volatile__( "movq %%rax,%%r8;"
 		" int $0x72;"
-		::"d"(8),"D"(app_pathname),"S"( app_id ),"c"(2), "a"(pwd));
+		::"d"(8),"D"(app_memory),"S"( app_id ),"c"(2), "a"(pwd));
 
         app_id ++;
     }
@@ -243,7 +257,7 @@ static void app_window_register(__pipe_t *pipe)
 {
     unsigned long new_window = pipe->r4 ;
     unsigned long id = 0;
-    id = pipe->r1 | pipe->r2 << 16 | pipe->r3 << 32;
+    id = pipe->r1 | (pipe->r2 << 16) | (pipe->r3) << 32;
 
     for(int i=0; i < app_index; i ++) {
         if( app[i].id == id ) 
@@ -276,6 +290,7 @@ int main()
     // register pipe launcher
     __asm__ __volatile__("int $0x72"::"d"(11));
 
+    app_memory = (char*)malloc(0x80000);
     app_pathname = malloc(0x1000);
     app_index = 0;
     app_index_foco = -1;
@@ -316,7 +331,7 @@ int main()
 	
     // area 8ba8aa
 	drawline(w->pos_x ,w->pos_y, w->width, w->height, 0x2f2f,w);
-    //wp("w.ppm");
+    wp("w.ppm");
 
 	// barra
 	drawline(w->pos_x ,w->height-36, w->width, WMENU_BAR_SIZE, 0x808080,w);

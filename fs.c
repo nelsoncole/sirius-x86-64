@@ -262,9 +262,8 @@ int create_file(const char *path,FILE *fd,super_block *fs,directory_entry *direc
 	dir->filesize = 0;
       	
       	
-      	unsigned int data_sector =  fs->reserved;
-      	unsigned int root_sector = data_sector + (fs->root_blk * fs->sector_per_blk);
-	
+    unsigned int data_sector =  fs->reserved;
+    unsigned int root_sector = data_sector + (fs->root_blk * fs->sector_per_blk);
 	
 	
 	// localizar blk disponivel

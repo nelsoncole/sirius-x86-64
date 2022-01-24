@@ -21,7 +21,7 @@ int main()
 
 unsigned long argv_pointer[COUNT_ARGV];
 unsigned long _v_;
-
+char *app_memory;
 void (*call_loader)  (int argc,char **argv);
 extern char *pwd;
 extern int call_function(void *addr,int argc,char *argv[]);
@@ -115,15 +115,26 @@ static int cmd_run(int argc,char **argv)
 		v += 256;
 	}
 	
-	strcpy(path, a);
-	__asm__ __volatile__("movq %%rax,%%r8;"
-	" int $0x72;"
-	::"d"(8),"D"(path),"S"(_v_),"c"(1), "a"(pwd)); // fork
+    strcpy(path, a);
+    FILE *fp = fopen(path,"r+b");
+    if(fp) {
+        fseek(fp,0,SEEK_END);
+	    int size = ftell(fp);
+	    rewind(fp);
+        fread (app_memory, 1, size, fp);
+	    fclose(fp);
 
-	wait_exit();
-	
-	
-	
+        __asm__ __volatile__("movq %%rax,%%r8;"
+	    " int $0x72;"
+	    ::"d"(8),"D"(app_memory),"S"(_v_),"c"(1), "a"(pwd)); // fork
+
+        wait_exit();
+
+    }else {
+        printf("fopen error: \'%s\'\n", path);
+	}
+
+		
 	return 0;
 }
 
@@ -155,7 +166,7 @@ int set_argv(char *s)
 
 void shell() {
 
-
+    app_memory = (char*)malloc(0x80000); // 512
 	
 	int argc = 0;
 	char *argv = (char*) malloc(0x1000);

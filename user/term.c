@@ -16,12 +16,13 @@
 
 extern char *pwd;
 MENU_T *menu_file, *menu_help;
-
+char *app_memory;
 static void loop(WINDOW *w);
 
 void main() {
 	
-	WINDOW *w = window("@~Terminal",100, 20, 600, 500, 0x1f1f2f, 0x80101020, 0xFFFFFF, 0x10);
+    app_memory = (char*)malloc(0x80000); // 512
+	WINDOW *w = window("@~Terminal",10, 20, 700, 500, 0x1f1f2f, 0x80101020, 0xFFFFFF, 0x10);
 
     w->style |= 0x80000000; 
 	
@@ -45,10 +46,23 @@ void main() {
 	char *path = malloc(128);
 
 	strcpy(path,"shell.bin\0");
-	__asm__ __volatile__("movq %%rax,%%r8;"
-	" int $0x72;"
-	::"d"(8),"D"(path),"S"(0),"c"(1), "a"(pwd)); // fork
-	
+
+    FILE *fp = fopen(path,"r+b");
+    if(fp) {
+        fseek(fp,0,SEEK_END);
+	    int size = ftell(fp);
+	    rewind(fp);
+        fread (app_memory, 1, size, fp);
+	    fclose(fp);
+
+        __asm__ __volatile__("movq %%rax,%%r8;"
+	    " int $0x72;"
+	    ::"d"(8),"D"(app_memory),"S"(0),"c"(1), "a"(pwd)); // fork
+
+    }else {
+        printf("fopen error: \'%s\'\n", path);
+	}
+
 	while(1) loop(w);
 }
 
@@ -57,7 +71,8 @@ static  void loop(WINDOW *w)
 	int msg = getmsg(0, w);
 	switch( msg ){
 		case ID_MENU_EXIT:
-             exit(0);
+            free(app_memory);
+            exit(0);
 		break;
 		case ID_MENU_HELP:
 

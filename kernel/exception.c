@@ -114,8 +114,8 @@ void fault_exception(int  n)
 		
 		unsigned long p = get_phy_addr (cr2);
 
-		printf("CR2 = 0x%x - %x, CR3 = 0x%x, CR4 = 0x%x\n",cr2 >> 32, cr2,cr3,cr4);
-		printf("PYSICAL: %x %x\n",p >>32, p);
+		printf("CR2 = 0x%x, CR3 = 0x%x, CR4 = 0x%x\n",cr2,cr3,cr4);
+		printf("PYSICAL: 0x%x\n", p);
 
 	}
 	

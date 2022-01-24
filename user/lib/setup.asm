@@ -6,20 +6,6 @@ global _start
 _start:
 	jmp start
 	extern ctr0, pipe_r, ptr_mouse2
-	extern _end
-Align 8
-header:
-    dq HEADER_MAGIC
-    dq HEADER_FLAGS    
-    dq header
-	dq _start
-	dq 0
-    dq _end
-    dq 0
-    dq 0
-
-	times 0x1000 -($-$$)   	db 0
-	
 start:
 
 	mov r8, rbx 
@@ -56,7 +42,3 @@ global argc, argv, pwd_ptr
 argc dq 0
 argv dq 0
 pwd_ptr dq 0
-
-[section .bss]
-;resb 0x2000 ; 8 KiB TODO o Lua 1.0 me obriga a fazer isto, e ao que parece o .eh_frame  
-

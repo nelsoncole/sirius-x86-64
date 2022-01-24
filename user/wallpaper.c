@@ -72,10 +72,10 @@ int wp(char *name) {
 
                         count ++;
                     
-                        if( 1  ) {
+                        if( 0 ) {
 
-                           // _wallpaper += 3;
-                           // count ++;
+                           _wallpaper += 3;
+                           count ++;
                        
                         }
                        
