@@ -59,15 +59,28 @@ int setup_i965(){
 		printf("panic: PCI Display Controller not found!\n");
 		return -1;
 	}
-	
-	printf("Display Controller\n");
+
+    printf("Display Controller\n");
 
 	i965_pci_init(data  >>  24 &0xff,data  >> 16  &0xff,data &0xffff);
 	
-	if((gtt->vid &0xffff) != 0x8086 || 1) { 
+    /*
+
+        2nd Generation Intel Core Processor Intel HD Graphics (2000/3000)
+        Device ID 116
+        Vendor ID 8086
+        
+        3rd Generation Intel Core Processor Intel HD Graphics (2500/4000)
+        Device ID 166
+        Vendor ID 8086
+
+        Device  ID 156
+        Vendor ID 8086
+
+    */
+	if((gtt->vid &0xffff) != 0x8086 || (gtt->did != 0x116 && gtt->did != 0x166 && gtt->did != 0x156)  ) { 
 		
 		printf("Graphic Native Intel, not found, device id %x, vendor id %x\n",gtt->did,gtt->vid);
-		
 		
 		unsigned long virt_addr;
 		mm_mp(gui->frame_buffer, (unsigned long*)&virt_addr, 0x800000/*8MiB*/, 0);

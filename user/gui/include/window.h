@@ -13,6 +13,8 @@
 #define WBART_SIZE 24
 #define WROD_SIZE 16
 
+#define SCROLL_SIZE 8
+
 #define WMENU_BAR_SIZE 36
 
 #define TYPE_MENUBOX 1

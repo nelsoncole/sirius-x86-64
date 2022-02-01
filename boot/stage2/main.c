@@ -83,7 +83,7 @@ void main()
 	} else {
 	
 		
-		memcpy((char*)0x400000, (const char*)0x50000, file_sector_count * (16*512) );
+		memcpy((char*)0x400000, (const char*)0x40000, file_sector_count * (16*512) );
 	
 	}
 	

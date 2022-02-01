@@ -118,38 +118,55 @@ int main(int argc, char **argv) {
     if(argc < 2) {
         printf("No address\n");
         return 0;
+    }*/
+
+    if(argc < 2) {
+        printf("No IP...\n");
+        return 0;
     }
 
-    char ip[18];
-    get_ip_from_name(ip, argv[1], 1);
+    if(argc < 3) {
+        printf("Port Null...\n");
+        return 0;
+    }
 
-    printf("IP %s\n", ip);*/
+    int port = strtoul (argv[2],NULL, 10);
+    char ip[18];
+   
+    if(!get_ip_from_name(ip, argv[1], 1)){
+        printf("DNS No IP...\n");
+        return 0;
+    }
+
+    printf("IP: %s Port: %d\n", ip, port);
 
     int client;
     struct sockaddr_in  saddr;
 
     saddr.sin_family = AF_INET;
-	saddr.sin_port = htons(20001);
-	saddr.sin_addr.s_addr = inet_addr("192.168.43.23");
+	saddr.sin_port = htons(port);
+	saddr.sin_addr.s_addr = inet_addr(ip);
 
     client = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    printf("Socket criado\n");
+    //printf("Socket criado\n");
     
     if( connect(client, (struct sockaddr*)&saddr, sizeof(saddr)) ){
 	    printf("Erro na concaxao\n");
-	    shutdown(client, 0);
+	    shutdown(client, 1);
 	    return (0);
     }
-    printf("Conetado ao servidor\n");
+    //printf("Conetado ao servidor\n");
 
     while(1){
-        printf("> ");
-        fgets(bf,1024,stdin);
-        send(client, bf, strlen(bf)+1 ,0);
+        //
         memset(bf, 0, 1024);
         printf("< ");
         int r = recv(client, bf, 1024, 0);
         printf("%s\n",bf);
+
+        printf("> ");
+        fgets(bf,1024,stdin);
+        send(client, bf, strlen(bf)+1 ,0);
     }
     shutdown(client, 0);
 	return 0;

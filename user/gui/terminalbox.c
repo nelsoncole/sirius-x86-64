@@ -7,18 +7,18 @@ void trminalscroll(HANDLE_T *obj, int mouse_x, int mouse_y){
     if(!obj) return;
     WINDOW *w = (WINDOW*) obj->w;
 
-    if( (mouse_x - w->area_x) < (obj->width - 8) ) return;
+    if( (mouse_x - w->area_x) < (obj->width - 0) ) return;
 
     while(w->spinlock != 0) __asm__ __volatile__("pause;");
     w->spinlock ++;
 
-    drawrect((obj->x + obj->width - 2) - 8, obj->y + 1, 1, obj->height - 2, 0x808080, w);
+    drawrect((obj->x + obj->width - 1) - 0, obj->y + 1, 1, obj->height - 2, 0x808080, w);
     // clean
-    drawline( (obj->x + obj->width - 1) - 7 ,obj->y + 2 + obj->scroll, 6, 40 , w->bg, w);
+    drawline( (obj->x + obj->width - 0) - 1 ,obj->y + 2 + obj->scroll, 6, 40 , w->bg, w);
     // update
     obj->scroll = mouse_y - w->area_y;
 
-    drawline( (obj->x + obj->width - 1) - 7 ,obj->y + 2 + obj->scroll, 6, 40 , 0xe0e0e0, w);
+    drawline( (obj->x + obj->width - 0) - 1 ,obj->y + 2 + obj->scroll, 6, 40 , 0xe0e0e0, w);
 
     w->spinlock = 0;
 }
@@ -53,9 +53,9 @@ HANDLE_T *terminalbox(int x, int y, int width, int height, int fg, int bg, WINDO
 	drawrect(obj->x, obj->y, obj->width, obj->height, 0x808080, w);
 
     // scroll
-    drawrect((obj->x + obj->width - 2) - 8, obj->y + 1, 1, obj->height - 2, 0x808080, w);
+    drawrect((obj->x + obj->width - 2) - 0, obj->y + 1, 1, obj->height - 2, 0x808080, w);
     obj->scroll = 0;
-    drawline( (obj->x + obj->width - 1) - 7 ,obj->y + 2 + obj->scroll, 6, 40 , 0xe0e0e0, w);
+    drawline( (obj->x + obj->width - 1) - 1 ,obj->y + 2 + obj->scroll, 6, 40 , 0xe0e0e0, w);
 
 	return obj;
 }

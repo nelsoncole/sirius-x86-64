@@ -336,25 +336,25 @@ static int ata_identify_device(int p,unsigned short *buffer)
 
 
 		// config ata[n]
-		ata[p].dev_type	= (buffer[0]&0x8000)? 0xffff:ATADEV_PATA;
+		    ata[p].dev_type	= (buffer[0]&0x8000)? 0xffff:ATADEV_PATA;
         	ata[p].lba_type	= (buffer[83]&0x0400)? ATA_LBA48:ATA_LBA28;
         	ata[p].mode 	= ATA_PIO_MODO;//FIXME(buffer[49]&0x0100)? ATA_DMA_MODO:ATA_PIO_MODO;
-		ata[p].bps 	= 512; 
+		    ata[p].bps 	= 512; 
 
 			break;
 
 		case ATADEV_PATAPI:
 		printf("Uinidade%d PATAPI\n",p);
 		ata_cmd_write(p,ATA_CMD_IDENTIFY_PACKET_DEVICE);
-        	ata_wait(p);
+        	/*ata_wait(p);
         	ata_wait_drq(p); 
         	ata_pio_read(p,buffer,512);
         	ata_wait_not_busy(p);
-        	ata_wait_no_drq(p);
+        	ata_wait_no_drq(p);*/
 
 
 		// config ata[n]
-		ata[p].dev_type	=(buffer[0]&0x8000)? ATADEV_PATAPI : 0xffff;
+		ata[p].dev_type	= 0xffff; //(buffer[0]&0x8000)? ATADEV_PATAPI : 0xffff;
         	ata[p].lba_type	= ATA_LBA28;
         	ata[p].mode 	= ATA_PIO_MODO;//FIXME(buffer[49]&0x0100)? ATA_DMA_MODO:ATA_PIO_MODO;
         	ata[p].bps 	= 2048; 

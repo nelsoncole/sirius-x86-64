@@ -10,8 +10,8 @@ void initialize_gui()
 	memset(gui,0,sizeof(gui_t));
 	
 	// BIOS VESA Video and Audio
-	unsigned char *vbe = (unsigned char*)0x40200;
-	unsigned char *vbe_info_mode = (unsigned char*)0x40200 + 0x200;
+	unsigned char *vbe = (unsigned char*)0x30200;
+	unsigned char *vbe_info_mode = vbe + 0x200;
 
 	// GUI
 	gui->pitch 		= (*(unsigned short*)(vbe_info_mode + 16));

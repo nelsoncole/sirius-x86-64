@@ -8,7 +8,6 @@
 #include "e1000.h"
 
 static unsigned long base_addr;
-static unsigned char mac_address[6];
 
 static int rx_cur;
 static int tx_cur;
@@ -58,7 +57,8 @@ void irq_e1000(){
     
 	//printf("[E1000] Interrupt detected\n");
     e1000_write_command(REG_IMASK, 0x1);
-    unsigned int to = e1000_read_command(0xC0);
+    unsigned int to = e1000_read_command(REG_ICR);
+    
     if(to&0x01){
         printf("[E1000] Transmit completed!\n");
     }else if(to&0x02){
@@ -68,32 +68,37 @@ void irq_e1000(){
         // Set Link Up
         unsigned long ty = e1000_read_command(0);
         e1000_write_command(0, ty | 0x40);
+
     }else if(to&0x80){
         printf("[E1000] Package recieved!\n");
         // call ethernet package received
         handler_ethernet_package_received();
+
     }else if(to&0x10){
         printf("[E1000] Good threshold!\n");
     }else{
         printf("[E1000] Unknown interrupt: %x !\n",to);
     }
+
 }
 
 void init_e1000(int bus,int slot,int function){
+    unsigned char mac_address[6];
+
     printf("[E1000] E1000 initialised bus=%x slot=%x function=%x \n",bus,slot,function);
     base_addr = pci_read_config_dword(bus,slot,function,0x10) & 0xFFFFFFFE;
     printf("[E1000] Base physical address: %x \n",base_addr);
-	unsigned long usbint = pci_read_config_dword(bus,slot,function,0x3C) & 0x000000FF;
-    if(usbint == 9) {
+	int intr = pci_read_config_dword(bus,slot,function,0x3C) & 0x000000FF;
+    if(intr == 9) {
         // TODO improviso para VirtualBox
         // IRQ19 
-        usbint += 10;
+        intr += 10;
     }
 
-    printf("[E1000] USBINT %d \n",usbint);
+    printf("[E1000] INTR %d \n",intr);
 
     // Configurar IRQ Handler
-    fnvetors_handler[usbint] = &irq_e1000;
+    fnvetors_handler[intr] = &irq_e1000;
 
     // Mapear para virtual o endereço fisico
     unsigned long virt_addr;

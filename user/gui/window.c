@@ -124,6 +124,10 @@ void drawstring_trans( const char *str, int cx, int cy, unsigned int fg, unsigne
 
 }
 
+/*
+ * 0x10 MENU
+ * 0x20 Scroll
+ */
 
 WINDOW *window(const char *title,int x, int y, int width, int height, int fg, int bg, int tfg, int style)
 {
@@ -165,6 +169,10 @@ WINDOW *window(const char *title,int x, int y, int width, int height, int fg, in
 		menu = WMENU_SIZE;
 	
 	w->area_width = w->width -6;
+    
+    if(style&0x20){
+        w->area_width -= SCROLL_SIZE;
+    }
 
 	w->area_height = w->height - (WBART_SIZE + 6 + menu + WROD_SIZE);
 	w->area_x = 3;

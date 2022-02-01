@@ -1,0 +1,702 @@
+/*
+ * TODO:
+ * Este driver está sendo em parte inspirado no driver if_re.c do freeBSD
+ * E outros codigos de terceiros
+ *
+ */
+
+#include <stdio.h>
+#include <string.h>
+#include <pci.h>
+#include <irq.h>
+#include <mm.h>
+#include <ethernet.h>
+#include "rtl8169.h"
+
+#include <kernel.h>
+
+#include <sleep.h>
+
+
+static int re_send_package(ethernet_package_descriptor_t desc);
+static ethernet_package_descriptor_t *re_recieve_package();
+
+unsigned long re_base_addr;
+struct re_softc re_soft;
+
+struct re_type {
+        unsigned short  vid;
+        unsigned short  did;
+        const char      *name;
+};
+
+static struct re_type devs[6] = {
+    {0,0, "Unknown"},
+    {RE_VENDORID, 0x8169, "Realtek PCI GbE Family Controller" },
+    {RE_VENDORID, 0x8168, "Realtek PCIe GbE Family Controller" },
+    {RE_VENDORID, 0x8161, "Realtek PCIe GbE Family Controller" },
+    {RE_VENDORID, 0x8136, "Realtek PCIe FE Family Controller" },
+    {DLINK_VENDORID  , 0x4300, "Realtek PCI GbE Family Controller" },
+};
+
+struct re_chip_info {
+	const char *name;
+	unsigned char version;
+	unsigned int rx_cfg_mask;
+};
+
+static struct re_chip_info re_chip_info[] = {
+    {0,                   0,    0x0},
+    {0,                   1,    0x0},
+    {0,                   2,    0x0},  
+    {"RTL-81XX",    MACFG_3,    0xFF00},
+    {"RTL-81XX",    MACFG_4,    0xFF00},
+    {"RTL-81XX",    MACFG_5,    0xFF00},
+    {"RTL-81XX",    MACFG_6,    0xFF00},
+    {"RTL-81XX",    MACFG_11,   0xE700},
+    {"RTL-81XX",    MACFG_12,   0xE700},
+    {"RTL-81XX",    MACFG_13,   0xE700},
+    {"RTL-81XX",    MACFG_14,   0xE700},
+    {"RTL-81XX",    MACFG_15,   0xE700},
+    {"RTL-81XX",    MACFG_16,   0xE700},
+    {"RTL-81XX",    MACFG_17,   0xE700},
+    {"RTL-81XX",    MACFG_18,   0xE700},
+    {"RTL-81XX",    MACFG_19,   0xE700},
+    {"RTL-81XX",    MACFG_21,   0xE700},
+    {"RTL-81XX",    MACFG_22,   0xE700},
+    {"RTL-81XX",    MACFG_23,   0xE700},
+    {"RTL-81XX",    MACFG_24,   0xC700},
+    {"RTL-81XX",    MACFG_25,   0xC700},
+    {"RTL-81XX",    MACFG_26,   0xC700},
+    {"RTL-81XX",    MACFG_27,   0xC700},
+    {"RTL-81XX",    MACFG_28,   0xC700},
+    {"RTL-81XX",    MACFG_31,   0x8700},
+    {"RTL-81XX",    MACFG_32,   0x8700},
+    {"RTL-81XX",    MACFG_33,   0x8700},
+    {"RTL-81XX",    MACFG_36,   0x8700},
+    {"RTL-81XX",    MACFG_37,   0x8700},
+    {"RTL-81XX",    MACFG_38,   0xBF00},
+    {"RTL-81XX",    MACFG_39,   0xBF00},
+    {"RTL-81XX",    MACFG_41,   0xE700},
+    {"RTL-81XX",    MACFG_42,   0xE700},
+    {"RTL-81XX",    MACFG_43,   0xE700},
+    {"RTL-81XX",    MACFG_50,   0xBF00},
+    {"RTL-81XX",    MACFG_51,   0xBF00},
+    {"RTL-81XX",    MACFG_52,   0xBF00},
+    {"RTL-81XX",    MACFG_53,   0xE700},
+    {"RTL-81XX",    MACFG_54,   0xE700},
+    {"RTL-81XX",    MACFG_55,   0xE700},
+    {"RTL-81XX",    MACFG_56,   0xCF00},
+    {"RTL-81XX",    MACFG_57,   0xCF00},
+    {"RTL-81XX",    MACFG_58,   0xCF00},
+    {"RTL-81XX",    MACFG_59,   0xCF00},
+    {"RTL-81XX",    MACFG_60,   0xCF00},
+    {"RTL-81XX",    MACFG_61,   0xCF00},
+    {"RTL-81XX",    MACFG_62,   0xCF00},
+    {"RTL-81XX",    MACFG_63,   0x8700},
+    {"RTL-81XX",    MACFG_64,   0x8700},
+    {"RTL-81XX",    MACFG_65,   0x8700},
+    {"RTL-81XX",    MACFG_66,   0x8700},
+    {"RTL-81XX",    MACFG_67,   0xCF00},
+    {"RTL-81XX",    MACFG_68,   0xCF00},
+    {"RTL-81XX",    MACFG_69,   0xCF00},
+    {"RTL-81XX",    MACFG_FF,   0x0},
+};
+
+
+unsigned int re_read_command(unsigned short addr){
+    return *( (volatile unsigned int *)(re_base_addr + addr));
+}
+
+void re_write_command(unsigned short addr,unsigned int val){
+    *( (volatile unsigned int *)(re_base_addr + addr)) = val;
+}
+
+unsigned short re_read_command_word(unsigned short addr){
+    return *( (volatile unsigned short *)(re_base_addr + addr));
+}
+
+void re_write_command_word(unsigned short addr,unsigned short val){
+    *( (volatile unsigned short *)(re_base_addr + addr)) = val;
+}
+
+unsigned char re_read_command_byte(unsigned short addr){
+    return *( (volatile unsigned char *)(re_base_addr + addr));
+}
+
+void re_write_command_byte(unsigned short addr,unsigned char val){
+    *( (volatile unsigned char *)(re_base_addr + addr)) = val;
+}
+
+void irq_realtek(){
+    printf("[RTL81] Interrupt detected\n");
+
+}
+
+
+int re_probe(struct re_softc * sc, int bus, int slot, int function){
+    int type = 0;
+    unsigned int data = pci_read_config_dword(bus,slot,function,0);
+    unsigned short did = (data >> 16) &0xFFFF;
+    unsigned short vid = data &0xFFFF;
+
+    for(int i=0; i < 6; i++ ){
+        if(devs[i].vid == vid && devs[i].did == did ) {
+            type = i;
+            break;
+        }
+    }
+
+
+    sc->vid = devs[type].vid;
+    sc->did = devs[type].did;
+    sc->type= type;
+    printf("[RTL81] Vendor ID: %x, Device ID: %x Name: %s\n", devs[type].vid, devs[type].did, devs[type].name);
+    return type;
+}
+
+static int re_check_mac_version(struct re_softc *sc)
+{
+        int error = 0;
+
+        switch(re_read_command(0x40) & 0xFCF00000) {
+        case 0x00800000:
+        case 0x04000000:
+                sc->chipset = MACFG_3;
+                sc->max_jumbo_frame_size = Jumbo_Frame_7k;
+                break;
+        case 0x10000000:
+                sc->chipset = MACFG_4;
+                sc->max_jumbo_frame_size = Jumbo_Frame_7k;
+                break;
+        case 0x18000000:
+                sc->chipset = MACFG_5;
+                sc->max_jumbo_frame_size = Jumbo_Frame_7k;
+                break;
+        case 0x98000000:
+                sc->chipset = MACFG_6;
+                sc->max_jumbo_frame_size = Jumbo_Frame_7k;
+                break;
+        case 0x34000000:
+        case 0xB4000000:
+                sc->chipset = MACFG_11;
+                sc->max_jumbo_frame_size = 0;//ETHERMTU;
+                break;
+        case 0x34200000:
+        case 0xB4200000:
+                sc->chipset = MACFG_12;
+                sc->max_jumbo_frame_size = 0;//ETHERMTU;
+                break;
+        case 0x34300000:
+        case 0xB4300000:
+                sc->chipset = MACFG_13;
+                sc->max_jumbo_frame_size = 0;// ETHERMTU;
+                break;
+        case 0x34900000:
+        case 0x24900000:
+                sc->chipset = MACFG_14;
+                sc->max_jumbo_frame_size = 0;//ETHERMTU;
+                break;
+        case 0x34A00000:
+        case 0x24A00000:
+                sc->chipset = MACFG_15;
+                sc->max_jumbo_frame_size = 0;// ETHERMTU;
+                break;
+        case 0x34B00000:
+        case 0x24B00000:
+                sc->chipset = MACFG_16;
+                sc->max_jumbo_frame_size = 0;//ETHERMTU;
+                break;
+        case 0x34C00000:
+        case 0x24C00000:
+                sc->chipset = MACFG_17;
+                sc->max_jumbo_frame_size =0;// ETHERMTU;
+                break;
+        case 0x34D00000:
+        case 0x24D00000:
+                sc->chipset = MACFG_18;
+                sc->max_jumbo_frame_size = 0;//ETHERMTU;
+                break;
+        case 0x34E00000:
+        case 0x24E00000:
+                sc->chipset = MACFG_19;
+                sc->max_jumbo_frame_size = 0;// ETHERMTU;
+                break;
+        case 0x30000000:
+                sc->chipset = MACFG_21;
+                sc->max_jumbo_frame_size = Jumbo_Frame_4k;
+                break;
+        case 0x38000000:
+                sc->chipset = MACFG_22;
+                sc->max_jumbo_frame_size = Jumbo_Frame_4k;
+                break;
+        case 0x38500000:
+        case 0xB8500000:
+        case 0x38700000:
+        case 0xB8700000:
+                sc->chipset = MACFG_23;
+                sc->max_jumbo_frame_size = Jumbo_Frame_4k;
+                break;
+        case 0x3C000000:
+                sc->chipset = MACFG_24;
+                sc->max_jumbo_frame_size = Jumbo_Frame_6k;
+                break;
+        case 0x3C200000:
+                sc->chipset = MACFG_25;
+                sc->max_jumbo_frame_size = Jumbo_Frame_6k;
+                break;
+        case 0x3C400000:
+                sc->chipset = MACFG_26;
+                sc->max_jumbo_frame_size = Jumbo_Frame_6k;
+                break;
+        case 0x3C900000:
+                sc->chipset = MACFG_27;
+                sc->max_jumbo_frame_size = Jumbo_Frame_6k;
+                break;
+        case 0x3CB00000:
+                sc->chipset = MACFG_28;
+                sc->max_jumbo_frame_size = Jumbo_Frame_6k;
+                break;
+        case 0x28100000:
+                sc->chipset = MACFG_31;
+                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
+                break;
+        case 0x28200000:
+                sc->chipset = MACFG_32;
+                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
+                break;
+        case 0x28300000:
+                sc->chipset = MACFG_33;
+                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
+                break;
+        case 0x2C100000:
+                sc->chipset = MACFG_36;
+                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
+                break;
+        case 0x2C200000:
+                sc->chipset = MACFG_37;
+                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
+                break;
+        case 0x2C800000:
+                sc->chipset = MACFG_38;
+                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
+                break;
+        case 0x2C900000:
+                sc->chipset = MACFG_39;
+                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
+                break;
+        case 0x24000000:
+                sc->chipset = MACFG_41;
+                sc->max_jumbo_frame_size = 0;// ETHERMTU;
+                break;
+        case 0x40900000:
+                sc->chipset = MACFG_42;
+                sc->max_jumbo_frame_size = 0;// ETHERMTU;
+                break;
+        case 0x40A00000:
+        case 0x40B00000:
+        case 0x40C00000:
+                sc->chipset = MACFG_43;
+                sc->max_jumbo_frame_size = 0;//ETHERMTU;
+                break;
+        case 0x48000000:
+                sc->chipset = MACFG_50;
+                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
+                break;
+        case 0x48100000:
+                sc->chipset = MACFG_51;
+                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
+                break;
+        case 0x48800000:
+                sc->chipset = MACFG_52;
+                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
+                break;
+        case 0x44000000:
+                sc->chipset = MACFG_53;
+                sc->max_jumbo_frame_size = 0;//ETHERMTU;
+                break;
+        case 0x44800000:
+                sc->chipset = MACFG_54;
+                sc->max_jumbo_frame_size = 0;//ETHERMTU;
+                break;
+        case 0x44900000:
+                sc->chipset = MACFG_55;
+                sc->max_jumbo_frame_size = 0;//ETHERMTU;
+                break;
+        case 0x4C000000:
+                sc->chipset = MACFG_56;
+                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
+                break;
+        case 0x4C100000:
+                sc->chipset = MACFG_57;
+                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
+                break;
+        case 0x50800000:
+                sc->chipset = MACFG_58;
+                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
+                break;
+        case 0x50900000:
+                sc->chipset = MACFG_59;
+                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
+                break;
+        case 0x5C800000:
+                sc->chipset = MACFG_60;
+                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
+                break;
+        case 0x50000000:
+                sc->chipset = MACFG_61;
+                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
+                break;
+        case 0x50100000:
+                sc->chipset = MACFG_62;
+                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
+                break;
+        case 0x50200000:
+                sc->chipset = MACFG_67;
+                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
+                break;
+        case 0x28800000:
+                sc->chipset = MACFG_63;
+                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
+                break;
+        case 0x28900000:
+                sc->chipset = MACFG_64;
+                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
+                break;
+        case 0x28A00000:
+                sc->chipset = MACFG_65;
+                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
+                break;
+        case 0x28B00000:
+                sc->chipset = MACFG_66;
+                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
+                break;
+        case 0x54000000:
+                sc->chipset = MACFG_68;
+                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
+                break;
+        case 0x54100000:
+                sc->chipset = MACFG_69;
+                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
+                break;
+        default:
+                printf("unknown device\n");
+                sc->chipset = MACFG_FF;
+                sc->max_jumbo_frame_size = 0;
+                error = -1;
+                break;
+        }
+
+        if(!sc->max_jumbo_frame_size){ 
+            sc->max_jumbo_frame_size = Jumbo_Frame_9k; 
+        }
+
+        return error;
+}
+
+static void re_lock(struct re_softc * sc){
+    re_write_command_byte(0x50, 0x00);
+}   
+
+static void re_unlock(struct re_softc * sc){
+    re_write_command_byte(0x50, 0xC0 );
+}
+
+
+static void re_setup_dma_map_buf(struct re_softc *sc){
+    unsigned long addr = 0;
+    // 4112 KiB
+    alloc_pages(0, 1028, (unsigned long*)&addr);
+
+    if(!addr) {
+        kernel_panic("realtack");
+    }
+
+    memset((void*)addr,0, 1028*4096);
+
+    sc->phymem = get_phy_addr(addr);
+    sc->vmem = addr;
+
+    sc->tx_buf = sc->phymem;
+    sc->rx_buf = sc->phymem + 8192 + (RE_TX_BUF_NUM*sizeof(struct TxDesc));
+
+    sc->tx_buf_v = sc->vmem;
+    sc->rx_buf_v = sc->vmem + 8192 + (RE_TX_BUF_NUM*sizeof(struct TxDesc));
+    
+    sc->tx_buf_v += 8192;
+    sc->rx_buf_v += 8192;
+
+    sc->tx_buf_num = RE_TX_BUF_NUM;
+    sc->rx_buf_num = RE_RX_BUF_NUM;
+
+    sc->tx_cur = 0;
+    sc->rx_cur = 0;
+
+    for(int i=0; i < RE_TX_BUF_NUM; i++){
+        sc->tx_desc[i] = (struct TxDesc *)(sc->vmem + i*sizeof(struct TxDesc));
+        unsigned long addr = sc->tx_buf + 8192 + i*8192;
+        sc->tx_desc[i]->TxBuffL = addr;
+        sc->tx_desc[i]->TxBuffH = addr >> 32;
+    }
+
+    for(int i=0; i < RE_RX_BUF_NUM; i++){
+        sc->rx_desc[i] = (struct RxDesc *)(sc->vmem + (8192 + RE_TX_BUF_NUM*sizeof(struct TxDesc)) + i*sizeof(struct RxDesc));
+        unsigned long addr = sc->rx_buf + 8192 + i*8192;
+        sc->rx_desc[i]->RxBuffL = addr;
+        sc->rx_desc[i]->RxBuffH = addr >> 32;
+    }
+}
+
+static void re_setup_tx_desc(struct re_softc *sc){
+
+    re_write_command(0x20, RL_ADDR_LO(sc->tx_buf));
+    re_write_command(0x24, RL_ADDR_HI(sc->tx_buf));
+}
+
+static void re_setup_rx_desc(struct re_softc *sc){
+
+    for(int i=0; i < RE_RX_BUF_NUM; i++){
+
+        if(i == (RE_RX_BUF_NUM - 1)){
+            sc->rx_desc[i]->Frame_Length = 8192;
+            sc->rx_desc[i]->EOR = 1;
+            sc->rx_desc[i]->OWN = 1;
+
+        } else{
+            sc->rx_desc[i]->Frame_Length = 8192;
+            sc->rx_desc[i]->OWN = 1;
+         }
+    }
+
+    re_write_command(0xe4, RL_ADDR_LO(sc->rx_buf));
+    re_write_command(0xe8, RL_ADDR_HI(sc->rx_buf));
+
+}
+
+static void re_get_hw_mac_address(struct re_softc *sc, unsigned char *eaddr){
+
+    unsigned int data = re_read_command(0x0000);
+    eaddr[0] = ((data & 0x000000FF)>>0) & 0xFF;
+    eaddr[1] = ((data & 0x0000FF00)>>8) & 0xFF;
+    eaddr[2] = ((data & 0x00FF0000)>>16) & 0xFF;
+    eaddr[3] = ((data & 0xFF000000)>>24) & 0xFF;
+    data = re_read_command(0x0000 + 4);
+    eaddr[4] = ((data & 0x000000FF)>>0) & 0xFF;
+    eaddr[5] = ((data & 0x0000FF00)>>8) & 0xFF;
+}
+
+void setup_realtek( int bus, int slot, int function){
+
+    unsigned char mac_address[6];
+    memset(&re_soft,0, sizeof(struct re_softc));
+    struct re_softc *sc = (struct re_softc *)&re_soft;
+
+    int type = re_probe(sc, bus, slot, function);
+    if(!type) {
+        return;
+    }
+
+    unsigned long up_addr = pci_read_config_dword(bus,slot,function,0x1C);
+    re_base_addr = (up_addr << 32 ) & 0xFFFFFFFF00000000;
+    re_base_addr |= pci_read_config_dword(bus,slot,function,0x18) & 0xFFFFFFFE;
+    int intr = pci_read_config_dword(bus,slot,function,0x3C) & 0x000000FF;
+    
+
+    printf("[RTL81] Base Address %x\n", re_base_addr);
+    re_soft.type = type;
+    re_soft.intr = intr;
+    re_soft.base_address = re_base_addr;
+
+    // Configurar IRQ Handler
+    fnvetors_handler[intr] = &irq_realtek;
+
+
+    unsigned int command = 0;
+    command = pci_read_config_dword(bus,slot,function, 4);
+    command |= (0 | 0x2 | 0x04);
+    pci_write_config_dword(bus,slot,function, 4, command);
+    command = pci_read_config_dword(bus,slot,function, 4);
+
+    // Enable o PCI Busmastering DMA
+    if(!(command&0x04))
+    {
+        printf("[RTL81] Busmastering was not enabled\n");
+    }
+
+
+    // Mapear para virtual o endereço fisico
+    unsigned long virt_addr;
+	mm_mp(re_base_addr, (unsigned long*)&virt_addr, 0x400000/*4MiB*/, 0);
+    re_base_addr = virt_addr;
+
+    // Soft reset the chip
+    re_write_command_byte(0x37, RE_CMD_RESET);
+    while(re_read_command_byte(0x37) & RE_CMD_RESET){ /*udelay(10);*/}
+
+    // Identify chip attached to board 
+    if(re_check_mac_version(sc) ){
+        sc->chipset = MACFG_69;
+    }
+
+    // get mac address
+	re_get_hw_mac_address(&re_soft, mac_address);
+    printf("[RTL81] Interrupt %d\n", intr);
+	printf("[RTL81] MAC %x:%x:%x:%x:%x:%x \n",mac_address[0],mac_address[1],mac_address[2],mac_address[3],mac_address[4],mac_address[5]);
+
+    // memory alloc
+    re_setup_dma_map_buf(&re_soft);
+
+    re_unlock(&re_soft);
+
+    type = 0;
+    // RTL-8169sb/8110sb or previous version
+	if (sc->chipset <= 5 ){
+        // Enable transmit and receive
+        // RE_COMMAND
+        re_write_command_byte(0x37, RE_CMD_TX_ENB | RE_CMD_RX_ENB);
+
+    }
+
+    // EarlyTxThres
+    // TxMaxSize Jumbo
+    re_write_command_byte(0xec, 0x40 -1);
+    // RxMaxSize
+    re_write_command_word(0xda, 8192 -1);
+
+    // Set Rx Config register
+    // RE_RXCFG
+    unsigned int cfg = 0;// 6 << 8;
+    //cfg |= (re_read_command(0x44) & re_chip_info[sc->chipset].rx_cfg_mask);
+    cfg = re_chip_info[sc->chipset].rx_cfg_mask;
+    re_write_command(0x44, cfg | 0xF);
+
+    // Set the initial TX configuration
+    // Set DMA burst size and Interframe Gap Time 
+    // RE_TXCFG
+    cfg = 3 << 24 | 6 << 8;
+    re_write_command(0x40, cfg); 
+
+    re_setup_tx_desc(&re_soft);
+    re_setup_rx_desc(&re_soft);
+
+
+    // Enable interrupts.
+    // RE_IMR
+    re_write_command_word(0x3c, RE_INTRS);
+
+
+    // RTL-8169sc/8110sc or later version
+    if (sc->chipset > 5){
+        // Enable transmit and receive
+        // RE_COMMAND
+        re_write_command_byte(0x37, RE_CMD_TX_ENB | RE_CMD_RX_ENB);
+
+    }
+
+    re_lock(&re_soft);
+    //udelay(10);
+
+    // RxMissed
+    re_write_command(0x4c, 0);
+    
+    // no early-rx interrupts
+	re_write_command_word(0x5c, re_read_command_word(0x5c) & 0xF000);
+
+
+    // register driver
+    register_ethernet_device((unsigned long)&re_send_package,(unsigned long)&re_recieve_package,mac_address);
+}
+
+
+int re_send_package(ethernet_package_descriptor_t desc){
+
+
+    struct re_softc *sc = (struct re_softc *)&re_soft;
+
+    unsigned long long dest = sc->tx_buf_v + (8192*sc->tx_cur);
+
+    if(desc.buffersize > 8192){
+        printf("The package is too big\n");
+        return 2;
+    }
+
+    memcpy((char*)dest, desc.buf, desc.buffersize);
+
+    sc->tx_desc[sc->tx_cur]->Frame_Length = desc.buffersize;
+    sc->tx_desc[sc->tx_cur]->OWN = 1;
+    sc->tx_desc[sc->tx_cur]->EOR = 1;
+    sc->tx_desc[sc->tx_cur]->FS = 1;
+    sc->tx_desc[sc->tx_cur]->LS = 1;
+    sc->tx_desc[sc->tx_cur]->IPCS = 1;
+
+    /*printf("Frame Length %d\n", sc->tx_desc[sc->tx_cur]->Frame_Length);
+    printf("TCPCS %d ", sc->tx_desc[sc->tx_cur]->TCPCS);
+    printf("UDPCS %d ", sc->tx_desc[sc->tx_cur]->UDPCS);
+    printf("IPCS %d ", sc->tx_desc[sc->tx_cur]->IPCS);
+    printf("SCRC %d ", sc->tx_desc[sc->tx_cur]->SCRC);
+    printf("TDMA %d ", sc->tx_desc[sc->tx_cur]->TDMA);
+    printf("LGSEN %d ", sc->tx_desc[sc->tx_cur]->LGSEN);
+    printf("LS %d ", sc->tx_desc[sc->tx_cur]->LS);
+    printf("FS %d ", sc->tx_desc[sc->tx_cur]->FS);
+    printf("EOR %d ", sc->tx_desc[sc->tx_cur]->EOR);
+    printf("OWN %d\n", sc->tx_desc[sc->tx_cur]->OWN); */
+
+    re_write_command_byte(0x38, 0x40); // set polling bit
+	while(re_read_command_byte(0x38) &0x40 ){ __asm__ __volatile__("pause;");}
+
+    //sc->tx_cur = (sc->tx_cur + 1) % sc->tx_buf_num;
+
+    
+    return 0;
+}
+
+ethernet_package_descriptor_t *re_recieve_package(){
+
+    struct re_softc *sc = (struct re_softc *)&re_soft;
+
+    ethernet_package_descriptor_t *desc = (ethernet_package_descriptor_t *)&packege_desc_buffer;
+    ethernet_package_descriptor_t *first_desc = desc; 
+
+    desc->flag = -1;
+    desc->count = 0;
+    desc->buffersize = 0;
+    desc->buf = (void*)0;
+    
+    while( 1 ){ 
+        if(!sc->rx_desc[sc->rx_cur]->OWN) 
+            break;
+    } 
+    /*
+    printf("Frame Length %d\n", sc->rx_desc[sc->rx_cur]->Frame_Length);
+    printf("TCPF %d ", sc->rx_desc[sc->rx_cur]->TCPF);
+    printf("UDPF %d ", sc->rx_desc[sc->rx_cur]->UDPF);
+    printf("IPF %d ", sc->rx_desc[sc->rx_cur]->IPF);
+    printf("TCPT %d ", sc->rx_desc[sc->rx_cur]->TCPT);
+    printf("UDPT %d ", sc->rx_desc[sc->rx_cur]->UDPT);
+    printf("CRC %d ", sc->rx_desc[sc->rx_cur]->CRC);
+    printf("RUNT %d ", sc->rx_desc[sc->rx_cur]->RUNT);
+    printf("RES %d ", sc->rx_desc[sc->rx_cur]->RES);
+    printf("RWT %d ", sc->rx_desc[sc->rx_cur]->RWT);
+    printf("RESV %d ", sc->rx_desc[sc->rx_cur]->RESV);
+    printf("BAR %d ", sc->rx_desc[sc->rx_cur]->BAR);
+    printf("PAM %d ", sc->rx_desc[sc->rx_cur]->PAM);
+    printf("MAR %d ", sc->rx_desc[sc->rx_cur]->MAR);
+    printf("LS %d ", sc->rx_desc[sc->rx_cur]->LS);
+    printf("FS %d ", sc->rx_desc[sc->rx_cur]->FS);
+    printf("EOR %d ", sc->rx_desc[sc->rx_cur]->EOR);
+    printf("OWN %d\n", sc->rx_desc[sc->rx_cur]->OWN);*/
+
+    sc->rx_desc[sc->rx_cur]->OWN = 1;
+
+    unsigned long long addr = sc->rx_buf_v + (8192*sc->rx_cur);
+
+    unsigned short len = sc->rx_desc[sc->rx_cur]->Frame_Length;
+
+    desc->buffersize = len;
+    desc->buf = (void*) addr;
+
+    desc->flag = 0;
+    sc->rx_cur = (sc->rx_cur + 1) % sc->rx_buf_num;       
+    
+    return first_desc;
+}

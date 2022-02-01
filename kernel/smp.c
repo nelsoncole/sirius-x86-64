@@ -83,7 +83,7 @@ void setup_smp() {
 	printf("\nInitialize APs... \\\\");
 	
 	// copy the AP trampoline code to a fixed address in low conventional memory (to address 0x0800:0x0000)
-	memcpy((void*)0x8000, (void*)0x30000, 4096); 
+	memcpy((void*)0x8000, (void*)0x3E000, 4096); 
 	unsigned long apstatck = 0x02000000;
 	
 	*aprunning = 0;

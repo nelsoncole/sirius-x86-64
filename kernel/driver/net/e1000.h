@@ -63,6 +63,28 @@ struct e1000_rx_memory
 #define REG_TXDESCLEN   0x3808
 #define REG_TXDESCHEAD  0x3810
 #define REG_TXDESCTAIL  0x3818
+
+// Registers
+
+#define REG_CTRL                        0x0000      // Device Control
+#define REG_EERD                        0x0014      // EEPROM Read
+#define REG_ICR                         0x00c0      // Interrupt Cause Read
+#define REG_IMS                         0x00d0      // Interrupt Mask Set/Read
+#define REG_RCTL                        0x0100      // Receive Control
+#define REG_TCTL                        0x0400      // Transmit Control
+#define REG_RDBAL                       0x2800      // Receive Descriptor Base Low
+#define REG_RDBAH                       0x2804      // Receive Descriptor Base High
+#define REG_RDLEN                       0x2808      // Receive Descriptor Length
+#define REG_RDH                         0x2810      // Receive Descriptor Head
+#define REG_RDT                         0x2818      // Receive Descriptor Tail
+#define REG_TDBAL                       0x3800      // Transmit Descriptor Base Low
+#define REG_TDBAH                       0x3804      // Transmit Descriptor Base High
+#define REG_TDLEN                       0x3808      // Transmit Descriptor Length
+#define REG_TDH                         0x3810      // Transmit Descriptor Head
+#define REG_TDT                         0x3818      // Transmit Descriptor Tail
+#define REG_MTA                         0x5200      // Multicast Table Array
+#define REG_RAL                         0x5400      // Receive Address Low
+#define REG_RAH                         0x5404      // Receive Address High
  
  
 #define REG_RDTR         0x2820 // RX Delay Timer Register
@@ -132,6 +154,9 @@ struct e1000_rx_memory
 #define TSTA_EC                         (1 << 1)    // Excess Collisions
 #define TSTA_LC                         (1 << 2)    // Late Collision
 #define LSTA_TU                         (1 << 3)    // Transmit Underrun
+
+// Control Register
+#define CTRL_SLU                        (1 << 6)    // Set Link Up
 
 #define E1000_NUM_RX_DESC 32
 #define E1000_NUM_TX_DESC 8

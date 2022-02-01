@@ -22,7 +22,7 @@ static void loop(WINDOW *w);
 void main() {
 	
     app_memory = (char*)malloc(0x80000); // 512
-	WINDOW *w = window("@~Terminal",10, 20, 700, 500, 0x1f1f2f, 0x80101020, 0xFFFFFF, 0x10);
+	WINDOW *w = window("@~Terminal",10, 20, 740, 500, 0x1f1f2f, 0x80101020, 0xFFFFFF, 0x30);
 
     w->style |= 0x80000000; 
 	

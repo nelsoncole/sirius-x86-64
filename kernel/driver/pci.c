@@ -233,9 +233,6 @@ int pci_get_info(void *buffer,int max_bus)
 	unsigned int data = -1;
 	int bus, dev, fun,i;
 
-
-	printf("PCI Listing devices:\n");
-
 	for(bus = 0;bus < max_bus; bus++) {
 		for(dev = 0; dev < MAX_DEV; dev++) {
 			for(fun = 0; fun < MAX_FUN; fun++) {
@@ -245,12 +242,21 @@ int pci_get_info(void *buffer,int max_bus)
 				for(i = 0;i < 256;i++) {
 					if((pci_class_names[i].classcode &0xffffff) != (data >> 8 &0xffffff))
 						continue;
-					printf("%s",pci_class_names[i].name);
-					printf(", B%d:D%d:F%d\n",bus,dev,fun); //FIXME
+                    int class = data >> 24 &0xff;
+                    int subclass = data >> 16 &0xff;
+                    printf("Device #%x:%x:%x -> ", bus, dev, fun);
+                    data = pci_read_config_dword(bus,dev,fun, 0);
+                    printf("Vendor ID: %x, Device ID: %x -> ", data &0xffff, data >> 16 &0xffff );
+					printf("Class: %d Subclass: %d ( %s )\n",class, subclass, pci_class_names[i].name);
 					break;
-
-				}		//FIXME
-				if(i == 256)printf("Other PCI Device ClassCode (%X), B%d:D%d:F%d\n",data,bus,dev,fun);
+				}
+		    
+                //FIXME
+				if(i == 256) {
+                    printf("Other PCI Device ClassCode (%x), B%d:D%d:F%d -> ",data,bus,dev,fun);
+                    data = pci_read_config_dword(bus,dev,fun, 0);
+                    printf("Vendor ID: %x, Device ID: %x\n", data &0xffff, data >> 16 &0xffff );
+                }
 					
 			}
 		}
@@ -306,6 +312,38 @@ unsigned int pci_scan_class(int class)
                		data =inportl(PCI_PORT_DATA);
 
                		if((data >> 24 &0xff) == class){
+
+					r = fun | dev << 16 | bus << 24;
+                    			return r;
+            
+                		}
+            		}
+     
+        	}
+     
+    	}
+
+    return (-1);
+
+}
+
+
+unsigned int pci_scan_class_subclass(int class, int subcalss)
+{
+   	unsigned int data = -1;
+
+   	unsigned int bus, dev, fun;
+
+	unsigned int r = 0;
+    
+   	for(bus = 0;bus < MAX_BUS; bus++) {
+       	for(dev = 0; dev < MAX_DEV; dev++){
+           		for(fun = 0; fun < MAX_FUN; fun++){
+
+               		outportl(PCI_PORT_ADDR,CONFIG_ADDR(bus,dev,fun, 0x8));
+               		data =inportl(PCI_PORT_DATA);
+
+               		if((data >> 24 &0xff) == class && (data >> 16 &0xff) == subcalss){
 
 					r = fun | dev << 16 | bus << 24;
                     			return r;

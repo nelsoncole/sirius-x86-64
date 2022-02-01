@@ -34,6 +34,9 @@ struct socket
     unsigned int    seq_x;
     unsigned int    ack_x;
 
+    //
+    unsigned char   connect;
+
     unsigned char   flags;
     unsigned int    length1;
     unsigned int    length2;
@@ -163,6 +166,8 @@ int connect(int socket, const struct sockaddr *address,
     fd->flags |= 0x1;
     // polling
     while(fd->flags&0x1);
+
+    fd->connect = 1;
 
     return 0;
 }
@@ -381,7 +386,7 @@ int shutdown(int socket, int how){
     while(fd->flags&1);
 
 
-    if(fd->type == SOCK_STREAM) {
+    if(fd->type == SOCK_STREAM && (fd->connect&0x1)) {
         // verificar se FIN + ACK
         if(fd->protocol_flags == (TCP_FIN | TCP_ACK) && fd->flags == 2){
 
@@ -419,6 +424,8 @@ int shutdown(int socket, int how){
             fd->seq_x = fd->ack + 1;
             fd->ack_x = fd->seq;
         }
+
+        fd->connect = 0;
         // clean    
         fd->flags &=~0x2;
     }

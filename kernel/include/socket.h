@@ -34,6 +34,9 @@ struct socket
     unsigned int    seq_x;
     unsigned int    ack_x;
 
+    //
+    unsigned char   connect;
+
     unsigned char   flags;
     unsigned int    length1;
     unsigned int    length2;

@@ -81,7 +81,7 @@ start:
 	mov word[file_filename],di
 	
 	mov word[filesystem_address],0x1000
-	mov word[file_address_di],0x3000
+	mov word[file_address_di],0x3E00
 	mov word[file_address_bx],0
 	
 	mov word[address_offset],0
@@ -109,7 +109,7 @@ start:
 	mov word[file_filename],di
 	
 	mov word[filesystem_address],0x1000
-	mov word[file_address_di],0x5000
+	mov word[file_address_di],0x4000
 	mov word[file_address_bx],0
 	
 	mov word[address_offset],0

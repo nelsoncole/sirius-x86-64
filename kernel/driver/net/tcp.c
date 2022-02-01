@@ -42,13 +42,13 @@ unsigned short src_port, unsigned short dst_port, unsigned int seq, unsigned int
         //options += options[1];
         
 
-    }
-
+    }*/
+    
     // Option End
     while ((options - start) & 3)
     {
         *options++ = 0;
-    }*/
+    }
 
     int hlen = (options - start);
     tcp->off = hlen << 2;

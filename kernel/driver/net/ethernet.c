@@ -127,7 +127,7 @@ loop:
                     data = (char*)ipv4_cache;
                     ipv4_cp = (ipv4_header_t*)(ipv4_cache + sizeof(ether_header_t));
                     if((ipv4_cp->dst == *(unsigned int*)target_ip) && (ipv4_cp->checksum != 0)){
-                        //send_ethernet_package(data, htons(ipv4_cp->len) + sizeof(ether_header_t));
+                        send_ethernet_package(data, htons(ipv4_cp->len) + sizeof(ether_header_t));
                         ipv4_cp->checksum = 0;
                     }
                     break;
@@ -187,11 +187,16 @@ next:
     if(count > 0) goto loop;
 }
 
+// RealTek PCI vendor ID
+#define	REALTEK_VENDORID 0x10EC
+// D-Link vendor ID
+#define DLINK_VENDORID  0x1186
+
 int int_ethernet_device()
 {
     int bus, slot, function;
     unsigned short device, vendor;
-    unsigned int data = pci_scan_class(2);
+    unsigned int data = pci_scan_class_subclass(2, 0);
 
     memset((char*)&default_ethernet_device, 0, sizeof(ethernet_device_t));
 
@@ -210,8 +215,13 @@ int int_ethernet_device()
     vendor = data &0xFFFF;
     
     
-    if( (device == 0x100e) || (device == 0x153A) || (device == 0x10EA)) {
+    if( vendor == 0x8086 && (device == 0x100e || device == 0x153A || device == 0x10EA) ) {
+
         init_e1000( bus, slot, function );
+
+    } else if(vendor == REALTEK_VENDORID \
+    && (device == 0x8169 || device == 0x8168 || device == 0x8161 || device == 0x8136 || device == 0x4300)){
+        setup_realtek( bus, slot, function );
     } else {
         printf("Unknown ethernet device\n");
         printf("Other Network device id %x vendor id %x\n", device, vendor);
@@ -263,21 +273,21 @@ void initialise_ethernet(){
 
         memset(dhcp, 0, sizeof(dhcp_header_t));
         dhcp_send(our_ip, dhcp_ip, DHCP_REQUEST);
-        if( udp_receive(dhcp, sizeof(dhcp_header_t)) ){
+        /*if( udp_receive(dhcp, sizeof(dhcp_header_t)) ){
             if(htonl(dhcp->magic_cookie) != 0x63825363) {
                 printf("No DHCP\n");
                 free(dhcp);
-                return;
+                goto end;
             }
 
             if(dhcp->options[2] != DHCP_ACK){
                 printf("%s\n", string_dhcp_message[dhcp->options[2]]);
                 free(dhcp);
-                return;
+                goto end;
             }
 
             printf("%s\n", string_dhcp_message[dhcp->options[2]]);
-        }
+        }*/
 
         fillIP((unsigned char*)& default_ethernet_device.client_ip,(unsigned char*)&our_ip);
         fillIP((unsigned char*)&default_ethernet_device.server_ip,(unsigned char*)&dhcp_ip);
@@ -288,7 +298,7 @@ void initialise_ethernet(){
     }else {
             printf("Internet device not found!\n");
             free(dhcp);
-            return;
+            goto end;
     }
 
     // ARP CACHE
@@ -297,7 +307,7 @@ void initialise_ethernet(){
     unsigned char ip[SIZE_OF_IP] =  {192,168,43,1};
     fillIP((unsigned char*)&src_ip, our_ip);
     fillIP((unsigned char*)&dst_ip, ip);
-    
-    //for(;;)__asm__ __volatile__("hlt");
 
+end:  
+    while(1){}
 }

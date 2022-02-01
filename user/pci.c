@@ -255,10 +255,11 @@ int pci_get_info(void *buffer,int max_bus)
 					if((pci_class_names[i].classcode &0xffffff) != (data >> 8 &0xffffff))
 						continue;
                     int class = data >> 24 &0xff;
+                    int subclass = data >> 16 &0xff;
                     printf("Device #%x:%x:%x -> ", bus, dev, fun);
                     data = pci_read_config_dword(bus,dev,fun, 0);
                     printf("Vendor ID: %x, Device ID: %x -> ", data &0xffff, data >> 16 &0xffff );
-					printf("Class: %d ( %s )\n",class, pci_class_names[i].name);
+					printf("Class: %d Subclass: %d ( %s )\n",class, subclass, pci_class_names[i].name);
 					break;
 				}
 		    

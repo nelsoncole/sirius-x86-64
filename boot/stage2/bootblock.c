@@ -5,7 +5,7 @@
 unsigned int *cof_bootblock()
 {
 	unsigned int *mem = (unsigned int *)0x100000;
-	unsigned char *boot_dv = (unsigned char*)0x40000;
+	unsigned char *boot_dv = (unsigned char*)0x30000;
 
 	memset(mem,0,0x1000); //4 KiB
 

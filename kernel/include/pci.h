@@ -59,6 +59,7 @@ void pci_write_config_dword(int bus,int dev,int fun,int offset,unsigned int data
 int pci_get_info(void *buffer,int max_bus);
 unsigned int pci_scan_bcc(unsigned int bcc);
 unsigned int pci_scan_class(int class);
+unsigned int pci_scan_class_subclass(int class, int subcalss);
 unsigned int pci_scan_bcc_scc(unsigned int bcc,unsigned int scc);
 unsigned int pci_scan_bcc_scc_prog(unsigned int bcc,unsigned int scc,unsigned int prog);
 unsigned int pci_scan_vendor(unsigned short vendor);

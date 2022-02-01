@@ -4,7 +4,7 @@
  **/
 OUTPUT_FORMAT("elf64-x86-64")
 ENTRY(_start)
-/*SECTIONS
+SECTIONS
 {
 	. = 0x401000;
 	_start = .;
@@ -12,7 +12,6 @@ ENTRY(_start)
 	.text :
 	{
 		code = .; _code = .; __code = .;
-		code = .;
 		*(.text)
 		. = ALIGN(4096);
 	}
@@ -39,7 +38,8 @@ ENTRY(_start)
 	}
 
 	end = .; _end = .; __end = .;
-}*/
+}
+/*
 SECTIONS
 {
 	. = 0x401000;
@@ -66,4 +66,4 @@ SECTIONS
 	}
 
     end = .; _end = .; __end = .;
-}
+}*/
