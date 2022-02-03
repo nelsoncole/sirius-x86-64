@@ -71,10 +71,6 @@ void irq_function(unsigned int n){
     if(n == 1 || n == 12){
         interrupt_status = 1;
     }
-
-    /*
-    outportb(0xA0,0x20);
-	outportb(0x20,0x20); */
 	
 	
 }

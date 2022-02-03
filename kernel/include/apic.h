@@ -101,7 +101,7 @@ void apic_timer_masked();
 #define IO_APIC_REDIR_TBL(n) 	(0x10 + 2 * n) //REDIR_TBL[0:23] 64 bits 
 
 
-typedef volatile struct _IOAPIC_REDIR_TBL {
+struct __IOAPIC_REDIR_TBL {
 	unsigned long long vector	: 8;
 	unsigned long long delv_mode 	: 3;
 	unsigned long long dest_mode	: 1;
@@ -113,7 +113,7 @@ typedef volatile struct _IOAPIC_REDIR_TBL {
 	unsigned long long rsv		: 39;
 	unsigned long long destination	: 8;
 	
-}__attribute__((packed)) IOAPIC_REDIR_TBL;
+}__attribute__((packed));
 
 int setup_ioapic();
 int ioapic_masked(int n);

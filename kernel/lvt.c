@@ -81,11 +81,6 @@ void lvt_function(int n)
 			printf("Default LVT n: %d\n",n - 0x20);
 		break;
 	}
-	
-    __asm__ __volatile__ ("nop;" :: );
-    __asm__ __volatile__ ("nop;" :: );
-    __asm__ __volatile__ ("nop;" :: );
-    __asm__ __volatile__ ("nop;" :: );
 }
 
 

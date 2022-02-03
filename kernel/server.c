@@ -48,8 +48,6 @@ void foco_default()
 void server(unsigned long entry_pointer_info)
 {
     char *buf;
-
-	char *path;
 	char *pwd;
 	unsigned long pid;
 	

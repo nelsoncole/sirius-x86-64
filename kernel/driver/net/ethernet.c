@@ -273,7 +273,7 @@ void initialise_ethernet(){
 
         memset(dhcp, 0, sizeof(dhcp_header_t));
         dhcp_send(our_ip, dhcp_ip, DHCP_REQUEST);
-        /*if( udp_receive(dhcp, sizeof(dhcp_header_t)) ){
+        if( udp_receive(dhcp, sizeof(dhcp_header_t)) ){
             if(htonl(dhcp->magic_cookie) != 0x63825363) {
                 printf("No DHCP\n");
                 free(dhcp);
@@ -287,7 +287,7 @@ void initialise_ethernet(){
             }
 
             printf("%s\n", string_dhcp_message[dhcp->options[2]]);
-        }*/
+        }
 
         fillIP((unsigned char*)& default_ethernet_device.client_ip,(unsigned char*)&our_ip);
         fillIP((unsigned char*)&default_ethernet_device.server_ip,(unsigned char*)&dhcp_ip);
@@ -298,7 +298,8 @@ void initialise_ethernet(){
     }else {
             printf("Internet device not found!\n");
             free(dhcp);
-            goto end;
+            free(ipv4_cache);
+            return;
     }
 
     // ARP CACHE

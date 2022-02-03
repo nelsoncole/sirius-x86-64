@@ -17,7 +17,8 @@
 
 #include <sleep.h>
 
-
+static void re_pci(int bus, int slot, int function);
+static void re_handle();
 static int re_send_package(ethernet_package_descriptor_t desc);
 static ethernet_package_descriptor_t *re_recieve_package();
 
@@ -128,11 +129,6 @@ void re_write_command_byte(unsigned short addr,unsigned char val){
     *( (volatile unsigned char *)(re_base_addr + addr)) = val;
 }
 
-void irq_realtek(){
-    printf("[RTL81] Interrupt detected\n");
-
-}
-
 
 int re_probe(struct re_softc * sc, int bus, int slot, int function){
     int type = 0;
@@ -163,232 +159,176 @@ static int re_check_mac_version(struct re_softc *sc)
         case 0x00800000:
         case 0x04000000:
                 sc->chipset = MACFG_3;
-                sc->max_jumbo_frame_size = Jumbo_Frame_7k;
                 break;
         case 0x10000000:
                 sc->chipset = MACFG_4;
-                sc->max_jumbo_frame_size = Jumbo_Frame_7k;
                 break;
         case 0x18000000:
                 sc->chipset = MACFG_5;
-                sc->max_jumbo_frame_size = Jumbo_Frame_7k;
                 break;
         case 0x98000000:
                 sc->chipset = MACFG_6;
-                sc->max_jumbo_frame_size = Jumbo_Frame_7k;
                 break;
         case 0x34000000:
         case 0xB4000000:
                 sc->chipset = MACFG_11;
-                sc->max_jumbo_frame_size = 0;//ETHERMTU;
                 break;
         case 0x34200000:
         case 0xB4200000:
                 sc->chipset = MACFG_12;
-                sc->max_jumbo_frame_size = 0;//ETHERMTU;
                 break;
         case 0x34300000:
         case 0xB4300000:
                 sc->chipset = MACFG_13;
-                sc->max_jumbo_frame_size = 0;// ETHERMTU;
                 break;
         case 0x34900000:
         case 0x24900000:
                 sc->chipset = MACFG_14;
-                sc->max_jumbo_frame_size = 0;//ETHERMTU;
                 break;
         case 0x34A00000:
         case 0x24A00000:
                 sc->chipset = MACFG_15;
-                sc->max_jumbo_frame_size = 0;// ETHERMTU;
                 break;
         case 0x34B00000:
         case 0x24B00000:
                 sc->chipset = MACFG_16;
-                sc->max_jumbo_frame_size = 0;//ETHERMTU;
                 break;
         case 0x34C00000:
         case 0x24C00000:
                 sc->chipset = MACFG_17;
-                sc->max_jumbo_frame_size =0;// ETHERMTU;
                 break;
         case 0x34D00000:
         case 0x24D00000:
                 sc->chipset = MACFG_18;
-                sc->max_jumbo_frame_size = 0;//ETHERMTU;
                 break;
         case 0x34E00000:
         case 0x24E00000:
                 sc->chipset = MACFG_19;
-                sc->max_jumbo_frame_size = 0;// ETHERMTU;
                 break;
         case 0x30000000:
                 sc->chipset = MACFG_21;
-                sc->max_jumbo_frame_size = Jumbo_Frame_4k;
                 break;
         case 0x38000000:
                 sc->chipset = MACFG_22;
-                sc->max_jumbo_frame_size = Jumbo_Frame_4k;
                 break;
         case 0x38500000:
         case 0xB8500000:
         case 0x38700000:
         case 0xB8700000:
                 sc->chipset = MACFG_23;
-                sc->max_jumbo_frame_size = Jumbo_Frame_4k;
                 break;
         case 0x3C000000:
                 sc->chipset = MACFG_24;
-                sc->max_jumbo_frame_size = Jumbo_Frame_6k;
                 break;
         case 0x3C200000:
                 sc->chipset = MACFG_25;
-                sc->max_jumbo_frame_size = Jumbo_Frame_6k;
                 break;
         case 0x3C400000:
                 sc->chipset = MACFG_26;
-                sc->max_jumbo_frame_size = Jumbo_Frame_6k;
                 break;
         case 0x3C900000:
                 sc->chipset = MACFG_27;
-                sc->max_jumbo_frame_size = Jumbo_Frame_6k;
                 break;
         case 0x3CB00000:
                 sc->chipset = MACFG_28;
-                sc->max_jumbo_frame_size = Jumbo_Frame_6k;
                 break;
         case 0x28100000:
                 sc->chipset = MACFG_31;
-                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
                 break;
         case 0x28200000:
                 sc->chipset = MACFG_32;
-                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
                 break;
         case 0x28300000:
                 sc->chipset = MACFG_33;
-                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
                 break;
         case 0x2C100000:
                 sc->chipset = MACFG_36;
-                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
                 break;
         case 0x2C200000:
                 sc->chipset = MACFG_37;
-                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
                 break;
         case 0x2C800000:
                 sc->chipset = MACFG_38;
-                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
                 break;
         case 0x2C900000:
                 sc->chipset = MACFG_39;
-                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
                 break;
         case 0x24000000:
                 sc->chipset = MACFG_41;
-                sc->max_jumbo_frame_size = 0;// ETHERMTU;
                 break;
         case 0x40900000:
                 sc->chipset = MACFG_42;
-                sc->max_jumbo_frame_size = 0;// ETHERMTU;
                 break;
         case 0x40A00000:
         case 0x40B00000:
         case 0x40C00000:
                 sc->chipset = MACFG_43;
-                sc->max_jumbo_frame_size = 0;//ETHERMTU;
                 break;
         case 0x48000000:
                 sc->chipset = MACFG_50;
-                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
                 break;
         case 0x48100000:
                 sc->chipset = MACFG_51;
-                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
                 break;
         case 0x48800000:
                 sc->chipset = MACFG_52;
-                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
                 break;
         case 0x44000000:
                 sc->chipset = MACFG_53;
-                sc->max_jumbo_frame_size = 0;//ETHERMTU;
                 break;
         case 0x44800000:
                 sc->chipset = MACFG_54;
-                sc->max_jumbo_frame_size = 0;//ETHERMTU;
                 break;
         case 0x44900000:
                 sc->chipset = MACFG_55;
-                sc->max_jumbo_frame_size = 0;//ETHERMTU;
                 break;
         case 0x4C000000:
                 sc->chipset = MACFG_56;
-                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
                 break;
         case 0x4C100000:
                 sc->chipset = MACFG_57;
-                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
                 break;
         case 0x50800000:
                 sc->chipset = MACFG_58;
-                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
                 break;
         case 0x50900000:
                 sc->chipset = MACFG_59;
-                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
                 break;
         case 0x5C800000:
                 sc->chipset = MACFG_60;
-                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
                 break;
         case 0x50000000:
                 sc->chipset = MACFG_61;
-                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
                 break;
         case 0x50100000:
                 sc->chipset = MACFG_62;
-                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
                 break;
         case 0x50200000:
                 sc->chipset = MACFG_67;
-                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
                 break;
         case 0x28800000:
                 sc->chipset = MACFG_63;
-                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
                 break;
         case 0x28900000:
                 sc->chipset = MACFG_64;
-                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
                 break;
         case 0x28A00000:
                 sc->chipset = MACFG_65;
-                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
                 break;
         case 0x28B00000:
                 sc->chipset = MACFG_66;
-                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
                 break;
         case 0x54000000:
                 sc->chipset = MACFG_68;
-                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
                 break;
         case 0x54100000:
                 sc->chipset = MACFG_69;
-                sc->max_jumbo_frame_size = Jumbo_Frame_9k;
                 break;
         default:
                 printf("unknown device\n");
                 sc->chipset = MACFG_FF;
-                sc->max_jumbo_frame_size = 0;
                 error = -1;
                 break;
-        }
-
-        if(!sc->max_jumbo_frame_size){ 
-            sc->max_jumbo_frame_size = Jumbo_Frame_9k; 
         }
 
         return error;
@@ -508,21 +448,10 @@ void setup_realtek( int bus, int slot, int function){
     re_soft.base_address = re_base_addr;
 
     // Configurar IRQ Handler
-    fnvetors_handler[intr] = &irq_realtek;
+    fnvetors_handler[intr] = &re_handle;
 
 
-    unsigned int command = 0;
-    command = pci_read_config_dword(bus,slot,function, 4);
-    command |= (0 | 0x2 | 0x04);
-    pci_write_config_dword(bus,slot,function, 4, command);
-    command = pci_read_config_dword(bus,slot,function, 4);
-
-    // Enable o PCI Busmastering DMA
-    if(!(command&0x04))
-    {
-        printf("[RTL81] Busmastering was not enabled\n");
-    }
-
+    re_pci( bus, slot, function);
 
     // Mapear para virtual o endereço fisico
     unsigned long virt_addr;
@@ -565,10 +494,10 @@ void setup_realtek( int bus, int slot, int function){
 
     // Set Rx Config register
     // RE_RXCFG
-    unsigned int cfg = 0;// 6 << 8;
-    //cfg |= (re_read_command(0x44) & re_chip_info[sc->chipset].rx_cfg_mask);
-    cfg = re_chip_info[sc->chipset].rx_cfg_mask;
-    re_write_command(0x44, cfg | 0xF);
+    unsigned int cfg = 7 << 13 | 6 << 8 | 0xf;
+    cfg |= (re_read_command(0x44) & 0xff7e1880);
+    //cfg = re_chip_info[sc->chipset].rx_cfg_mask | 0xF;
+    re_write_command(0x44, cfg);
 
     // Set the initial TX configuration
     // Set DMA burst size and Interframe Gap Time 
@@ -580,11 +509,6 @@ void setup_realtek( int bus, int slot, int function){
     re_setup_rx_desc(&re_soft);
 
 
-    // Enable interrupts.
-    // RE_IMR
-    re_write_command_word(0x3c, RE_INTRS);
-
-
     // RTL-8169sc/8110sc or later version
     if (sc->chipset > 5){
         // Enable transmit and receive
@@ -593,16 +517,26 @@ void setup_realtek( int bus, int slot, int function){
 
     }
 
-    re_lock(&re_soft);
-    //udelay(10);
-
     // RxMissed
     re_write_command(0x4c, 0);
     
     // no early-rx interrupts
 	re_write_command_word(0x5c, re_read_command_word(0x5c) & 0xF000);
 
+    // Timerint
+    re_write_command(0x58, 0);
+    // Enable interrupts.
+    unsigned int re_intrs =  0x8000 | 0x4000 | 0x0040 | 0x0020 | 0x0010 | 0x0008 | 0x0002 | 0x0001;
+    re_write_command_word(0x3c, re_intrs);
 
+
+    re_lock(&re_soft);
+    //udelay(10);
+    int status = re_read_command_word(0x3e);
+    re_write_command_word(0x3e, status);
+
+
+    //while(1){}
     // register driver
     register_ethernet_device((unsigned long)&re_send_package,(unsigned long)&re_recieve_package,mac_address);
 }
@@ -629,17 +563,11 @@ int re_send_package(ethernet_package_descriptor_t desc){
     sc->tx_desc[sc->tx_cur]->LS = 1;
     sc->tx_desc[sc->tx_cur]->IPCS = 1;
 
-    /*printf("Frame Length %d\n", sc->tx_desc[sc->tx_cur]->Frame_Length);
-    printf("TCPCS %d ", sc->tx_desc[sc->tx_cur]->TCPCS);
-    printf("UDPCS %d ", sc->tx_desc[sc->tx_cur]->UDPCS);
-    printf("IPCS %d ", sc->tx_desc[sc->tx_cur]->IPCS);
-    printf("SCRC %d ", sc->tx_desc[sc->tx_cur]->SCRC);
-    printf("TDMA %d ", sc->tx_desc[sc->tx_cur]->TDMA);
-    printf("LGSEN %d ", sc->tx_desc[sc->tx_cur]->LGSEN);
-    printf("LS %d ", sc->tx_desc[sc->tx_cur]->LS);
-    printf("FS %d ", sc->tx_desc[sc->tx_cur]->FS);
-    printf("EOR %d ", sc->tx_desc[sc->tx_cur]->EOR);
-    printf("OWN %d\n", sc->tx_desc[sc->tx_cur]->OWN); */
+    /* TXPoll
+	HPQ		= 0x80		// Poll cmd on the high prio queue
+	NPQ		= 0x40		// Poll cmd on the low prio queue 
+	FSWInt	= 0x01		// Forced software interrupt 
+    */
 
     re_write_command_byte(0x38, 0x40); // set polling bit
 	while(re_read_command_byte(0x38) &0x40 ){ __asm__ __volatile__("pause;");}
@@ -665,26 +593,7 @@ ethernet_package_descriptor_t *re_recieve_package(){
     while( 1 ){ 
         if(!sc->rx_desc[sc->rx_cur]->OWN) 
             break;
-    } 
-    /*
-    printf("Frame Length %d\n", sc->rx_desc[sc->rx_cur]->Frame_Length);
-    printf("TCPF %d ", sc->rx_desc[sc->rx_cur]->TCPF);
-    printf("UDPF %d ", sc->rx_desc[sc->rx_cur]->UDPF);
-    printf("IPF %d ", sc->rx_desc[sc->rx_cur]->IPF);
-    printf("TCPT %d ", sc->rx_desc[sc->rx_cur]->TCPT);
-    printf("UDPT %d ", sc->rx_desc[sc->rx_cur]->UDPT);
-    printf("CRC %d ", sc->rx_desc[sc->rx_cur]->CRC);
-    printf("RUNT %d ", sc->rx_desc[sc->rx_cur]->RUNT);
-    printf("RES %d ", sc->rx_desc[sc->rx_cur]->RES);
-    printf("RWT %d ", sc->rx_desc[sc->rx_cur]->RWT);
-    printf("RESV %d ", sc->rx_desc[sc->rx_cur]->RESV);
-    printf("BAR %d ", sc->rx_desc[sc->rx_cur]->BAR);
-    printf("PAM %d ", sc->rx_desc[sc->rx_cur]->PAM);
-    printf("MAR %d ", sc->rx_desc[sc->rx_cur]->MAR);
-    printf("LS %d ", sc->rx_desc[sc->rx_cur]->LS);
-    printf("FS %d ", sc->rx_desc[sc->rx_cur]->FS);
-    printf("EOR %d ", sc->rx_desc[sc->rx_cur]->EOR);
-    printf("OWN %d\n", sc->rx_desc[sc->rx_cur]->OWN);*/
+    }
 
     sc->rx_desc[sc->rx_cur]->OWN = 1;
 
@@ -699,4 +608,173 @@ ethernet_package_descriptor_t *re_recieve_package(){
     sc->rx_cur = (sc->rx_cur + 1) % sc->rx_buf_num;       
     
     return first_desc;
+}
+
+static void re_handle(){
+    unsigned short status = re_read_command_word(0x3e);
+    printf("[RTL81] Interrupt detected %x\n", status );
+
+    if(status&0x20) {
+
+		printf("[RTL81] Link change detected!\n");
+		//ethernet_set_link_status(1);
+	}else if(status&0x01)
+    {
+		printf("[RTL81] Package recieved!\n");
+
+	}else if(status&0x04)
+    {
+		printf("[RTL81] Package send!\n");
+		//((unsigned volatile long*)((unsigned volatile long)&package_send_ack))[0] = 1;
+	}
+
+	re_write_command_word(0x3e, status);
+	status = re_read_command_word(0x3e);
+	if(status!=0x00)
+    {
+		printf("[RTL81] Unresolved interrupt: %x \n",status);
+	}
+
+}
+extern unsigned long lapicbase;
+extern unsigned int localId;
+static void re_pci(int bus, int slot, int function){
+
+    unsigned int command = 0;
+    command = pci_read_config_dword(bus,slot,function, 4);
+    command |= (0 | 0x2 | 0x04);
+    pci_write_config_dword(bus,slot,function, 4, command);
+    command = pci_read_config_dword(bus,slot,function, 4);
+
+    // Enable o PCI Busmastering DMA
+    if(!(command&0x04))
+    {
+        printf("[RTL81] Busmastering was not enabled\n");
+    }
+
+
+    unsigned int capp;
+    /*
+
+    // MSI-X
+    // Capabilities List Pointer
+    capp = pci_read_config_byte(bus,slot,function, 0x34);
+    for(int i=0; i < 10; i++){
+        // Capabilities List Pointer Register
+        command = pci_read_config_word(bus,slot,function, capp);
+        if((command&0xff) == 0x11) break;
+
+        capp = command >> 8 &0xff;
+        if(!capp) break;
+
+    }
+
+    if(capp != 0){
+        command = pci_read_config_word(bus,slot,function, capp);
+        if((command&0xff) ==0x11){
+
+            // INTx# Disable
+            command = pci_read_config_word(bus,slot,function, 0x4) | 1 << 10;
+            //pci_write_config_word(bus,slot,function, 0x4, command);
+
+            int msix_off = capp;
+            unsigned int msix_bir = pci_read_config_dword(bus,slot,function,capp + 4);
+            unsigned int msix_table_off = msix_bir & ~7;
+            unsigned long tmp;
+
+            msix_bir &= 7;
+
+            int msix_sz = pci_read_config_word(bus,slot,function, capp + 0x2) &0x7FF;
+
+
+            tmp = pci_read_config_dword(bus,slot,function, 0x10 + msix_bir*4 + 4);
+            tmp <<= 32;
+            tmp |= pci_read_config_dword(bus,slot,function, 0x10 + msix_bir*4) &0xfffffff0;
+            tmp += msix_table_off;
+
+            mm_mp(tmp, (unsigned long*)&tmp, 0x40000, 0);
+            unsigned int *msix = (unsigned int *)tmp;
+            //char *msix_bitmap = malloc(msix_sz);
+
+            unsigned int pba_bir = pci_read_config_dword(bus,slot,function,capp + 8);
+            unsigned int pba_table_off = msix_bir & ~7;
+            pba_bir &= 7;
+
+            tmp = pci_read_config_dword(bus,slot,function, 0x10 + pba_bir*4 + 4);
+            tmp <<= 32;
+            tmp |= pci_read_config_dword(bus,slot,function, 0x10 + pba_bir*4) &0xfffffff0;
+            tmp += pba_table_off;
+            unsigned long *pba = (unsigned long *)tmp;
+        
+            // Mask everything
+            unsigned int ctrl = pci_read_config_dword(bus,slot,function, msix_off);
+            pci_write_config_dword(bus,slot,function, msix_off, ctrl | (1 << 30));
+
+            for (int i = 0; i < msix_sz; i++) {
+                msix[i * 4 + 0] = 0;
+                msix[i * 4 + 1] = 0;
+                msix[i * 4 + 2] = 0;
+                msix[i * 4 + 3] = 1;
+            }
+
+
+            int i = 0;
+            int irq = 11;
+            int id = localId;
+            unsigned long MSI_TAG = 0xFEE00000;
+            msix[i * 4 + 0] = MSI_TAG | (id << 12);
+            msix[i * 4 + 1] = MSI_TAG >> 32;
+            msix[i * 4 + 2] = irq & 0xFF;
+            msix[i * 4 + 3] = 0;
+            // unmask everything
+            pci_write_config_dword(bus,slot,function, msix_off, ctrl & ~(1 << 30));
+
+            // MSI-x Enable
+            command = pci_read_config_dword(bus,slot,function, capp);
+            command |= 0x80000000;
+            pci_write_config_dword(bus,slot,function, capp, command);
+
+        }
+    }
+
+    */
+
+    // MSI
+    // Capabilities List Pointer
+    capp = pci_read_config_byte(bus,slot,function, 0x34);
+    for(int i=0; i < 10; i++){
+        // Capabilities List Pointer Register
+        command = pci_read_config_word(bus,slot,function, capp);
+        if((command&0xff) == 0x5) break;
+
+        capp = command >> 8 &0xff;
+        if(!capp) break;
+
+    }
+
+    if(capp != 0){
+        command = pci_read_config_word(bus,slot,function, capp);
+        if((command&0xff) ==0x5){
+            printf("Message Signaled Interrupt: %x\n", command);
+
+            command = pci_read_config_word(bus,slot,function, 0x4) | 1 << 10;
+            pci_write_config_word(bus,slot,function, 0x4, command);
+            printf("%x\n", pci_read_config_word(bus,slot,function, 0x4));
+
+            unsigned long d = 0xFEE00000;// re_handle;
+            pci_write_config_dword(bus,slot,function, capp + 0x4, d);
+            pci_write_config_dword(bus,slot,function, capp + 0x8, d >> 32);
+
+            pci_write_config_word(bus,slot,function, capp + 0xc, 17);
+            
+            // MSI Enable
+            command = pci_read_config_dword(bus,slot,function, capp);
+            command |= 0x10000;
+            pci_write_config_dword(bus,slot,function, capp, command);
+
+
+        }
+    }
+
+
 }

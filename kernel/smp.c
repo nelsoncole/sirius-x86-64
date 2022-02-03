@@ -90,7 +90,10 @@ void setup_smp() {
 	*bspdone = 0;
 
 	
-	for(int i = 0; i < core->numcore; i++) {
+	for(int i = 0; i < 2/*core->numcore*/; i++) {
+
+        if(core->numcore == 1)
+            break;
 		// do not start BSP, that's already running this code
 		if(core->lapic_ids[i] == core->bspid) continue;
 		

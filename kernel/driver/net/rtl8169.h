@@ -24,27 +24,6 @@
 #define RE_CMD_RESET		0x0010
 
 
-/*
- * Interrupt status register bits.
- */
-#define RE_ISR_RX_OK		0x0001
-#define RE_ISR_RX_ERR		0x0002
-#define RE_ISR_TX_OK		0x0004
-#define RE_ISR_TX_ERR		0x0008
-#define RE_ISR_RX_OVERRUN	0x0010
-#define RE_ISR_PKT_UNDERRUN	0x0020
-#define RE_ISR_LINKCHG		0x0020
-#define RE_ISR_FIFO_OFLOW	0x0040
-#define RE_ISR_TDU		    0x0080
-#define RE_ISR_LENCHG	    0x2000
-#define RE_ISR_PCS_TIMEOUT	0x4000	/* 8129 only */
-#define RE_ISR_SYSTEM_ERR	0x8000
-
-#define RE_INTRS	\
-	(RE_ISR_TX_OK|RE_ISR_RX_OK|RE_ISR_RX_ERR|RE_ISR_TX_ERR|		\
-	RE_ISR_RX_OVERRUN|RE_ISR_PKT_UNDERRUN|RE_ISR_TDU|	\
-	RE_ISR_PCS_TIMEOUT|RE_ISR_SYSTEM_ERR | RE_ISR_LINKCHG | RE_ISR_LENCHG)
-
 #define Jumbo_Frame_2k	(2 * 1024)
 #define Jumbo_Frame_3k	(3 * 1024)
 #define Jumbo_Frame_4k	(4 * 1024)

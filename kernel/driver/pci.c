@@ -227,6 +227,45 @@ void pci_write_config_dword(int bus,int dev,int fun,int offset,unsigned int data
     	outportl(PCI_PORT_DATA,data);
 }
 
+unsigned short pci_read_config_word(int bus,int dev,int fun,int offset)
+{
+    	int shift = offset %4;
+ 
+    	outportl(PCI_PORT_ADDR,CONFIG_ADDR(bus,dev,fun, offset - shift));
+        unsigned int data =  inportl(PCI_PORT_DATA);
+    
+    	return (data >> (shift*8)) &0xffff;
+}
+
+void pci_write_config_word(int bus,int dev,int fun,int offset,unsigned short data)
+{
+        int shift = offset %4;
+        unsigned int d = read_pci_config_addr(bus,dev,fun, offset - shift);
+        d &=~ (0xffff << (shift*8));
+        d |= data << (shift*8);
+        write_pci_config_addr(bus,dev,fun, offset - shift, d);
+}
+
+unsigned char pci_read_config_byte(int bus,int dev,int fun,int offset)
+{
+
+        int shift = offset %4;
+ 
+    	outportl(PCI_PORT_ADDR,CONFIG_ADDR(bus,dev,fun, offset - shift));
+        unsigned int data =  inportl(PCI_PORT_DATA);
+    
+    	return (data >> (shift*8)) &0xff;
+}
+
+void pci_write_config_byte(int bus,int dev,int fun,int offset,unsigned char data)
+{
+        int shift = offset %4;
+        unsigned int d = read_pci_config_addr(bus,dev,fun, offset - shift);
+        d &=~ (0xffff << (shift*8));
+        d |= data << (shift*8);
+        write_pci_config_addr(bus,dev,fun, offset - shift, d);
+}
+
 //FIXME Nelson, esta funcao deve retornar uma lista de trivers PCI presentes na maquina
 int pci_get_info(void *buffer,int max_bus) 
 {
