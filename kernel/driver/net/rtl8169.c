@@ -346,13 +346,15 @@ static void re_unlock(struct re_softc * sc){
 static void re_setup_dma_map_buf(struct re_softc *sc){
     unsigned long addr = 0;
     // 4112 KiB
-    alloc_pages(0, 1028, (unsigned long*)&addr);
+    //alloc_pages(0, 2048, (unsigned long*)&addr);
+
+    mm_mp(0x10000000 /*256MiB*/, (unsigned long*)&addr, 0x800000/*8MiB*/, 0);
 
     if(!addr) {
         kernel_panic("realtack");
     }
 
-    memset((void*)addr,0, 1028*4096);
+    memset((char*)addr,0, 1028*4096);
 
     sc->phymem = get_phy_addr(addr);
     sc->vmem = addr;
@@ -438,10 +440,10 @@ void setup_realtek( int bus, int slot, int function){
 
     unsigned long up_addr = pci_read_config_dword(bus,slot,function,0x1C);
     re_base_addr = (up_addr << 32 ) & 0xFFFFFFFF00000000;
-    re_base_addr |= pci_read_config_dword(bus,slot,function,0x18) & 0xFFFFFFFE;
+    re_base_addr |= pci_read_config_dword(bus,slot,function,0x18) & 0xFFFFFFF0;
     int intr = pci_read_config_dword(bus,slot,function,0x3C) & 0x000000FF;
     
-
+   
     printf("[RTL81] Base Address %x\n", re_base_addr);
     re_soft.type = type;
     re_soft.intr = intr;
@@ -461,6 +463,7 @@ void setup_realtek( int bus, int slot, int function){
     // Soft reset the chip
     re_write_command_byte(0x37, RE_CMD_RESET);
     while(re_read_command_byte(0x37) & RE_CMD_RESET){ /*udelay(10);*/}
+
 
     // Identify chip attached to board 
     if(re_check_mac_version(sc) ){
@@ -526,15 +529,12 @@ void setup_realtek( int bus, int slot, int function){
     // Timerint
     re_write_command(0x58, 0);
     // Enable interrupts.
-    unsigned int re_intrs =  0x8000 | 0x4000 | 0x0040 | 0x0020 | 0x0010 | 0x0008 | 0x0002 | 0x0001;
+    unsigned int re_intrs = 0x8000 | 0x4000 | 0x0040 | 0x0020 | 0x0010 | 0x0008 | 0x0002 | 0x0001;
     re_write_command_word(0x3c, re_intrs);
 
 
     re_lock(&re_soft);
     //udelay(10);
-    int status = re_read_command_word(0x3e);
-    re_write_command_word(0x3e, status);
-
 
     //while(1){}
     // register driver
@@ -590,27 +590,43 @@ ethernet_package_descriptor_t *re_recieve_package(){
     desc->buffersize = 0;
     desc->buf = (void*)0;
     
-    while( 1 ){ 
-        if(!sc->rx_desc[sc->rx_cur]->OWN) 
-            break;
-    }
 
-    sc->rx_desc[sc->rx_cur]->OWN = 1;
 
-    unsigned long long addr = sc->rx_buf_v + (8192*sc->rx_cur);
+    while(sc->rx_desc[sc->rx_cur]->OWN == 0){
+       /* while( 1 ){ 
+            if(!sc->rx_desc[sc->rx_cur]->OWN) 
+                break;
 
-    unsigned short len = sc->rx_desc[sc->rx_cur]->Frame_Length;
+            if(default_ethernet_device.is_online)
+                return first_desc;
+        }*/
 
-    desc->buffersize = len;
-    desc->buf = (void*) addr;
+        sc->rx_desc[sc->rx_cur]->OWN = 1;
 
-    desc->flag = 0;
-    sc->rx_cur = (sc->rx_cur + 1) % sc->rx_buf_num;       
+        unsigned long long addr = sc->rx_buf_v + (8192*sc->rx_cur);
+
+        unsigned short len = sc->rx_desc[sc->rx_cur]->Frame_Length;
+        sc->rx_cur = (sc->rx_cur + 1) % sc->rx_buf_num;
+
+        desc->buffersize = len;
+        desc->buf = (void*) addr;
+
+        desc->flag = 0;
+        first_desc->count++;
+        desc++;
+    }      
     
     return first_desc;
 }
-
+extern int screan_spin_lock;
 static void re_handle(){
+
+    while(screan_spin_lock != 0) {}
+	
+    screan_spin_lock ++;
+
+    VERBOSE = 1;
+
     unsigned short status = re_read_command_word(0x3e);
     printf("[RTL81] Interrupt detected %x\n", status );
 
@@ -635,6 +651,9 @@ static void re_handle(){
 		printf("[RTL81] Unresolved interrupt: %x \n",status);
 	}
 
+    while(1){}
+
+    screan_spin_lock = 0;
 }
 extern unsigned long lapicbase;
 extern unsigned int localId;
@@ -765,7 +784,7 @@ static void re_pci(int bus, int slot, int function){
             pci_write_config_dword(bus,slot,function, capp + 0x4, d);
             pci_write_config_dword(bus,slot,function, capp + 0x8, d >> 32);
 
-            pci_write_config_word(bus,slot,function, capp + 0xc, 17);
+            pci_write_config_word(bus,slot,function, capp + 0xc, 11);
             
             // MSI Enable
             command = pci_read_config_dword(bus,slot,function, capp);

@@ -90,11 +90,6 @@ int ioapic_cofiguration(int count)
 {
 
 	for(int n = 0; n < count; n++) {
-	    if(0)
-            set_ioapic_redir_table(n/*IRQn*/,0x40 + n/*vector*/,\
-	        1/*Delivery Mode*/,0/*Destination Mode*/,0/*RO*/,0/*Interrupt Input Pin Polarity*/,\
-	        0/*RO*/,0,1/* masked*/, localId);
-        else
 	        set_ioapic_redir_table(n/*IRQn*/,0x40 + n/*vector*/,\
 	        0/*Delivery Mode*/,0/*Destination Mode*/,0/*RO*/,0/*Interrupt Input Pin Polarity*/,\
 	        0/*RO*/,0,1/* masked*/, localId);

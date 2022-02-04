@@ -104,7 +104,7 @@ void DDA_line(int x0, int y0, int x1, int y1, unsigned int color )
 
 
 extern char* get_ip_from_name(char *addr, const char *name , int query_type);
-char bf[128];
+char bf[4096];
 int main(int argc, char **argv) {
 
 //    DDA_line(400, 100, 500, 300, 0xFFFFFF);
@@ -130,15 +130,22 @@ int main(int argc, char **argv) {
         return 0;
     }
 
+    int dns = 0;
+    if(argc < 4) {
+        dns = 1;
+    }
+
     int port = strtoul (argv[2],NULL, 10);
-    char ip[18];
-   
+    char ip[128];
+    if(!dns)
+        strcpy(ip, argv[1]);
+    else
     if(!get_ip_from_name(ip, argv[1], 1)){
         printf("DNS No IP...\n");
         return 0;
     }
 
-    printf("IP: %s Port: %d\n", ip, port);
+    printf("IP: %s, Port: %d\n", ip, port);
 
     int client;
     struct sockaddr_in  saddr;
@@ -157,16 +164,22 @@ int main(int argc, char **argv) {
     }
     //printf("Conetado ao servidor\n");
 
+    int y = 0;
     while(1){
         //
         memset(bf, 0, 1024);
         printf("< ");
         int r = recv(client, bf, 1024, 0);
         printf("%s\n",bf);
+    
+        if(y > 1 || dns == 0 ) {
 
-        printf("> ");
-        fgets(bf,1024,stdin);
-        send(client, bf, strlen(bf)+1 ,0);
+            printf("> ");
+            fgets(bf,1024,stdin);
+            send(client, bf, strlen(bf),0);
+        }
+
+        y++;
     }
     shutdown(client, 0);
 	return 0;

@@ -111,7 +111,7 @@ int mm_mp( unsigned long phy_addr, unsigned long *virt_addr,unsigned size, int f
 }
 
 // TODO
-// 0x2000000 -- 0x3000000 -- 16 MiB RAM_BITMAP
+// 0x2000000 -- 0x3000000 -- 32 MiB RAM_BITMAP
 // 0x3000000 -- 0x3001000 -- 4 KiB ALLOC_PAGE_DIR
 // 0x3001000 -- 0x3201000 -- 2 MiB ALLOC_PAGE_TABLE
 
@@ -136,7 +136,7 @@ unsigned long ram_setup(unsigned long entry_pointer_info)
 
 	return ((unsigned long) RAM_BITMAP);
 }
-
+extern int screan_spin_lock;
 unsigned long alloc_frame()
 {
 	unsigned char *bmp = RAM_BITMAP + 2048;
@@ -146,7 +146,7 @@ unsigned long alloc_frame()
 		for(int t = 0; t < 8; t++) {
 		
 			if( !(*bmp >> t &0x1) ) {
-			
+
 				*bmp |= (1 << t);
 				return 0x4000000 + ( (i*8+t)*0x1000); //64MiB +++
 			}
@@ -155,9 +155,12 @@ unsigned long alloc_frame()
 		bmp++;
 	}
 	
+    while(screan_spin_lock != 0) {}
+    screan_spin_lock ++;
+    VERBOSE = 1;
 	printf("Alloc Frame error\n"); 
-		cli();
-		for(;;);
+	cli();
+	while(1){}
 	
 	return 0;
 }

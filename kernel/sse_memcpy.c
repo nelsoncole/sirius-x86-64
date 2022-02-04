@@ -33,7 +33,7 @@ void *sse_memcpy(void * s1, const void * s2, size_t len)
   	}
   	
   	/* PREFETCH has effect even for MOVSB instruction */
-  	__asm__ __volatile__ (
+  	/*__asm__ __volatile__ (
 		"   prefetchnta (%0)\n"
 		"   prefetchnta 32(%0)\n"
     	"   prefetchnta 64(%0)\n"
@@ -45,14 +45,15 @@ void *sse_memcpy(void * s1, const void * s2, size_t len)
     	"   prefetchnta 256(%0)\n"
    		"   prefetchnta 288(%0)\n"
    		: : "r" (src) );
+    */
     		
     size_t x = n/64;
   	if(x > 0) {
   	
   		for(int i = 0; i < x; i ++) {
   			__asm__ __volatile__ (
-    		"prefetchnta 320(%0)\n"
-       		"prefetchnta 352(%0)\n"
+    		/*"prefetchnta 320(%0)\n"
+       		"prefetchnta 352(%0)\n"*/
         	"movaps (%0), %%xmm0\n"
        		"movaps 16(%0), %%xmm1\n"
         	"movaps 32(%0), %%xmm2\n"
@@ -69,10 +70,10 @@ void *sse_memcpy(void * s1, const void * s2, size_t len)
 
 	   	/* since movntq is weakly-ordered, a "sfence"
 	     * is needed to become ordered again. */
-	    __asm__ __volatile__ ("sfence":::"memory");
+	   // __asm__ __volatile__ ("sfence":::"memory");
 	    
 	    // enables to use FPU 
-	    __asm__ __volatile__ ("emms":::"memory");
+	    //__asm__ __volatile__ ("emms":::"memory");
 	}
 	
 	if( n%64 ) small_memcpy(dst, src, n%64); 

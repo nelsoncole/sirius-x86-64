@@ -8,6 +8,7 @@
 #include <data.h>
 
 #include <socket.h>
+#include <ethernet.h>
 
 unsigned long thread_id;
 unsigned long server_id[6];
@@ -125,13 +126,12 @@ loop:
             // processar socket
             //cli();
             socket_server_transmit();
+            //handler_ethernet_package_received();
             socket_execute_row();
             //sti();
 			break;
 	}
 
-    __asm__ __volatile__("sti; hlt;");    
-    __asm__ __volatile__("sti; hlt;");
 	goto loop;
 }
 

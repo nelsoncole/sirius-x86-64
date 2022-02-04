@@ -9,12 +9,14 @@
 #include <i965.h>
 
 
+#include <ethernet.h>
+
 #define TASK_BARRA 36
 
 #define SSE_MMREG_SIZE 16
 
 extern unsigned long timer_ticks;
-
+int rf;
 extern char cursor18x18[18*20];
 extern void copymem(void *s1, const void *s2, unsigned long n);
 
@@ -170,13 +172,14 @@ void window_foco(unsigned long addr) {
 }
 
 void paint_desktop(void *bankbuffer) {
-
+    int count = 0;
 	while(paint_ready_queue->spinlock);
 	paint_ready_queue->spinlock++;
 
 	paint = paint_ready_queue->next;
 	while(paint){
 	    if(paint->w != 0) {
+            count++;
 		    WINDOW *w = (WINDOW*) paint->w;
 		
 		    while(w->spinlock != 0)__asm__ __volatile__("pause;");
@@ -246,6 +249,8 @@ void paint_desktop(void *bankbuffer) {
 
 
 	paint_ready_queue->spinlock = 0;
+
+    rf = count;
 }
 
 
@@ -322,31 +327,7 @@ void compose()
 	mouseaddr->width = 18;
 	mouseaddr->height = 20;
 
-    cli();
-
     for (;;){
-
-        // 40 fps
-        // o pit deve ser divido por 100 = 10ms
-        while( timer_ticks%2 != 0 && 1) {
-            __asm__ __volatile__ ("sti; hlt;" :: );
-            __asm__ __volatile__ ("sti; hlt;" :: );
-        }
-    
-        // fazer refresh por segundo quando não houver nenhuma interrupção
-        // Isto deve refrescar a CPU
-        if(!interrupt_status){
-
-            while( !interrupt_status && timer_ticks%30 != 0 ){
-                __asm__ __volatile__ ("sti; hlt;" :: );
-                __asm__ __volatile__ ("sti; hlt;" :: );
-
-            }
-
-            cli();
-        }
-
-        interrupt_status = 0;
 
         paint_desktop(zbuf);
         paint_cursor(zbuf,mouseaddr);
@@ -358,13 +339,15 @@ void compose()
 		//#endif
 		
   		
-  		while(screan_spin_lock);
+  		while(screan_spin_lock){}
 		screan_spin_lock++;
   		
   		//copymem(vram, zbuf, len);
   		sse_memcpy(vram, zbuf, len);
   		
   		screan_spin_lock = 0;
+
+        handler_ethernet_package_received();
   		
   	}
   	

@@ -79,7 +79,7 @@ char* get_ip_from_name(char *addr, const char *name , int query_type){
     src.sin_port = htons(0);
 
     dest.sin_family = AF_INET;
-    dest.sin_addr.s_addr = inet_addr(dns_servers[3]); //dns ip
+    dest.sin_addr.s_addr = inet_addr(dns_servers[2]); //dns ip
     dest.sin_port = htons(53);
 
     int socketid = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -88,7 +88,7 @@ char* get_ip_from_name(char *addr, const char *name , int query_type){
         return 0;
     }
 
-    if( bind( socketid, (struct sockaddr*)&dest, sizeof(struct sockaddr_in)) ) {
+    if( bind( socketid, (struct sockaddr*)&src, sizeof(struct sockaddr_in)) ) {
         printf("Can't bind socket!\n");
         return 0;
     }

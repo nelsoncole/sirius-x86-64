@@ -119,7 +119,7 @@ loop:
 
             switch( htons(arp->operation) ){
                 case ARP_OPC_REQUEST:
-                    printf("ARP REQUEST\n");
+                    //printf("ARP REQUEST\n");
                     arp_save_address( ip, mac);
                     //arp_replay(ip, mac);
                     arp_replay2(target_ip, ip, mac);
@@ -132,11 +132,11 @@ loop:
                     }
                     break;
                 case ARP_OPC_REPLY:
-                    printf("ARP REPLAY\n");
+                    //printf("ARP REPLAY\n");
                     arp_save_address( ip, mac);
                     break;
                 default:
-                    printf("ARP UNKNOWN %x\n", htons(arp->operation) );
+                    //printf("ARP UNKNOWN %x\n", htons(arp->operation) );
                     break;
             }   
             break;
@@ -144,29 +144,32 @@ loop:
             ipv4 = (ipv4_header_t*) (prd->buf + sizeof(ether_header_t) );
             switch( ipv4->protocol){
                 case IP_PROTOCOL_ICMP:
-                    printf("IPv4 ICMP\n");
+                    //printf("IPv4 ICMP\n");
                     break;
                 case IP_PROTOCOL_TCP:
-                    printf("IPv4 TCP\n");
+                    //printf("IPv4 TCP\n");
                     tcp = (tcp_header_t*) ((unsigned long)(prd->buf + sizeof(ipv4_header_t) + sizeof(ether_header_t)));
                     data = (char*) tcp;
+                    end = (char*) tcp;
                     data += (tcp->off >>4)*4;
-                    end = (char*)(prd->buf + prd->buffersize);
-                    len = end - data;
+                    end += htons(ipv4->len) - sizeof(ipv4_header_t);
+                    len =  end - data;
                     socket_server_receive(0, IP_PROTOCOL_TCP, ipv4->src, ipv4->dst, tcp->src_port,
                     tcp->dst_port, data, len, tcp->seq, tcp->ack, tcp->flags);
                     break;
                 case IP_PROTOCOL_UDP:
-                    printf("IPv4 UDP\n");
+                    //printf("IPv4 UDP\n");
                     udp = (udp_header_t*) ((unsigned long)(prd->buf + sizeof(ipv4_header_t) + sizeof(ether_header_t)));
                     data = (char*) udp;
+                    end = (char*) udp;
                     data += sizeof(udp_header_t);
-                    len = htons(udp->length) - sizeof(udp_header_t);
+                    end += htons(ipv4->len) - sizeof(ipv4_header_t);
+                    len =  end - data;
                     socket_server_receive(0,IP_PROTOCOL_UDP, ipv4->src, ipv4->dst, udp->src_port, udp->dst_port, data, len, 0, 0, 0);
                   
                     break;
                 default:
-                    printf("IPv4 UNKNOWN %x\n", ipv4->protocol );
+                    //printf("IPv4 UNKNOWN %x\n", ipv4->protocol );
                     break;
             }
 
@@ -310,5 +313,7 @@ void initialise_ethernet(){
     fillIP((unsigned char*)&dst_ip, ip);
 
 end:  
-    while(1){}
+
+    return;   
+   //while(1){}
 }

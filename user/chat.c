@@ -12,12 +12,12 @@ int main(int argc, char **argv) {
         return 0;
     }
 
-    char ip[18];
+    char ip[128];
    
-    if(!get_ip_from_name(ip, argv[1], 1)){
+    /*if(!get_ip_from_name(ip, argv[1], 1)){
         printf("DNS No IP...\n");
         return 0;
-    }
+    }*/
 
     struct sockaddr_in sera;
     struct sockaddr_in serb;
@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
     sera.sin_port  = htons(0);
 
     serb.sin_family        = AF_INET;
-    serb.sin_addr.s_addr = inet_addr("192.168.43.1"/*(const char*)ip*/);
+    serb.sin_addr.s_addr = inet_addr(/*(const char*)ip*/argv[1]);
     serb.sin_port  = htons(20001);
 
     int socketid = socket(AF_INET, SOCK_DGRAM, 0);

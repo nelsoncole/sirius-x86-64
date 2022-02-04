@@ -110,15 +110,15 @@ void main(unsigned long entry_pointer_info)
 	printf("Setup RTC ...\\\\\n"); 
 	rtc_setup();
 	apic_timer_umasked();
-    ioapic_umasked(0);
+    //ioapic_umasked(0);
 	ioapic_umasked(1);
 	ioapic_umasked(2);
 	//ioapic_umasked(8);
 	ioapic_umasked(12);
-    //ioapic_umasked(11);
+    ioapic_umasked(11);
     //ioapic_umasked(19);
 
-    for(int i=2; i < 24; i++){ ioapic_umasked(i);}
+    //for(int i=2; i < 24; i++){ ioapic_umasked(i);}
 
     printf("Setup I965 ...\\\\\n"); 
 	setup_i965();
@@ -179,12 +179,10 @@ void main(unsigned long entry_pointer_info)
 	
 	create_thread( &compose, stack + 0x7FFF, (unsigned long)pml4e, 0, 0x80,0,0, 0);
 	done();
-	
-	sti();
 
-	while(launcher)
-		__asm__ __volatile__("pause" :::"memory");
-	cli();
+	//sti();
+	while(launcher){}
+	//cli();
 	
 	
 	printf("Initialize....\n");
@@ -205,6 +203,7 @@ void main(unsigned long entry_pointer_info)
         fread (bf, 1, e, fp);
 
 		exectve(0, 0, syspwd, bf);
+        free(bf);
 		fclose(fp);
 	}else {
 		printf("fopen error launcher.bin\n");

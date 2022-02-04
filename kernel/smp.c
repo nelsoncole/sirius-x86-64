@@ -84,7 +84,7 @@ void setup_smp() {
 	
 	// copy the AP trampoline code to a fixed address in low conventional memory (to address 0x0800:0x0000)
 	memcpy((void*)0x8000, (void*)0x3E000, 4096); 
-	unsigned long apstatck = 0x02000000;
+	unsigned long apstatck = 0x01800000 + 0x400000;
 	
 	*aprunning = 0;
 	*bspdone = 0;
@@ -167,13 +167,3 @@ void ap_startup(int apicid) {
 	
 	}while(1);
 }
-
-
-
-
-
-
-
-
-
-
