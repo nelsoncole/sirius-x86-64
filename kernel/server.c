@@ -126,7 +126,6 @@ loop:
             // processar socket
             //cli();
             socket_server_transmit();
-            //handler_ethernet_package_received();
             socket_execute_row();
             //sti();
 			break;

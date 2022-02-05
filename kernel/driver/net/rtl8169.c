@@ -18,7 +18,7 @@
 #include <sleep.h>
 
 static void re_pci(int bus, int slot, int function);
-static void re_handle();
+void re_handle();
 static int re_send_package(ethernet_package_descriptor_t desc);
 static ethernet_package_descriptor_t *re_recieve_package();
 
@@ -529,14 +529,14 @@ void setup_realtek( int bus, int slot, int function){
     // Timerint
     re_write_command(0x58, 0);
     // Enable interrupts.
-    unsigned int re_intrs = 0x8000 | 0x4000 | 0x0040 | 0x0020 | 0x0010 | 0x0008 | 0x0002 | 0x0001;
+    unsigned int re_intrs = 0x8000 | 0x4000 | 0x2000 | 0x0040 | 0x0020 | 0x0010 | 0x0008 | 0x0002 | 0x0001;
     re_write_command_word(0x3c, re_intrs);
 
 
     re_lock(&re_soft);
     //udelay(10);
-
-    //while(1){}
+   /* __asm__ __volatile__("sti");
+    while(1){}*/
     // register driver
     register_ethernet_device((unsigned long)&re_send_package,(unsigned long)&re_recieve_package,mac_address);
 }
@@ -618,15 +618,9 @@ ethernet_package_descriptor_t *re_recieve_package(){
     
     return first_desc;
 }
-extern int screan_spin_lock;
-static void re_handle(){
-
-    while(screan_spin_lock != 0) {}
-	
-    screan_spin_lock ++;
-
-    VERBOSE = 1;
-
+extern void apic_eoi_register();
+void re_handle(){
+    
     unsigned short status = re_read_command_word(0x3e);
     printf("[RTL81] Interrupt detected %x\n", status );
 
@@ -634,29 +628,29 @@ static void re_handle(){
 
 		printf("[RTL81] Link change detected!\n");
 		//ethernet_set_link_status(1);
-	}else if(status&0x01)
-    {
+	}
+    
+    if(status&0x01) {
 		printf("[RTL81] Package recieved!\n");
+        handler_ethernet_package_received();
 
-	}else if(status&0x04)
-    {
+	}
+    
+    if(status&0x04) {
+
 		printf("[RTL81] Package send!\n");
 		//((unsigned volatile long*)((unsigned volatile long)&package_send_ack))[0] = 1;
 	}
 
 	re_write_command_word(0x3e, status);
-	status = re_read_command_word(0x3e);
+	/*status = re_read_command_word(0x3e);
 	if(status!=0x00)
     {
 		printf("[RTL81] Unresolved interrupt: %x \n",status);
-	}
-
-    while(1){}
-
-    screan_spin_lock = 0;
+	}*/
 }
-extern unsigned long lapicbase;
-extern unsigned int localId;
+
+extern int apic_send_msi( struct dev *dev, void (*main)());
 static void re_pci(int bus, int slot, int function){
 
     unsigned int command = 0;
@@ -671,128 +665,14 @@ static void re_pci(int bus, int slot, int function){
         printf("[RTL81] Busmastering was not enabled\n");
     }
 
-
-    unsigned int capp;
-    /*
-
-    // MSI-X
-    // Capabilities List Pointer
-    capp = pci_read_config_byte(bus,slot,function, 0x34);
-    for(int i=0; i < 10; i++){
-        // Capabilities List Pointer Register
-        command = pci_read_config_word(bus,slot,function, capp);
-        if((command&0xff) == 0x11) break;
-
-        capp = command >> 8 &0xff;
-        if(!capp) break;
-
-    }
-
-    if(capp != 0){
-        command = pci_read_config_word(bus,slot,function, capp);
-        if((command&0xff) ==0x11){
-
-            // INTx# Disable
-            command = pci_read_config_word(bus,slot,function, 0x4) | 1 << 10;
-            //pci_write_config_word(bus,slot,function, 0x4, command);
-
-            int msix_off = capp;
-            unsigned int msix_bir = pci_read_config_dword(bus,slot,function,capp + 4);
-            unsigned int msix_table_off = msix_bir & ~7;
-            unsigned long tmp;
-
-            msix_bir &= 7;
-
-            int msix_sz = pci_read_config_word(bus,slot,function, capp + 0x2) &0x7FF;
-
-
-            tmp = pci_read_config_dword(bus,slot,function, 0x10 + msix_bir*4 + 4);
-            tmp <<= 32;
-            tmp |= pci_read_config_dword(bus,slot,function, 0x10 + msix_bir*4) &0xfffffff0;
-            tmp += msix_table_off;
-
-            mm_mp(tmp, (unsigned long*)&tmp, 0x40000, 0);
-            unsigned int *msix = (unsigned int *)tmp;
-            //char *msix_bitmap = malloc(msix_sz);
-
-            unsigned int pba_bir = pci_read_config_dword(bus,slot,function,capp + 8);
-            unsigned int pba_table_off = msix_bir & ~7;
-            pba_bir &= 7;
-
-            tmp = pci_read_config_dword(bus,slot,function, 0x10 + pba_bir*4 + 4);
-            tmp <<= 32;
-            tmp |= pci_read_config_dword(bus,slot,function, 0x10 + pba_bir*4) &0xfffffff0;
-            tmp += pba_table_off;
-            unsigned long *pba = (unsigned long *)tmp;
-        
-            // Mask everything
-            unsigned int ctrl = pci_read_config_dword(bus,slot,function, msix_off);
-            pci_write_config_dword(bus,slot,function, msix_off, ctrl | (1 << 30));
-
-            for (int i = 0; i < msix_sz; i++) {
-                msix[i * 4 + 0] = 0;
-                msix[i * 4 + 1] = 0;
-                msix[i * 4 + 2] = 0;
-                msix[i * 4 + 3] = 1;
-            }
-
-
-            int i = 0;
-            int irq = 11;
-            int id = localId;
-            unsigned long MSI_TAG = 0xFEE00000;
-            msix[i * 4 + 0] = MSI_TAG | (id << 12);
-            msix[i * 4 + 1] = MSI_TAG >> 32;
-            msix[i * 4 + 2] = irq & 0xFF;
-            msix[i * 4 + 3] = 0;
-            // unmask everything
-            pci_write_config_dword(bus,slot,function, msix_off, ctrl & ~(1 << 30));
-
-            // MSI-x Enable
-            command = pci_read_config_dword(bus,slot,function, capp);
-            command |= 0x80000000;
-            pci_write_config_dword(bus,slot,function, capp, command);
-
-        }
-    }
-
-    */
+    struct dev dev; 
+    dev.bus = bus;
+    dev.slot = slot;
+    dev.function = function;
 
     // MSI
-    // Capabilities List Pointer
-    capp = pci_read_config_byte(bus,slot,function, 0x34);
-    for(int i=0; i < 10; i++){
-        // Capabilities List Pointer Register
-        command = pci_read_config_word(bus,slot,function, capp);
-        if((command&0xff) == 0x5) break;
-
-        capp = command >> 8 &0xff;
-        if(!capp) break;
-
-    }
-
-    if(capp != 0){
-        command = pci_read_config_word(bus,slot,function, capp);
-        if((command&0xff) ==0x5){
-            printf("Message Signaled Interrupt: %x\n", command);
-
-            command = pci_read_config_word(bus,slot,function, 0x4) | 1 << 10;
-            pci_write_config_word(bus,slot,function, 0x4, command);
-            printf("%x\n", pci_read_config_word(bus,slot,function, 0x4));
-
-            unsigned long d = 0xFEE00000;// re_handle;
-            pci_write_config_dword(bus,slot,function, capp + 0x4, d);
-            pci_write_config_dword(bus,slot,function, capp + 0x8, d >> 32);
-
-            pci_write_config_word(bus,slot,function, capp + 0xc, 11);
-            
-            // MSI Enable
-            command = pci_read_config_dword(bus,slot,function, capp);
-            command |= 0x10000;
-            pci_write_config_dword(bus,slot,function, capp, command);
-
-
-        }
+    if(apic_send_msi( &dev, &re_handle)){
+        printf("[RTL81] MSI was not enabled\n");
     }
 
 

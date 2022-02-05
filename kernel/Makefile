@@ -15,7 +15,7 @@ storage.o rtc.o hda.o speaker.o e1000.o ethernet.o arp.o udp.o ipv4.o dhcp.o tcp
 LIB = string.o vsprintf.o stdio.o stdlib.o
 OBJ = setup.o main.o io.o gdt.o tss.o idt.o vetor.o exception.o data.o server.o smp.o delay.o \
 paging.o mm.o cpuid.o msr.o lvt.o irq.o apic.o ioapic.o intr.o sleep.o thread.o exectve.o syscall.o asyscall.o \
-console.o exit.o sse.o $(DRIVER) $(GUI) $(FILE) $(LIB) sse_memcpy.o panic.o
+console.o exit.o sse.o $(DRIVER) $(GUI) $(FILE) $(LIB) sse_memcpy.o panic.o msi.o
 
 
 .PHONY: all kernel.bin ap.bin a.bin

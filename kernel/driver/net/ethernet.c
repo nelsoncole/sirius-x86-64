@@ -43,6 +43,10 @@ void ethernet_set_link_status(unsigned long a){
     default_ethernet_device.is_online = a;
 }
 
+void ethernet_set_interrupt_status(unsigned long a){
+    default_ethernet_device.is_interrupt = a;
+}
+
 
 void register_ethernet_device(unsigned long send_package,unsigned long receive_package,unsigned char mac[SIZE_OF_MAC])
 {
@@ -79,7 +83,7 @@ int send_ethernet_package(const void *buf, size_t size){
 
 void handler_ethernet_package_received(){
 
-    if(!default_ethernet_device.is_online) return;
+    if(/*!default_ethernet_device.is_interrupt ||*/ !default_ethernet_device.is_online) return;
 
     ether_header_t *eh;
     arp_header_t *arp;
@@ -119,7 +123,7 @@ loop:
 
             switch( htons(arp->operation) ){
                 case ARP_OPC_REQUEST:
-                    //printf("ARP REQUEST\n");
+                    printf("ARP REQUEST\n");
                     arp_save_address( ip, mac);
                     //arp_replay(ip, mac);
                     arp_replay2(target_ip, ip, mac);
@@ -132,11 +136,11 @@ loop:
                     }
                     break;
                 case ARP_OPC_REPLY:
-                    //printf("ARP REPLAY\n");
+                    printf("ARP REPLAY\n");
                     arp_save_address( ip, mac);
                     break;
                 default:
-                    //printf("ARP UNKNOWN %x\n", htons(arp->operation) );
+                    printf("ARP UNKNOWN %x\n", htons(arp->operation) );
                     break;
             }   
             break;
@@ -144,10 +148,10 @@ loop:
             ipv4 = (ipv4_header_t*) (prd->buf + sizeof(ether_header_t) );
             switch( ipv4->protocol){
                 case IP_PROTOCOL_ICMP:
-                    //printf("IPv4 ICMP\n");
+                    printf("IPv4 ICMP\n");
                     break;
                 case IP_PROTOCOL_TCP:
-                    //printf("IPv4 TCP\n");
+                    printf("IPv4 TCP\n");
                     tcp = (tcp_header_t*) ((unsigned long)(prd->buf + sizeof(ipv4_header_t) + sizeof(ether_header_t)));
                     data = (char*) tcp;
                     end = (char*) tcp;
@@ -158,7 +162,7 @@ loop:
                     tcp->dst_port, data, len, tcp->seq, tcp->ack, tcp->flags);
                     break;
                 case IP_PROTOCOL_UDP:
-                    //printf("IPv4 UDP\n");
+                    printf("IPv4 UDP\n");
                     udp = (udp_header_t*) ((unsigned long)(prd->buf + sizeof(ipv4_header_t) + sizeof(ether_header_t)));
                     data = (char*) udp;
                     end = (char*) udp;
@@ -169,7 +173,7 @@ loop:
                   
                     break;
                 default:
-                    //printf("IPv4 UNKNOWN %x\n", ipv4->protocol );
+                    printf("IPv4 UNKNOWN %x\n", ipv4->protocol );
                     break;
             }
 
@@ -201,7 +205,7 @@ int int_ethernet_device()
     unsigned short device, vendor;
     unsigned int data = pci_scan_class_subclass(2, 0);
 
-    memset((char*)&default_ethernet_device, 0, sizeof(ethernet_device_t));
+    memset(&default_ethernet_device, 0, sizeof(ethernet_device_t));
 
     if(data == -1) {
 		printf("PCI PANIC: Network Controller not found!\n");
@@ -315,5 +319,5 @@ void initialise_ethernet(){
 end:  
 
     return;   
-   //while(1){}
+    //while(1){}
 }

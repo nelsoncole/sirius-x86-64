@@ -9,7 +9,7 @@ extern void idt_flush(idtr_t*);
 extern void syscall_install();
 
 extern void intr_install();
-
+extern void msi_vector_install();
 static void idt_null_install();
 
 idt_t idt[256];
@@ -59,6 +59,9 @@ void idt_install(void)
     // 
     intr_install();
 
+    // 0x80
+    msi_vector_install();
+
 	idtr->limit = (sizeof(idt_t)*256)-1;
     idtr->base = (unsigned long)&idt;
     
@@ -82,11 +85,11 @@ void _idt_gate(int n, unsigned int offset,unsigned short sel, unsigned char dpl,
 
 
 extern void intr_null();
-
 static void idt_null_install()
 {
     for(int i=0; i < 256; i++)
 	    idt_gate(i,(unsigned long)intr_null, 8,0);
+
 }
 
 

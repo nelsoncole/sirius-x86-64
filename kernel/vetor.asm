@@ -890,7 +890,225 @@ intr_null:
 	
 	iretq
 
+global msi0,msi1,msi2,msi3,msi4,msi5,msi6,msi7,msi8,msi9
+global msi10,msi11,msi12,msi13,msi14,msi15,msi16,msi17,msi18,msi19
+global msi20,msi21,msi22,msi23,msi24,msi25,msi26,msi27,msi28,msi29
+global msi30,msi31
+
+extern msi_function
+msi_jmp:
+
+	push gs
+	push fs
+      	
+   	push r15
+	push r14
+	push r13
+	push r12
+	push r11
+	push r10
+	push r9
+	push r8
+	push rdi
+	push rsi
+	push rbp
+	push rsp
+	push rbx
+	push rdx
+	push rcx
+	push rax
+
+	;fxsave [SavedFloats2]
 	
+	mov rdi, [rsp + 0x90]
+	call msi_function
+
+	;fxrstor [SavedFloats2]
+
+	pop rax
+	pop rcx
+	pop rdx
+	pop rbx
+	pop rsp
+	pop rbp
+	pop rsi
+	pop rdi
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+	pop r12
+	pop r13
+	pop r14
+	pop r15
+	
+	pop fs
+	pop gs
+	
+	
+	add rsp, 16
+	iretq
+	
+msi0:
+	push qword 0
+	push qword 0 
+	jmp msi_jmp
+	
+msi1:
+	push qword 0
+	push qword 1 
+	jmp msi_jmp
+
+msi2:
+	push qword 0
+	push qword 2 
+	jmp msi_jmp
+	
+msi3:
+	push qword 0
+	push qword 3 
+	jmp msi_jmp
+
+msi4:
+	push qword 0
+	push qword 4 
+	jmp msi_jmp
+	
+msi5:
+	push qword 0
+	push qword 5 
+	jmp msi_jmp
+
+msi6:
+	push qword 0
+	push qword 6 
+	jmp msi_jmp
+	
+msi7:
+	push qword 0
+	push qword 7 
+	jmp msi_jmp
+
+msi8:
+	push qword 0
+	push qword 8 
+	jmp msi_jmp
+	
+msi9:
+	push qword 0
+	push qword 9 
+	jmp msi_jmp
+
+msi10:
+	push qword 0
+	push qword 10 
+	jmp msi_jmp
+	
+msi11:
+	push qword 0
+	push qword 11 
+	jmp msi_jmp
+
+msi12:
+	push qword 0
+	push qword 12 
+	jmp msi_jmp
+	
+msi13:
+	push qword 0
+	push qword 13 
+	jmp msi_jmp
+
+msi14:
+	push qword 0
+	push qword 14 
+	jmp msi_jmp
+	
+msi15:
+	push qword 0
+	push qword 15 
+	jmp msi_jmp
+
+msi16:
+	push qword 0
+	push qword 16 
+	jmp msi_jmp
+	
+msi17:
+	push qword 0
+	push qword 17 
+	jmp msi_jmp
+
+msi18:
+	push qword 0
+	push qword 18 
+	jmp msi_jmp
+	
+msi19:
+	push qword 0
+	push qword 19 
+	jmp msi_jmp
+
+msi20:
+	push qword 0
+	push qword 20 
+	jmp msi_jmp
+	
+msi21:
+	push qword 0
+	push qword 21 
+	jmp msi_jmp
+
+msi22:
+	push qword 0
+	push qword 22 
+	jmp msi_jmp
+	
+msi23:
+	push qword 0
+	push qword 23 
+	jmp msi_jmp
+
+msi24:
+	push qword 0
+	push qword 24 
+	jmp msi_jmp
+	
+msi25:
+	push qword 0
+	push qword 25 
+	jmp msi_jmp
+
+msi26:
+	push qword 0
+	push qword 26 
+	jmp msi_jmp
+	
+msi27:
+	push qword 0
+	push qword 27 
+	jmp msi_jmp
+
+msi28:
+	push qword 0
+	push qword 28 
+	jmp msi_jmp
+	
+msi29:
+	push qword 0
+	push qword 29 
+	jmp msi_jmp
+
+msi30:
+	push qword 0
+	push qword 30 
+	jmp msi_jmp
+	
+msi31:
+	push qword 0
+	push qword 31 
+	jmp msi_jmp
+
 segment .data
 global SavedFloats
 align 16

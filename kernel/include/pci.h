@@ -51,6 +51,17 @@ typedef struct _PCI_COFIG_SPACE{
 
 }__attribute__((packed)) PCI_COFIG_SPACE;
 
+struct dev
+{
+    unsigned short vid;
+    unsigned short did;
+    int bus;
+    int slot;
+    int function;
+    char name[128];
+
+}__attribute__((packed));
+
 
 int read_pci_config_addr(int bus,int dev,int fun, int offset);
 void write_pci_config_addr(int bus,int dev,int fun,int offset,unsigned int data);

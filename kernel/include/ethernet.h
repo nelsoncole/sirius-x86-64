@@ -54,6 +54,7 @@ typedef struct _ethernet_device{
     unsigned char server_ip[4];
     unsigned char is_enabled;
     unsigned char is_online;
+    unsigned char is_interrupt;
     //
     unsigned long send_package;
     unsigned long receive_package;

@@ -8,9 +8,6 @@
 
 #include <i965.h>
 
-
-#include <ethernet.h>
-
 #define TASK_BARRA 36
 
 #define SSE_MMREG_SIZE 16
@@ -346,8 +343,6 @@ void compose()
   		sse_memcpy(vram, zbuf, len);
   		
   		screan_spin_lock = 0;
-
-        handler_ethernet_package_received();
   		
   	}
   	
