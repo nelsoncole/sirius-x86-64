@@ -641,13 +641,6 @@ void re_handle(){
 		printf("[RTL81] Package send!\n");
 		//((unsigned volatile long*)((unsigned volatile long)&package_send_ack))[0] = 1;
 	}
-
-	re_write_command_word(0x3e, status);
-	/*status = re_read_command_word(0x3e);
-	if(status!=0x00)
-    {
-		printf("[RTL81] Unresolved interrupt: %x \n",status);
-	}*/
 }
 
 extern int apic_send_msi( struct dev *dev, void (*main)());

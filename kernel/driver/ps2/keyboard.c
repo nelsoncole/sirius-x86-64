@@ -57,7 +57,12 @@ unsigned char keyboard_charset[1];
 // Algumas variáveis estática, para o controle 
 static int shift;
 static int caps_lock;
-
+/*
+ * 0 ScrollLock
+ * 1 NumberLock
+ * 2 CapsLock
+ */
+unsigned char led_status;
 
 static int scaps; 
 
@@ -85,7 +90,7 @@ const char ascii_maiusculas[256] = {
 };
 
 
-
+static void kbd_led_handling(unsigned char status);
 
 // Esta função será usada para ler dados do teclado na porta 0x60, fora do IRQ1
 unsigned char keyboard_read()
@@ -137,25 +142,25 @@ void keyboard_handler(void)
 {
 	
 	//if(count >= 2)count = 0;
-
-    	unsigned char scancode = inportb(0x60);
-
+    unsigned char scancode = inportb(0x60);
+    //printf("(%x, scaps = %d) ", scancode, scaps);
 	//key_buffer[count++] = scancode;
-	
-	//printf("(%x, scaps = %d) ", scancode, scaps);
+
+    // ignore ack
+	if(scancode == 0xFA) return;
 	
 	// Control kernel
-	if(scancode == KEY_F1) {
+	    if(scancode == KEY_F1) {
 
-		_stdin = stdin;
-		scaps = 0;
-		return;
-	}
+		    _stdin = stdin;
+		    scaps = 0;
+		    return;
+	    }
 	
     	if(scancode & 0x80) {
 
         	if((scancode == 0xAA) || (scancode == 0xB6))
-        	shift = 0;
+        	    shift = 0;
 
     	} else {
             	if((scancode == 0x2A) || (scancode == 0x36)) {
@@ -165,11 +170,9 @@ void keyboard_handler(void)
             	}
     	}
 
-
 	
     	if(scancode &0x80 || (scancode == 0x45)) {
-    
-        	
+     
 			if(scancode == 0xE0) { // scape sequence
 				scaps ++;
 				shift = 0;
@@ -177,16 +180,28 @@ void keyboard_handler(void)
 			
 				scaps = 0;
 			}
+
+            if((scancode&0x7F) == 0x3A){
+
+                if(caps_lock == 1){
+                    caps_lock = 0;
+                }else{
+                    caps_lock = 1;
+                }
+
+                led_status &=~ 1 << 2;
+                led_status |= caps_lock << 2;
+
+                kbd_led_handling(led_status);
+            }
+
+           
 			
 
     	} else {
-
 		
-		
-         	if( (shift == 1 ) || (caps_lock == 1) ) {
-                	
+         	if( (shift == 1 ) || (caps_lock == 1) ) {	
                 	keyboard_charset[0] = ascii_maiusculas[scancode];
-
 
         	} else {
 
@@ -213,7 +228,7 @@ void keyboard_handler(void)
                 				fputc( LEFT_BRACKET , _stdin);
               					fputc( SEQUENCE + 3 , _stdin);
                			break;
-				}
+				        }
 				                			
                 	} else keyboard_charset[0] = ascii_minusculas[scancode];
             	}
@@ -222,12 +237,36 @@ void keyboard_handler(void)
 		
 			fputc(keyboard_charset[0] &0xff, _stdin);
 			
-			//printf("\nSIM: %x ", scancode );
+			//printf("%c ", keyboard_charset[0] &0xff );
 		}
         }	
 
 
 	keyboard_charset[0] = 0;
+}
+
+static void kbd_led_handling(unsigned char status){
+    while( inportb(0x64) & 2 );
+    outportb(0x60, 0xED);
+
+    //unsigned char in = inportb(0x60);
+    //while(!( in == 0xFA || in == 0xFE) ){ in = inportb(0x60);} // ACK ou RESEND
+    while( inportb(0x64) & 2 );
+    outportb(0x60, status);
+}
+
+static void kbd_set_command(int command, unsigned char val){
+    while( inportb(0x64) & 2 );
+    outportb(0x60, command);
+  
+    while( inportb(0x64) & 2 );
+    outportb(0x60, val);
+
+    while( !(inportb(0x64) & 1) );
+    unsigned char in = inportb(0x60);
+    while(!( in == 0xFA || in == 0xFE) ){ 
+        in = inportb(0x60);
+    } // ACK ou RESEND
 }
 
 void keyboard_install()
@@ -238,16 +277,18 @@ void keyboard_install()
 	caps_lock = 0;
 	count = 0;
 	scaps = 0;
+    led_status = 0;
 
 	// set current scan code set
-	//keyboard_write(0xF0);
-	//keyboard_read();  // ACK
-	// Set scan code set 2
-	//keyboard_write(2);
-	//keyboard_read();  // ACK
+    //kbd_set_command(0xF0 , 4);
+    // kbd set rate
+    kbd_set_command(0xF3 , 0);
 
-    	// IRQ set Handler
-    	cli();
+    // limpar LEDs
+    // kbd_led_handling(led_status);
+
+    // IRQ set Handler
+    cli();
 	fnvetors_handler[1] = &keyboard_handler;
 	// Enable IRQ Interrup
 }

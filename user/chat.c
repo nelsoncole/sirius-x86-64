@@ -48,7 +48,7 @@ int main(int argc, char **argv) {
         printf("< ");
         socklen_t len = sizeof(serb);
         count = recvfrom(socketid, message, 256, 0, (struct sockaddr*)&serb, &len);    
-        printf("%s\n",message);
+        printf("%s",message);
     }
     shutdown(socketid, 0);
 	return 0;

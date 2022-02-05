@@ -115,7 +115,7 @@ void main(unsigned long entry_pointer_info)
 	ioapic_umasked(2);
 	//ioapic_umasked(8);
 	ioapic_umasked(12);
-    //ioapic_umasked(11);
+    ioapic_umasked(11);
     ioapic_umasked(19);
 
     printf("Setup I965 ...\\\\\n"); 
@@ -144,11 +144,6 @@ void main(unsigned long entry_pointer_info)
     clears_creen();
     printf("Ethernet ...\\\\\n");
     int_ethernet_device();
-    
-    // TODO initialize ethernet
-    sti();
-    initialise_ethernet();
-    cli();
 
 	/* Testing
     
@@ -165,6 +160,10 @@ void main(unsigned long entry_pointer_info)
         printf("Cannot create socket\n");
         for(;;);
     }
+
+    // TODO initialize ethernet
+    sti();
+    initialise_ethernet();
 	
 	cli();	
 	printf("Done\n");

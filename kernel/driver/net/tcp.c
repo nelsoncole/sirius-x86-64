@@ -30,19 +30,17 @@ unsigned short src_port, unsigned short dst_port, unsigned int seq, unsigned int
     unsigned char *options = start;
     options += sizeof(tcp_header_t);
 
-   /* if (flags & TCP_SYN) {
+    if (flags & TCP_SYN) {
 
         options[0] = TCP_OPT_MSS; // Maximum Segment Size (2)
         options[1] = 4;
         *(unsigned short *)(options + 2) = htons(1460);
         options += options[1];
        
-        //options[0] = TCP_OPT_SACK; // SACK Permitted
-        //options[1] = 2;
-        //options += options[1];
-        
-
-    }*/
+        options[0] = TCP_OPT_SACK; // SACK Permitted
+        options[1] = 2;
+        options += options[1];
+    }
     
     // Option End
     while ((options - start) & 3)

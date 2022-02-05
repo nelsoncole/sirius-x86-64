@@ -8,6 +8,9 @@
 #include "ipv4.h"
 #include "ether.h"
 
+extern unsigned int swait_init(int time);
+extern int swait(unsigned int status);
+
 int udp_send(unsigned int src_address, unsigned int dst_address, unsigned short src_port, unsigned short dst_port, const void *data, size_t length)
 {
     unsigned len = sizeof(ether_header_t) + sizeof(ipv4_header_t) + sizeof(udp_header_t) + length;
@@ -32,28 +35,51 @@ int udp_send(unsigned int src_address, unsigned int dst_address, unsigned short 
 }
 
 
-int udp_receive(void *data, size_t length){
+int udp_receive(void *data, size_t length, unsigned short port){
 
     ethernet_package_descriptor_t *prd;
     ipv4_header_t *hdr;
     ether_header_t *eh;
 
+
+    unsigned int status = swait_init(10);
+
+    int bk = 0;
     while(1){
         prd = get_ethernet_package();
         // pooling
         if(prd->flag) {
+            if(!swait(status)){
+                return 0;
+            }
             continue;
         }
 
-        eh = (ether_header_t*) prd->buf;
-        hdr =(ipv4_header_t*) (prd->buf + sizeof(ether_header_t));
-        if(htons(eh->type) == ET_IPV4) {
-            if(hdr->protocol == IP_PROTOCOL_UDP){
-                break;
-            }
+        int count = (int) prd->count;
+        for(int i=0; i < count; i++){
+            eh = (ether_header_t*) prd->buf;
+            hdr =(ipv4_header_t*) (prd->buf + sizeof(ether_header_t));
+            if(htons(eh->type) == ET_IPV4) 
+            {
+                if(hdr->protocol == IP_PROTOCOL_UDP)
+                {
+                    udp_header_t *udp = (udp_header_t*)(hdr +1);
+                    if(htons(udp->dst_port) == port)
+                    {
+                        bk = 1;
+                        break;
+                    }
+                }
 
+            }
+            prd++;
         }
 
+        if(bk == 1) break;
+
+        if(!swait(status)){
+            return 0;
+        }
     }
 
     hdr++;

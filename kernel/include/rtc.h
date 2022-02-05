@@ -19,5 +19,8 @@ extern struct tm *clock;
 void rtc_setup();
 void rtc_handler(void);
 
+unsigned int swait_init(int time);
+int swait(unsigned int status);
+
 
 #endif

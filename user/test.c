@@ -170,7 +170,7 @@ int main(int argc, char **argv) {
         memset(bf, 0, 1024);
         printf("< ");
         int r = recv(client, bf, 1024, 0);
-        printf("%s\n",bf);
+        printf("%s",bf);
     
         if(y >= 1 || dns == 0 ) {
 

@@ -85,16 +85,6 @@ int MOUSE_BAT_TEST(){
 // Este é o manipulador do IRQ12
 void mouse_handler(void) {
 
-	/*if (first_time != 0) {
-		// DICA DO TIO FRED
-    		// Ao que parce ignorar a leitura do primeiro byte
-    		// coloca nossos dados na ordem status, x, y
-        
-        	first_time = 0;
-        	inportb(0x60);
-		return;
-    	}*/
-
 	switch(count_mouse++) 
 	{
 		case 0: 

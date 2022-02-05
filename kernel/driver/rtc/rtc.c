@@ -96,3 +96,39 @@ void rtc_handler(void){
 	
 
 }
+
+
+unsigned int swait_init(int time){
+    unsigned int status;
+    while( get_update_in_progress() );
+
+	outportb(0x70,0);
+	int sec = convert_bcd(inportb(0x71)) &0x3f;
+    outportb(0x70,2);
+	int min = convert_bcd(inportb(0x71)) &0x3f;
+
+    min += time/60;
+    sec += time%60;
+    min += sec/60;
+    sec = sec%60;
+
+    status = min << 8 & 0xFF00;
+    status |= sec;
+
+    return status;
+}
+
+int swait(unsigned int status){
+    while( get_update_in_progress() );
+
+	outportb(0x70,0);
+	int sec = convert_bcd(inportb(0x71)) &0x3f;
+    outportb(0x70,2);
+	int min = convert_bcd(inportb(0x71)) &0x3f;
+
+    if(sec >= (status&0xFF) && min >= (status >> 8 &0xFF) ){
+        return 0;
+    }
+
+    return 1; 
+}

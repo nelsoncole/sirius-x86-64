@@ -264,13 +264,19 @@ void initialise_ethernet(){
 
         memset(dhcp, 0, sizeof(dhcp_header_t));
         dhcp_send(our_ip, dhcp_ip, DHCP_DISCOVER);
-        if( udp_receive(dhcp, sizeof(dhcp_header_t)) ){
+        if( udp_receive(dhcp, sizeof(dhcp_header_t), 68) ){
             if(htonl(dhcp->magic_cookie) != 0x63825363) {
                 printf("No DHCP\n");
-                for(;;);
+                free(ipv4_cache);
+                goto end;
             }
             printf("%s\n", string_dhcp_message[dhcp->options[2]]);
             dhcp_parse_options(dhcp);
+        }else {
+        
+            printf("timeout\n");
+            free(ipv4_cache);
+            goto end;
         }
 
         printf("Your    IP %d.%d.%d.%d \n",our_ip[0],our_ip[1],our_ip[2],our_ip[3]);
@@ -280,16 +286,16 @@ void initialise_ethernet(){
 
         memset(dhcp, 0, sizeof(dhcp_header_t));
         dhcp_send(our_ip, dhcp_ip, DHCP_REQUEST);
-        if( udp_receive(dhcp, sizeof(dhcp_header_t)) ){
+        if( udp_receive(dhcp, sizeof(dhcp_header_t), 68) ){
             if(htonl(dhcp->magic_cookie) != 0x63825363) {
                 printf("No DHCP\n");
-                free(dhcp);
+                free(ipv4_cache);
                 goto end;
             }
 
             if(dhcp->options[2] != DHCP_ACK){
                 printf("%s\n", string_dhcp_message[dhcp->options[2]]);
-                free(dhcp);
+                free(ipv4_cache);
                 goto end;
             }
 
@@ -299,14 +305,11 @@ void initialise_ethernet(){
         fillIP((unsigned char*)& default_ethernet_device.client_ip,(unsigned char*)&our_ip);
         fillIP((unsigned char*)&default_ethernet_device.server_ip,(unsigned char*)&dhcp_ip);
 
-        
         ethernet_set_link_status(1);
-        free(dhcp);
     }else {
             printf("Internet device not found!\n");
-            free(dhcp);
             free(ipv4_cache);
-            return;
+            goto end;
     }
 
     // ARP CACHE
@@ -317,7 +320,7 @@ void initialise_ethernet(){
     fillIP((unsigned char*)&dst_ip, ip);
 
 end:  
-
+    free(dhcp);
     return;   
     //while(1){}
 }

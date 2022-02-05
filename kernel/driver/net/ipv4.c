@@ -40,7 +40,7 @@ int ipv4_send(void *buf, unsigned char protocol, unsigned int src_address, unsig
     hdr->len = htons(len);
     hdr->id = htons(ipv4_count++);
     hdr->offset = htons(0x4000);
-    hdr->ttl = 64;
+    hdr->ttl = 63;
     hdr->protocol = protocol;
     hdr->checksum = 0;
     hdr->src = src_address;

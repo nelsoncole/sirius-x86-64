@@ -150,24 +150,3 @@ void local_apic_send_startup(unsigned int apic_id, unsigned int vector)
 
     while (local_apic_read_command(LAPIC_ICRLO) & ICR_SEND_PENDING);
 }
-
-/*
-static void apic_send_msi(target_phys_addr_t addr, uint32_t data)
-{
-    uint8_t dest = (addr & MSI_ADDR_DEST_ID_MASK) >> MSI_ADDR_DEST_ID_SHIFT;
-    uint8_t vector = (data & MSI_DATA_VECTOR_MASK) >> MSI_DATA_VECTOR_SHIFT;
-    uint8_t dest_mode = (addr >> MSI_ADDR_DEST_MODE_SHIFT) & 0x1;
-    uint8_t trigger_mode = (data >> MSI_DATA_TRIGGER_SHIFT) & 0x1;
-    uint8_t delivery = (data >> MSI_DATA_DELIVERY_MODE_SHIFT) & 0x7;
-    // XXX: Ignore redirection hint.
-    apic_deliver_irq(dest, dest_mode, delivery, vector, 0, trigger_mode);
-}
-
-unsigned long arch_msi_address(unsigned long *data, size_t vector, unsigned int processor, unsigned char edgetrigger, unsigned char deassert) 
-{
-	*data = (vector & 0xFF) | (edgetrigger == 1 ? 0 : (1 << 15)) | (deassert == 1 ? 0 : (1 << 14));
-	return (0xFEE00000 | (processor << 12));
-}
-
-
-*/

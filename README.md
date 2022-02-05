@@ -20,7 +20,8 @@ RTC                 | :white_check_mark: | :white_check_mark: | :white_check_mar
 PIT                 | :white_check_mark: | :white_check_mark: | :white_check_mark:
 HPIT                | :white_check_mark: | :white_check_mark: | :white_check_mark:
 ACPI                | :white_check_mark: | :white_check_mark: | :white_check_mark:
-HD Graphics Series  | :x:                | :x:                | :white_check_mark:
+Intel HD Graphics   | :x:                | :x:                | :white_check_mark:
+RTL8169             | :question:         | :question:         | :white_check_mark:
 
 
 

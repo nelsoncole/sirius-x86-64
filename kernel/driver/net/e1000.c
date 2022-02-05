@@ -8,7 +8,7 @@
 #include "e1000.h"
 
 static unsigned long base_addr;
-
+static void e1000_pci(int bus, int slot, int function);
 static int rx_cur;
 static int tx_cur;
 struct e1000_rx_desc *rx_descs[E1000_NUM_RX_DESC];
@@ -96,9 +96,10 @@ void init_e1000(int bus,int slot,int function){
     }
 
     printf("[E1000] INTR %d \n",intr);
-
     // Configurar IRQ Handler
     fnvetors_handler[intr] = &irq_e1000;
+
+    e1000_pci( bus, slot, function);
 
     // Mapear para virtual o endereço fisico
     unsigned long virt_addr;
@@ -148,16 +149,6 @@ void init_e1000(int bus,int slot,int function){
     }
     printf("[E1000] MAC: %x:%x:%x:%x:%x:%x \n",mac_address[0],mac_address[1],
     mac_address[2],mac_address[3],mac_address[4],mac_address[5]);
-
-
-    // Habilitar o PCI Busmastering DMA
-    if(!(pci_read_config_dword(bus,slot,function,0x04)&0x04))
-    {
-        unsigned int to = pci_read_config_dword(bus,slot,function,0x04) | 0x04;
-        pci_write_config_dword(bus,slot,function,0x04, to);
-
-        printf("[E1000] Busmastering was not enabled, but now it is!\n");
-    }
 
     // No multicast
     // MTA(n) = 0
@@ -331,4 +322,32 @@ ethernet_package_descriptor_t *e1000_recieve_package(){
     }
 
     return first_desc;
+}
+
+extern int apic_send_msi( struct dev *dev, void (*main)());
+static void e1000_pci(int bus, int slot, int function){
+
+    unsigned int command = 0;
+    command = pci_read_config_dword(bus,slot,function, 4);
+    command |= (0 | 0x2 | 0x04);
+    pci_write_config_dword(bus,slot,function, 4, command);
+    command = pci_read_config_dword(bus,slot,function, 4);
+
+    // Enable o PCI Busmastering DMA
+    if(!(command&0x04))
+    {
+        printf("[E1000] Busmastering was not enabled\n");
+    }
+
+    struct dev dev; 
+    dev.bus = bus;
+    dev.slot = slot;
+    dev.function = function;
+
+    // MSI
+    if(apic_send_msi( &dev, &irq_e1000)){
+        printf("[E1000] MSI was not enabled\n");
+    }
+
+
 }
