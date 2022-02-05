@@ -23,7 +23,7 @@
 
 unsigned int dst_ip = 0;
 unsigned int src_ip = 0;
-
+extern unsigned int ipv4_count;
 ethernet_package_descriptor_t packege_desc_buffer[32];
 
 ethernet_device_t default_ethernet_device;
@@ -255,7 +255,7 @@ void initialise_ethernet(){
     ipv4_cache = (unsigned char *)malloc(0x10000); // 64KiB
     dhcp_header_t *dhcp = (dhcp_header_t *)malloc(sizeof(dhcp_header_t)); 
     package_recieved_ack = 1;
-
+    ipv4_count  = 0;
     memset(ipv4_cache, 0, 0x10000);
 
     printf("[ETH] Ethernet module reached!\n");

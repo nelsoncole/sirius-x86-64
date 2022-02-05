@@ -7,7 +7,7 @@
 
 
 unsigned char *ipv4_cache;
-
+unsigned int ipv4_count = 0;
 int ipv4_send(void *buf, unsigned char protocol, unsigned int src_address, unsigned int dst_address, unsigned length)
 {
 
@@ -38,7 +38,7 @@ int ipv4_send(void *buf, unsigned char protocol, unsigned int src_address, unsig
     hdr->ver = 4;
     hdr->tos = 0;
     hdr->len = htons(len);
-    hdr->id = htons(1);
+    hdr->id = htons(ipv4_count++);
     hdr->offset = htons(0x4000);
     hdr->ttl = 64;
     hdr->protocol = protocol;
@@ -46,19 +46,11 @@ int ipv4_send(void *buf, unsigned char protocol, unsigned int src_address, unsig
     hdr->src = src_address;
     hdr->dst = dst_address;
 
-    unsigned long checksum = 0;
-    checksum += 0x4500;
-    checksum += len;
-    checksum += 1;
-    checksum += 0x4000;
-    checksum += 0x4000 + protocol;
-    checksum += htons((src_address >> 16) & 0xFFFF);
-    checksum += htons(src_address & 0xFFFF); 
-    checksum += htons((dst_address >> 16) & 0xFFFF);
-    checksum += htons(dst_address & 0xFFFF);
-    checksum = (checksum >> 16) + (checksum & 0xffff);
-    checksum += (checksum >> 16);
-    hdr->checksum = htons((unsigned short) (~checksum));
+    // Checksum
+    unsigned char *start = (unsigned char *)hdr;
+    unsigned char *end = (unsigned char *)(start + sizeof(ipv4_header_t));
+    unsigned short checksum = net_checksum(0, 0,(const unsigned char *)start, (const unsigned char *)end);
+    hdr->checksum = htons(checksum);
 
     // Hardware
     if(send_ethernet_package( (void*)addr,length + sizeof(ipv4_header_t) + sizeof(ether_header_t)) ) 

@@ -172,7 +172,7 @@ int main(int argc, char **argv) {
         int r = recv(client, bf, 1024, 0);
         printf("%s\n",bf);
     
-        if(y > 1 || dns == 0 ) {
+        if(y >= 1 || dns == 0 ) {
 
             printf("> ");
             fgets(bf,1024,stdin);

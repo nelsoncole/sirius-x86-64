@@ -8,12 +8,16 @@ unsigned short net_checksum(const unsigned char *phdr, int phdr_len, const unsig
     unsigned int len = phdr_len;
     unsigned short *p = (unsigned short *)phdr;
 
+    if(!phdr) goto no;
+
     // acc
     // Pseudo Head
     while (len > 1) {
         checksum += *p++;
         len -= 2;
     }
+
+no:
 
     len = end - start;
     p = (unsigned short *)start;

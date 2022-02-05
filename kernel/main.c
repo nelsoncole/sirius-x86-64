@@ -116,7 +116,7 @@ void main(unsigned long entry_pointer_info)
 	//ioapic_umasked(8);
 	ioapic_umasked(12);
     //ioapic_umasked(11);
-    //ioapic_umasked(19);
+    ioapic_umasked(19);
 
     printf("Setup I965 ...\\\\\n"); 
 	setup_i965();
