@@ -115,6 +115,7 @@ void main(unsigned long entry_pointer_info)
 	ioapic_umasked(1);
 	ioapic_umasked(2);
 	//ioapic_umasked(8);
+    ioapic_umasked(9);
 	ioapic_umasked(12);
     ioapic_umasked(11);
     ioapic_umasked(19);

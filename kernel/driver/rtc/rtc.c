@@ -107,8 +107,10 @@ unsigned int swait_init(int time){
     outportb(0x70,2);
 	int min = convert_bcd(inportb(0x71)) &0x3f;
 
+
     min += time/60;
     sec += time%60;
+    sec += 1;
     min += sec/60;
     sec = sec%60;
 

@@ -153,7 +153,7 @@ int apic_send_msi( struct dev *dev, void (*fuc)()){
     pci_write_config_dword(bus,slot,function, capp_addr + 0x8, MSI_TAG >> 32);
 
     // (vector & 0xFF) | (edgetrigger == 1 ? 0 : (1 << 15)) | (deassert == 1 ? 0 : (1 << 14));
-    command = (0x80 + vector_msi & 0xFF); 
+    command = (0x80 + vector_msi) & 0xFF; 
     pci_write_config_word(bus,slot,function, capp_addr + 0xc, command);
 
     // MSI Enable
@@ -161,7 +161,7 @@ int apic_send_msi( struct dev *dev, void (*fuc)()){
     command |= 0x1;
     pci_write_config_word(bus,slot,function, capp_addr + 0x2, command);
 
-    fnvetors_handler_msi[vector_msi++] = (unsigned long)fuc;
+    fnvetors_handler_msi[vector_msi++] = (void*)fuc;
     return 0;
 
 }

@@ -56,9 +56,8 @@ void e1000_link_up(){
 void irq_e1000(){
     
 	//printf("[E1000] Interrupt detected\n");
-    e1000_write_command(REG_IMASK, 0x1);
     unsigned int to = e1000_read_command(REG_ICR);
-    
+    e1000_write_command(REG_IMASK, to);
     if(to&0x01){
         printf("[E1000] Transmit completed!\n");
     }else if(to&0x02){
@@ -86,7 +85,7 @@ void init_e1000(int bus,int slot,int function){
     unsigned char mac_address[6];
 
     printf("[E1000] E1000 initialised bus=%x slot=%x function=%x \n",bus,slot,function);
-    base_addr = pci_read_config_dword(bus,slot,function,0x10) & 0xFFFFFFFE;
+    base_addr = pci_read_config_dword(bus,slot,function,0x10) & 0xFFFFFFF0;
     printf("[E1000] Base physical address: %x \n",base_addr);
 	int intr = pci_read_config_dword(bus,slot,function,0x3C) & 0x000000FF;
     if(intr == 9) {

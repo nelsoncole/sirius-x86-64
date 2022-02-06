@@ -21,8 +21,6 @@
 #include "arp.h"
 #include "dhcp.h"
 
-unsigned int dst_ip = 0;
-unsigned int src_ip = 0;
 extern unsigned int ipv4_count;
 ethernet_package_descriptor_t packege_desc_buffer[32];
 
@@ -229,6 +227,8 @@ int int_ethernet_device()
     } else if(vendor == REALTEK_VENDORID \
     && (device == 0x8169 || device == 0x8168 || device == 0x8161 || device == 0x8136 || device == 0x4300)){
         setup_realtek( bus, slot, function );
+    }else if(vendor == 0x1022 && (device == 0x2000)){
+        setup_pcnet( bus, slot, function );
     } else {
         printf("Unknown ethernet device\n");
         printf("Other Network device id %x vendor id %x\n", device, vendor);
@@ -315,12 +315,9 @@ void initialise_ethernet(){
     // ARP CACHE
     init_arp();
 
-    unsigned char ip[SIZE_OF_IP] =  {192,168,43,1};
-    fillIP((unsigned char*)&src_ip, our_ip);
-    fillIP((unsigned char*)&dst_ip, ip);
+end:
 
-end:  
-    free(dhcp);
-    return;   
+    printf("[ETH] End\n");
+    free(dhcp);  
     //while(1){}
 }

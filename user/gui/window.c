@@ -154,10 +154,10 @@ WINDOW *window(const char *title,int x, int y, int width, int height, int fg, in
 
 	w->cy = w->cx = 0;
 	
-    if(width == -1) w->width = (w->rx - w->rx/4);
+    if(width == -1 || width > w->rx) w->width = w->rx;
     else w->width = width;
 
-    if(height == -1) w->height = (w->ry - w->ry/6);
+    if(height == -1 || height > w->ry) w->height = w->ry;
     else w->height = height;
 
 	w->pos_x = x;

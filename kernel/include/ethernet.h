@@ -88,6 +88,7 @@ void handler_ethernet_package_received();
 
 void init_e1000(int bus,int slot,int function);
 void setup_realtek( int bus, int slot, int function);
+void setup_pcnet( int bus, int slot, int function );
 int int_ethernet_device();
 void register_ethernet_device(unsigned long send_package,unsigned long receive_package,unsigned char mac[SIZE_OF_MAC]);
 void initialise_ethernet();

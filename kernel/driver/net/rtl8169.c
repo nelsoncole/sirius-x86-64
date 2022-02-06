@@ -346,24 +346,24 @@ static void re_unlock(struct re_softc * sc){
 static void re_setup_dma_map_buf(struct re_softc *sc){
     unsigned long addr = 0;
     // 4112 KiB
-    //alloc_pages(0, 2048, (unsigned long*)&addr);
-
-    mm_mp(0x10000000 /*256MiB*/, (unsigned long*)&addr, 0x800000/*8MiB*/, 0);
+    // Alocar 8MiB
+    alloc_pages(0, 2048, (unsigned long*)&addr);
+    
+    //mm_mp(0x10000000 /*256MiB*/, (unsigned long*)&addr, 0x800000/*8MiB*/, 0);
 
     if(!addr) {
         kernel_panic("realtack");
     }
-
-    memset((char*)addr,0, 1028*4096);
+    memset((void*)addr, 0, 2048*0x1000);
 
     sc->phymem = get_phy_addr(addr);
     sc->vmem = addr;
 
     sc->tx_buf = sc->phymem;
-    sc->rx_buf = sc->phymem + 8192 + (RE_TX_BUF_NUM*sizeof(struct TxDesc));
+    sc->rx_buf = sc->phymem + 8192 + (RE_TX_BUF_NUM*8192);
 
     sc->tx_buf_v = sc->vmem;
-    sc->rx_buf_v = sc->vmem + 8192 + (RE_TX_BUF_NUM*sizeof(struct TxDesc));
+    sc->rx_buf_v = sc->vmem + 8192 + (RE_TX_BUF_NUM*8192);
     
     sc->tx_buf_v += 8192;
     sc->rx_buf_v += 8192;
@@ -382,7 +382,7 @@ static void re_setup_dma_map_buf(struct re_softc *sc){
     }
 
     for(int i=0; i < RE_RX_BUF_NUM; i++){
-        sc->rx_desc[i] = (struct RxDesc *)(sc->vmem + (8192 + RE_TX_BUF_NUM*sizeof(struct TxDesc)) + i*sizeof(struct RxDesc));
+        sc->rx_desc[i] = (struct RxDesc *)(sc->vmem + (8192 + RE_TX_BUF_NUM*8192) + i*sizeof(struct RxDesc));
         unsigned long addr = sc->rx_buf + 8192 + i*8192;
         sc->rx_desc[i]->RxBuffL = addr;
         sc->rx_desc[i]->RxBuffH = addr >> 32;
@@ -590,16 +590,7 @@ ethernet_package_descriptor_t *re_recieve_package(){
     desc->buffersize = 0;
     desc->buf = (void*)0;
     
-
-
     while(sc->rx_desc[sc->rx_cur]->OWN == 0){
-       /* while( 1 ){ 
-            if(!sc->rx_desc[sc->rx_cur]->OWN) 
-                break;
-
-            if(default_ethernet_device.is_online)
-                return first_desc;
-        }*/
 
         sc->rx_desc[sc->rx_cur]->OWN = 1;
 
@@ -639,7 +630,6 @@ void re_handle(){
     if(status&0x04) {
 
 		printf("[RTL81] Package send!\n");
-		//((unsigned volatile long*)((unsigned volatile long)&package_send_ack))[0] = 1;
 	}
 }
 
