@@ -150,99 +150,88 @@ void keyboard_handler(void)
 	if(scancode == 0xFA) return;
 	
 	// Control kernel
-	    if(scancode == KEY_F1) {
+    if(scancode == KEY_F1) {
+        _stdin = stdin;
+        scaps = 0;
+        return;
+    }
+	
+    //
+    if(scancode & 0x80) {
+        if((scancode == 0xAA) || (scancode == 0xB6))
+            shift = 0;
+    } else {
+        if((scancode == 0x2A) || (scancode == 0x36)) {
+            shift = 1;
+            scaps = 0;
+            return;
+        }
+    }
 
-		    _stdin = stdin;
+	//
+    if(scancode &0x80 || (scancode == 0x45)) {
+        if(scancode == 0xE0) { // scape sequence
+	        scaps ++;
+			shift = 0;
+	    } else {
 		    scaps = 0;
-		    return;
-	    }
-	
-    	if(scancode & 0x80) {
-
-        	if((scancode == 0xAA) || (scancode == 0xB6))
-        	    shift = 0;
-
-    	} else {
-            	if((scancode == 0x2A) || (scancode == 0x36)) {
-            		shift = 1;
-            		scaps = 0;
-            		return;
-            	}
-    	}
-
-	
-    	if(scancode &0x80 || (scancode == 0x45)) {
-     
-			if(scancode == 0xE0) { // scape sequence
-				scaps ++;
-				shift = 0;
-			} else {
-			
-				scaps = 0;
-			}
-
-            if((scancode&0x7F) == 0x3A){
-
-                if(caps_lock == 1){
-                    caps_lock = 0;
-                }else{
-                    caps_lock = 1;
-                }
-
-                led_status &=~ 1 << 2;
-                led_status |= caps_lock << 2;
-
-                kbd_led_handling(led_status);
+        }
+        
+        if((scancode&0x7F) == 0x3A){
+            if(caps_lock == 1){
+                caps_lock = 0;
+            }else{
+                caps_lock = 1;
             }
+    
+            led_status &=~ 1 << 2;
+            led_status |= caps_lock << 2;
 
-           
-			
-
-    	} else {
+            kbd_led_handling(led_status);
+        }
+    } else {
 		
-         	if( (shift == 1 ) || (caps_lock == 1) ) {	
-                	keyboard_charset[0] = ascii_maiusculas[scancode];
-
-        	} else {
-
-              		if( scaps > 0 ) {
-                		scaps = 0;
-                		switch(scancode) {
-                			case UP:
-                				fputc( ESC , _stdin);
-                				fputc( LEFT_BRACKET , _stdin);
-                				fputc( SEQUENCE , _stdin);
-                			break;
-                			case DOWN:
-                				fputc( ESC , _stdin);
-                				fputc( LEFT_BRACKET , _stdin);
-                				fputc( SEQUENCE + 1, _stdin);
-                			break;
-                			case RIGHT:
-                				fputc( ESC , _stdin);
-                				fputc( LEFT_BRACKET , _stdin);
-                				fputc( SEQUENCE + 2 , _stdin);
-                			break;
-                			case LEFT:
-                				fputc( ESC , _stdin);
-                				fputc( LEFT_BRACKET , _stdin);
-              					fputc( SEQUENCE + 3 , _stdin);
-               			break;
-				        }
+        if( scaps > 0 ) 
+        {
+            scaps = 0;
+            switch(scancode) {
+                case UP:
+                    fputc( ESC , _stdin);
+                    fputc( LEFT_BRACKET , _stdin);
+                    fputc( SEQUENCE , _stdin);
+                    break;
+                case DOWN:
+                    fputc( ESC , _stdin);
+                    fputc( LEFT_BRACKET , _stdin);
+                    fputc( SEQUENCE + 1, _stdin);
+                	break;
+                case RIGHT:
+                    fputc( ESC , _stdin);
+                    fputc( LEFT_BRACKET , _stdin);
+                    fputc( SEQUENCE + 2 , _stdin);
+                    break;
+                case LEFT:
+                    fputc( ESC , _stdin);
+                    fputc( LEFT_BRACKET , _stdin);
+              	    fputc( SEQUENCE + 3 , _stdin);
+                    break;
+            }
 				                			
-                	} else keyboard_charset[0] = ascii_minusculas[scancode];
-            	}
+        }else if( (shift == 1 ) || (caps_lock == 1) ) {	
+            keyboard_charset[0] = ascii_maiusculas[scancode];
+        } else {
+            keyboard_charset[0] = ascii_minusculas[scancode];
+        }
+    }
 
-		if( (keyboard_charset[0] &0xff) != 0) { 
+    if( (keyboard_charset[0] &0xff) != 0) { 
 		
-			fputc(keyboard_charset[0] &0xff, _stdin);
+    fputc(keyboard_charset[0] &0xff, _stdin);
 			
-			//printf("%c ", keyboard_charset[0] &0xff );
-		}
-        }	
+    //printf("%c ", keyboard_charset[0] &0xff );
+    }	
 
-
-	keyboard_charset[0] = 0;
+    keyboard_charset[0] = 0;
 }
 
 static void kbd_led_handling(unsigned char status){
@@ -272,16 +261,21 @@ static void kbd_set_command(int command, unsigned char val){
 void keyboard_install()
 {
 
-	keyboard_charset[0] = 0;
-	shift = 0;
-	caps_lock = 0;
-	count = 0;
-	scaps = 0;
+    keyboard_charset[0] = 0;
+    shift = 0;
+    caps_lock = 0;
+    count = 0;
+    scaps = 0;
     led_status = 0;
 
 	// set current scan code set
     //kbd_set_command(0xF0 , 4);
+
+
+
     // kbd set rate
+    // Repeat rate (00000b = 30 Hz)
+    // Delay before keys repeat (00b = 250 ms)
     kbd_set_command(0xF3 , 0);
 
     // limpar LEDs
@@ -289,7 +283,10 @@ void keyboard_install()
 
     // IRQ set Handler
     cli();
-	fnvetors_handler[1] = &keyboard_handler;
+    fnvetors_handler[1] = &keyboard_handler;
 	// Enable IRQ Interrup
+
+    //clean buffer
+    inportb(0x60);
 }
 

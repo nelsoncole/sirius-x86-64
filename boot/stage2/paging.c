@@ -7,7 +7,7 @@
 
 #include <data.h>
 
-#define GUI_VIRTUAL_BUFFER 0x3C00000
+#define GUI_VIRTUAL_BUFFER 0x7800000
 
 pml4_table_t *pml4e = (pml4_table_t *)PAGING_ADDR;
 pae_page_directory_pointer_table_t *pdpte = (pae_page_directory_pointer_table_t*) (PAGING_ADDR + 0x1000);
@@ -53,11 +53,11 @@ void page_install(void)
 	unsigned long addr;
 	int i;
 	//PAE PTE
-	memset(pte,0,512*sizeof(pae_page_table_t)*36);
+	memset(pte,0,512*sizeof(pae_page_table_t)*64);
 	
-	//58 MiB
+	//120 MiB
 	addr = 0;
-	for(i=0;i < 512*30; i++) {
+	for(i=0;i < 512*60; i++) {
 		
 		pte->p = 1;
 		pte->rw = 1;
@@ -68,9 +68,9 @@ void page_install(void)
 	}
 	
 	
-	// Linear Frame BUffer 4 MiB
+	// Linear Frame BUffer 8 MiB
 	addr = (unsigned long)gui->frame_buffer;
-	for(i=0;i < 512 * 2; i++) {
+	for(i=0;i < 512 * 4; i++) {
 		
 		pte->p = 1;
 		pte->rw = 1;
@@ -83,11 +83,11 @@ void page_install(void)
 	
 	memset(pde,0,512*sizeof(pae_page_directory_t));
 	addr = (unsigned long)pae_pte;
-	for(i=0;i < 32; i++) {
+	for(i=0;i < 64; i++) {
 		
 		pde->p = 1;
 		pde->rw = 1;
-		//if(i > 31) pde->us = 1;
+		//if(i > 59) pde->us = 1;
 		pde->phy_addr_pt = (addr >>12) &0xfffffffff;
 		
 		addr +=0x1000;

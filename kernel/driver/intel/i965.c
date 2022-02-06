@@ -86,7 +86,6 @@ int setup_i965(){
 		mm_mp(gui->frame_buffer, (unsigned long*)&virt_addr, 0x800000/*8MiB*/, 0);
 		gui->virtual_buffer = virt_addr;
 		
-		
 		return 1;
 	}
 	

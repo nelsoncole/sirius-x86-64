@@ -112,8 +112,8 @@ int mm_mp( unsigned long phy_addr, unsigned long *virt_addr,unsigned size, int f
 
 // TODO
 // 0x2000000 -- 0x3000000 -- 32 MiB RAM_BITMAP
-// 0x3000000 -- 0x3001000 -- 4 KiB ALLOC_PAGE_DIR
-// 0x3001000 -- 0x3201000 -- 2 MiB ALLOC_PAGE_TABLE
+// 0x6000000 -- 0x6001000 -- 4 KiB ALLOC_PAGE_DIR
+// 0x6001000 -- 0x6201000 -- 2 MiB ALLOC_PAGE_TABLE
 
 unsigned char *RAM_BITMAP;
 pae_page_directory_t *alloc_pde;
@@ -123,44 +123,37 @@ unsigned long ram_setup(unsigned long entry_pointer_info)
 
 	RAM_BITMAP = (unsigned char*) (0x2000000);
 	
-	// Reserved Kernel 64MiB
-	int len = ((64*1024)/4)/8;
+	// Reserved Kernel 128MiB
+	int len = ((128*1024)/4)/8;
 	
 	memset(RAM_BITMAP, -1, len);
 	
-	// Free 64 MiB to 128 MiB
+	// Free 128 MiB to 512 MiB
 	int offset = len;
-	len = (((512 - 64)*1024)/4)/8;
+	len = (((512 - 128)*1024)/4)/8;
 	
 	memset(RAM_BITMAP + offset, 0, len);
 
 	return ((unsigned long) RAM_BITMAP);
 }
-extern int screan_spin_lock;
+
 unsigned long alloc_frame()
 {
-	unsigned char *bmp = RAM_BITMAP + 2048;
-	int limit = (((512-64)*1024)/4);
-	for(unsigned int i = 2046; i <  limit; i++ ){
+	unsigned char *bmp = RAM_BITMAP + 4096;
+	int limit = ((512*1024)/4);
+	for(unsigned int i = 4096; i <  limit; i++ ){
 	
 		for(int t = 0; t < 8; t++) {
 		
 			if( !(*bmp >> t &0x1) ) {
 
 				*bmp |= (1 << t);
-				return 0x4000000 + ( (i*8+t)*0x1000); //64MiB +++
+				return (i*8+t)*0x1000;
 			}
 		}
 		
 		bmp++;
 	}
-	
-    while(screan_spin_lock != 0) {}
-    screan_spin_lock ++;
-    VERBOSE = 1;
-	printf("Alloc Frame error\n"); 
-	cli();
-	while(1){}
 	
 	return 0;
 }
@@ -169,7 +162,7 @@ int free_frame(unsigned long addr)
 {
 
 	unsigned int block = addr/0x1000;
-	unsigned int byte = block/8; 
+	unsigned int byte = block/8;
 	unsigned int bit = block%8;
 	
 	unsigned char *bmp = (unsigned char*)(RAM_BITMAP + byte);
@@ -187,12 +180,12 @@ unsigned long alloc_pages_setup(unsigned long entry_pointer_info)
 {
 	alloc_spin_lock = 0;
 
-	alloc_pde = (pae_page_directory_t *) (0x3000000);
+	alloc_pde = (pae_page_directory_t *) (0x6000000);
 	pae_page_directory_t *pde = alloc_pde;
 	memset( pde,0, 512*sizeof(pae_page_directory_t));
 	
 	
-	alloc_pte = (pae_page_table_t *) (0x3001000);
+	alloc_pte = (pae_page_table_t *) (0x6001000);
 	pae_page_table_t *pte = alloc_pte;
 	memset(pte, 0, 512*sizeof(pae_page_table_t) *512);
 	
@@ -277,8 +270,7 @@ unsigned long alloc_pages(int type, unsigned len, unsigned long *addr)
 			
 			for(int y=0; y < len; y++) {
 				unsigned long frame = alloc_frame();
-				
-				if(!frame){ printf("FIXME frame");for(;;);}
+				if(!frame){ printf("FIXME frame"); while(1){}}
 				
 				pte->p = 1;
 				
@@ -353,18 +345,16 @@ void free_pages(void *addr)
 
 unsigned long get_phy_addr (unsigned long v) {
 
-
-	int table = (int) (v >> 12 &0x1FF);
-    	int directory = (int) (v >> 21 &0x1FF);
-    	int directory_ptr = (int) (v >> 30 &0x1FF);
-    	//int pml4 = (int) (v >> 39 &0x1FF);
+    int table = (int) (v >> 12 &0x1FF);
+    int directory = (int) (v >> 21 &0x1FF);
+    int directory_ptr = (int) (v >> 30 &0x1FF);
+    //int pml4 = (int) (v >> 39 &0x1FF);
     	
     	
-    	pae_page_directory_t *pde = (pae_page_directory_t *)( pdpte[directory_ptr].phy_addr_pd << 12 &0xffffffffffff);
-	pae_page_table_t *pte  = (pae_page_table_t *) (pde[directory].phy_addr_pt << 12 &0xffffffffffff);
+    pae_page_directory_t *pde = (pae_page_directory_t *)( pdpte[directory_ptr].phy_addr_pd << 12 &0xffffffffffff);
+    pae_page_table_t *pte  = (pae_page_table_t *) (pde[directory].phy_addr_pt << 12 &0xffffffffffff);
 	
 	unsigned long phy = pte[table].frames << 12 &0xffffffffffff;
-
 
 	return phy;
 }

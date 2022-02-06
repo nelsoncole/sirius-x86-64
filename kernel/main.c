@@ -93,6 +93,7 @@ void main(unsigned long entry_pointer_info)
 	page_install(entry_pointer_info);
 	printf("Setup MM ...\\\\\n");
 	initialize_mm_mp();
+    printf("Setup RAM ...\\\\\n");
 	ram_setup(entry_pointer_info);
 	alloc_pages_setup(entry_pointer_info);
 	
@@ -127,7 +128,7 @@ void main(unsigned long entry_pointer_info)
 	
 	printf("Sirius OS (Kernel mode: AMD64 or x86_64)\nCPU: %s\n",cpu_name);
 	
-	_stdin = stdin = fopen (0, "stdin");	
+	_stdin = stdin = fopen (0, "stdin");
 	_stdout = stdout = fopen (0, "stdout");
 	_stderr = stderr = fopen (0, "stderr");
 	

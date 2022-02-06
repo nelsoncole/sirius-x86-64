@@ -125,15 +125,15 @@ loop:
                 case ARP_OPC_REQUEST:
                     printf("ARP REQUEST\n");
                     arp_save_address( ip, mac);
-                    //arp_replay(ip, mac);
-                    arp_replay2(target_ip, ip, mac);
+                    arp_replay(ip, mac);
+
                     //repaly packet
-                    data = (char*)ipv4_cache;
+                    /*data = (char*)ipv4_cache;
                     ipv4_cp = (ipv4_header_t*)(ipv4_cache + sizeof(ether_header_t));
                     if((ipv4_cp->dst == *(unsigned int*)target_ip) && (ipv4_cp->checksum != 0)){
                         send_ethernet_package(data, htons(ipv4_cp->len) + sizeof(ether_header_t));
                         ipv4_cp->checksum = 0;
-                    }
+                    }*/
                     break;
                 case ARP_OPC_REPLY:
                     printf("ARP REPLAY\n");

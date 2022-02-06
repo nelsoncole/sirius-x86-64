@@ -21,7 +21,7 @@ void msi_vector_install()
 {
     vector_msi = 0;
 
-	idt_gate(0x80 + 0,(unsigned long)msi0 , 8,0);
+    idt_gate(0x80 + 0,(unsigned long)msi0 , 8,0);
     idt_gate(0x80 + 1,(unsigned long)msi1 , 8,0);
     idt_gate(0x80 + 2,(unsigned long)msi2 , 8,0);
     idt_gate(0x80 + 3,(unsigned long)msi3 , 8,0);
@@ -61,7 +61,7 @@ void msi_vector_install()
 
 void default_mas(int n){
 	
-	printf("Null MSI vector: %d\n",n); 
+	printf("Null MSI vector: %d\n",n+0x80); 
 }
 
 static void *fnvetors_handler_msi[32] = {
@@ -110,13 +110,13 @@ void msi_function(unsigned int n){
     	// Chamda de função correspondente
     	call_function(addr, n);
 
-    }else printf("error msi vector: %d\n", n);
+    }else printf("error msi vector: %d\n", n+0x80);
 
     apic_eoi_register();
 	
 }
 
-int apic_send_msi( struct dev *dev, void (*main)()){
+int apic_send_msi( struct dev *dev, void (*fuc)()){
 
     int bus = dev->bus;
     int slot = dev->slot;
@@ -161,7 +161,7 @@ int apic_send_msi( struct dev *dev, void (*main)()){
     command |= 0x1;
     pci_write_config_word(bus,slot,function, capp_addr + 0x2, command);
 
-    fnvetors_handler_msi[vector_msi++] = (unsigned long)main;
+    fnvetors_handler_msi[vector_msi++] = (unsigned long)fuc;
     return 0;
 
 }
