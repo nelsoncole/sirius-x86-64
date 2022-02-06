@@ -22,6 +22,7 @@ HPIT                | :white_check_mark: | :white_check_mark: | :white_check_mar
 ACPI                | :white_check_mark: | :white_check_mark: | :white_check_mark:
 Intel HD Graphics   | :x:                | :x:                | :white_check_mark:
 RTL8169             | :question:         | :question:         | :white_check_mark:
+AMD PC Net3         | :white_check_mark: | :white_check_mark: | :question:
 
 
 
