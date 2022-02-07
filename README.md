@@ -26,6 +26,6 @@ AMD PCNet           | :white_check_mark: | :white_check_mark: | :question:
 
 
 
-![Alt text](relative/screeanshot/image1.png?raw=true "Title")
+<img src="/screenshot/image1.png" alt="My cool logo"/>
 
 By: Nelson Cole
