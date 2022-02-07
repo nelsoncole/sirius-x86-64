@@ -56,7 +56,6 @@ const char *ahci_type[] = {
     "PM",
 };
 
-
 static int sata_port_initialize(HBA_MEM_T *mmio);
 
 static const char _zhba_base[62*1024]__attribute__((aligned(4096)));
@@ -66,10 +65,9 @@ void ahci_initialize (unsigned long mmio /*ABAR*/) {
 	// Favor de deixar o HBA_BASE na memória baixa < 4GiB
 	HBA_BASE = (unsigned long) (_zhba_base);// malloc(0x10000); // 64 KiB
 	// FIXME É importante que este endereço seja o físico na memória
-	dmavirt =(unsigned char*) malloc(0x10000); // 64 KiB;
+	dmavirt =(unsigned char*) malloc(0x20000); // 128 KiB;
 	
 	dmaphy = (unsigned char*) get_phy_addr ((unsigned long)dmavirt);
-
 
     hba_mem_space = (HBA_MEM_T*) mmio;
 
@@ -559,36 +557,33 @@ static int ahci_write(int satanum,HBA_PORT_T *port, uint64_t lba, uint32_t count
 	if(!(ata[satanum].flag&0x80000000)) return (-1);
 
 	
-			
+    // Spin lock timeout counter
+    int spin = 0;
+    int slot = 0;
 
-    	// Spin lock timeout counter
-   	int spin = 0;
-    	int slot = 0;
-
-    	// Redefinir registo de interrupção de porta 
-    	port->is = (uint32_t) -1;
+    // Redefinir registo de interrupção de porta 
+    port->is = (uint32_t) -1;
 	// Received FIS
-    	// HBA_FIS_T *rfis = (HBA_FIS_T*)(port->fb);
+    // HBA_FIS_T *rfis = (HBA_FIS_T*)(port->fb);
 
-    	// Defina o comando de cabeçalho ou slot e configura
-    	HBA_CMD_HEADER_T *cmdheader0 = (HBA_CMD_HEADER_T*)((unsigned long)port->clb);
+    // Defina o comando de cabeçalho ou slot e configura
+    HBA_CMD_HEADER_T *cmdheader0 = (HBA_CMD_HEADER_T*)((unsigned long)port->clb);
 
-    	sata_set_cmdHeader(port,satanum,cmdheader0,(sizeof(H2D_REGISTER_FIS_T)/sizeof(uint32_t)),1/*write*/,0,0,0,1,0);
+    sata_set_cmdHeader(port,satanum,cmdheader0,(sizeof(H2D_REGISTER_FIS_T)/sizeof(uint32_t)),1/*write*/,0,0,0,1,0);
     
-    	// Defina Comando de tabela
-    	HBA_CMD_TBL_T *cmdtable = (HBA_CMD_TBL_T*)((unsigned long)cmdheader0->ctba);
-	memset(cmdtable,0,sizeof(HBA_CMD_TBL_T) +(cmdheader0->prdtl -1)*sizeof(HBA_PRDT_ENTRY_T));
-
-
-	__asm__ __volatile__("cld; rep; movsd;"::"D"(dmavirt),\
-            "S"(buf),"c"((count * ata[satanum].bps)/4));
+    // Defina Comando de tabela
+    HBA_CMD_TBL_T *cmdtable = (HBA_CMD_TBL_T*)((unsigned long)cmdheader0->ctba);
+    memset(cmdtable,0,sizeof(HBA_CMD_TBL_T) +(cmdheader0->prdtl -1)*sizeof(HBA_PRDT_ENTRY_T));
+    
+    __asm__ __volatile__("cld; rep; movsd;"::"D"(dmavirt),\
+        "S"(buf),"c"((count * ata[satanum].bps)/4));
 
     
-    	// Configura a PRDT
-    	sata_set_prdt(cmdtable,dmaphy/*buf*/,(count * ata[satanum].bps) -1);
+    // Configura a PRDT
+    sata_set_prdt(cmdtable,dmaphy/*buf*/,(count * ata[satanum].bps) -1);
     
 
-    	// Configure o Comando FIS
+    // Configure o Comando FIS
 
     	switch(ata[satanum].dev_type)
     	{

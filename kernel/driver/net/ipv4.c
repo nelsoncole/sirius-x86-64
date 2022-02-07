@@ -19,7 +19,7 @@ int ipv4_send(void *buf, unsigned char protocol, unsigned int src_address, unsig
     unsigned char mac[SIZE_OF_MAC] ={0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
     
     if(dst_address != 0xFFFFFFFF){
-        if(get_hardwere_ethernet(mac)) {
+        if(get_hardwere_ethernet(mac, dst_address)) {
             printf("Hardware indefinido\n");
                     return 0;
         } 
@@ -40,7 +40,7 @@ int ipv4_send(void *buf, unsigned char protocol, unsigned int src_address, unsig
     hdr->len = htons(len);
     hdr->id = htons(ipv4_count++);
     hdr->offset = htons(0x4000);
-    hdr->ttl = 63;
+    hdr->ttl = 64;
     hdr->protocol = protocol;
     hdr->checksum = 0;
     hdr->src = src_address;

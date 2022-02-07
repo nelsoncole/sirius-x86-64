@@ -132,7 +132,12 @@ void socket_server_transmit(){
                         udp_send(src_ip, dest_ip, src_port, dest_port, buf, len);
                         break;
                     case SOCK_STREAM:
-                        tcp_send(src_ip, dest_ip, src_port, dest_port, seq, ack, protocol_flags, buf, len);
+                        if(protocol_flags == TCP_SYN){
+                            tcp_connect(src_ip, dest_ip, src_port, dest_port);
+                        }else {
+                            //tcp_send(src_ip, dest_ip, src_port, dest_port, seq, ack, protocol_flags, buf, len);
+                            tcp_send_payload(src_ip, dest_ip,src_port, dest_port, protocol_flags, buf, len);
+                        }
                         break;
                 }
             }

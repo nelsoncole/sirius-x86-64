@@ -67,7 +67,7 @@ static unsigned char *arp_cache_get_address(unsigned char *mac, unsigned char *i
     return 0;
 }
 
-int get_hardwere_ethernet(unsigned char *mac){
+int get_hardwere_ethernet(unsigned char *mac, unsigned int ip){
     unsigned char everyone[SIZE_OF_MAC] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
     int n = 2;
     while(n > 0) {

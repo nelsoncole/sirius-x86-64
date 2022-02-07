@@ -124,14 +124,6 @@ loop:
                     printf("ARP REQUEST\n");
                     arp_save_address( ip, mac);
                     arp_replay(ip, mac);
-
-                    //repaly packet
-                    /*data = (char*)ipv4_cache;
-                    ipv4_cp = (ipv4_header_t*)(ipv4_cache + sizeof(ether_header_t));
-                    if((ipv4_cp->dst == *(unsigned int*)target_ip) && (ipv4_cp->checksum != 0)){
-                        send_ethernet_package(data, htons(ipv4_cp->len) + sizeof(ether_header_t));
-                        ipv4_cp->checksum = 0;
-                    }*/
                     break;
                 case ARP_OPC_REPLY:
                     printf("ARP REPLAY\n");
@@ -156,8 +148,19 @@ loop:
                     data += (tcp->off >>4)*4;
                     end += htons(ipv4->len) - sizeof(ipv4_header_t);
                     len =  end - data;
-                    socket_server_receive(0, IP_PROTOCOL_TCP, ipv4->src, ipv4->dst, tcp->src_port,
-                    tcp->dst_port, data, len, tcp->seq, tcp->ack, tcp->flags);
+                    if (tcp->flags == (TCP_ACK | TCP_SYN) || tcp->flags == (TCP_ACK | TCP_PSH) || tcp->flags == (TCP_ACK | TCP_FIN) ) {
+                        if (tcp_push_ack(ipv4->src, ipv4->dst, htons(tcp->src_port),htons(tcp->dst_port),htonl(tcp->seq), htonl(tcp->ack), tcp->flags, len))
+                            break;
+
+                        socket_server_receive(0, IP_PROTOCOL_TCP, ipv4->src, ipv4->dst, tcp->src_port,
+                        tcp->dst_port, data, len, tcp->seq, tcp->ack, tcp->flags);
+
+                    }else if(tcp->flags == TCP_ACK){
+                        // verificar erro
+                        // verifica termino de conexao
+                        tcp_finish(ipv4->src, ipv4->dst, htons(tcp->src_port),htons(tcp->dst_port), htonl(tcp->ack));
+                        break;
+                    }    
                     break;
                 case IP_PROTOCOL_UDP:
                     printf("IPv4 UDP\n");

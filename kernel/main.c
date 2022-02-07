@@ -158,6 +158,9 @@ void main(unsigned long entry_pointer_info)
 	user->clock = (unsigned long) clock;
 
     //
+    init_tcp();
+
+    //
     if(init_socket(AF_LOCAL, SOCK_STREAM, 0) < 0){
         printf("Cannot create socket\n");
         for(;;);

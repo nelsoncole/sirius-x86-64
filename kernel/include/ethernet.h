@@ -29,6 +29,15 @@
 #define SIZE_OF_IP 4
 
 
+// Flags
+#define TCP_FIN     (1 << 0)
+#define TCP_SYN     (1 << 1)
+#define TCP_RST     (1 << 2)
+#define TCP_PSH     (1 << 3)
+#define TCP_ACK     (1 << 4)
+#define TCP_URG     (1 << 5)
+
+
 extern unsigned char our_ip[SIZE_OF_IP];
 extern unsigned char router_ip[SIZE_OF_IP];
 extern unsigned char dns_ip[SIZE_OF_IP];
@@ -96,7 +105,7 @@ void initialise_ethernet();
 //
 void init_arp();
 int arp_save_address(unsigned char *ip, unsigned char *mac);
-int get_hardwere_ethernet(unsigned char *mac);
+int get_hardwere_ethernet(unsigned char *mac, unsigned int ip);
 void arp_request(unsigned char *ip, unsigned char *mac);
 void arp_replay(unsigned char *ip, unsigned char *mac);
 void arp_replay2(unsigned char *src_ip, unsigned char *dest_ip, unsigned char *dest_mac);
@@ -108,6 +117,16 @@ int udp_receive(void *data, size_t length, unsigned short port);
 //
 int tcp_send(unsigned int src_address, unsigned int dst_address,
 unsigned short src_port, unsigned short dst_port, unsigned int seq, unsigned int ack, unsigned char flags, const void *data, size_t length);
+int init_tcp();
+int tcp_connect(unsigned int src_address, unsigned int dst_address,
+unsigned short src_port, unsigned short dst_port);
+int tcp_push_ack(unsigned int src_address, unsigned int dst_address,
+unsigned short src_port, unsigned short dst_port, unsigned int seq,
+unsigned int ack, unsigned char flags, size_t len);
+int tcp_send_payload(unsigned int src_address, unsigned int dst_address,
+unsigned short src_port, unsigned short dst_port, unsigned char flags, const void *data, size_t len);
+void tcp_finish(unsigned int src_address, unsigned int dst_address,
+unsigned short src_port, unsigned short dst_port, unsigned int ack);
 
 //
 int dhcp_send(unsigned char *your_ip, unsigned char *server_ip, unsigned char message_type);
