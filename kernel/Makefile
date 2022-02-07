@@ -1,5 +1,5 @@
 ASFLAGS64  :=-f elf64 -O0
-CFLAGS64 :=-Wall -O0 -m64 -std=c11 -ffreestanding -mcmodel=large -mno-red-zone -fno-stack-protector \
+CFLAGS64 :=-Wall -O0 -m64 -std=c11 -std=gnu99 -ffreestanding -mcmodel=large -mno-red-zone -fno-stack-protector \
 -nostdlib -nostdinc -I ./include
 
 LDFLAGS64  :=-m elf_x86_64 -Map kernel.map -T link.ld

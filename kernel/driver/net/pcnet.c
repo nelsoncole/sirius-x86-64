@@ -185,7 +185,7 @@ void setup_pcnet( int bus, int slot, int function ){
 	if (i <= 0) {
 		printf ("%s: timeout: controller init failed\n", "pcnet");
         while(1){}
-		return -1;
+		return;
 	}
 
     pcnetWriteCSR(0, CSR_STATUS_INIT | CSR_STATUS_IENA | CSR_STATUS_STRT);

@@ -348,8 +348,6 @@ static void re_setup_dma_map_buf(struct re_softc *sc){
     // 4112 KiB
     // Alocar 8MiB
     alloc_pages(0, 2048, (unsigned long*)&addr);
-    
-    //mm_mp(0x10000000 /*256MiB*/, (unsigned long*)&addr, 0x800000/*8MiB*/, 0);
 
     if(!addr) {
         kernel_panic("realtack");
@@ -631,6 +629,8 @@ void re_handle(){
 
 		printf("[RTL81] Package send!\n");
 	}
+
+    re_write_command(0x3e, status);
 }
 
 extern int apic_send_msi( struct dev *dev, void (*main)());
