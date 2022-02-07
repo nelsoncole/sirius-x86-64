@@ -27,5 +27,6 @@ AMD PCNet           | :white_check_mark: | :white_check_mark: | :question:
 
 
 <img src="/screenshot/image1.png" alt="My cool logo"/>
+<img src="/screenshot/image2.png" alt="My cool logo"/>
 
 By: Nelson Cole

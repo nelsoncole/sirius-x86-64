@@ -86,6 +86,6 @@ install:
 	
 push:
 	git add ./
-	git commit -m "commit++"	
+	git commit -m "My cool logo"	
 	git push -u origin main
 	
