@@ -272,12 +272,12 @@ int kbd_wait_irq_ack(){
 	for (i = 10000000; i > 0; i--) {
 		if ( ((unsigned volatile char*)((unsigned volatile char)&kbd_irq_ack))[0] )
 			break;
-		//udelay (10);
+		    //udelay (10);
 	}
 
     if (i <= 0) {
 		printf ("%s: timeout: controller init failed\n", "keyboard");
-		return -1;
+		//return -1;
 	}
 
     ((unsigned volatile char*)((unsigned volatile char)&kbd_irq_ack ))[0] = 0;
