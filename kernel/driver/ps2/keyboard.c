@@ -52,7 +52,7 @@
 #define CAPSLOCK 0
 
 
-unsigned volatile char kbd_irq_ack = 0;
+unsigned volatile long kbd_irq_ack = 0;
 unsigned char keyboard_charset[1];
 
 // Algumas variáveis estática, para o controle 
@@ -149,7 +149,7 @@ void keyboard_handler(void)
 
     // ignore ack
 	if(scancode == 0xFA) {
-        ((unsigned volatile char*)((unsigned volatile char)&kbd_irq_ack ))[0] = 1;
+        *(unsigned volatile long*)(&kbd_irq_ack) = 1;
         return;
     }   
 	
@@ -266,21 +266,21 @@ static void kbd_set_command(int command, unsigned char val){
 
 int kbd_wait_irq_ack(){
 
-    ((unsigned volatile char*)((unsigned volatile char)&kbd_irq_ack ))[0] = 0;
+    *(unsigned volatile long*)(&kbd_irq_ack) = 0;
 
     int i;
 	for (i = 10000000; i > 0; i--) {
-		if ( ((unsigned volatile char*)((unsigned volatile char)&kbd_irq_ack))[0] )
+		if ( *(unsigned volatile long*)(&kbd_irq_ack) )
 			break;
 		    //udelay (10);
 	}
 
     if (i <= 0) {
 		printf ("%s: timeout: controller init failed\n", "keyboard");
-		//return -1;
+		return -1;
 	}
 
-    ((unsigned volatile char*)((unsigned volatile char)&kbd_irq_ack ))[0] = 0;
+    *(unsigned volatile long*)(&kbd_irq_ack) = 0;
     return 0;
 }
 
@@ -314,7 +314,7 @@ void keyboard_install()
 
     sti();
     if(kbd_wait_irq_ack()){
-       kernel_panic("keyboard, wait irq ack");
+       printf("keyboard error, wait irq ack\n");
     }
     cli();
 }

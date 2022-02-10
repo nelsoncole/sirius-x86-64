@@ -229,6 +229,6 @@ unsigned long rcx, unsigned long r8, unsigned long r9)
 void syscall_install()
 {
 	// ring 3  	
-    	_idt_gate(0x72,(unsigned long)int114, 0x8,3,0);
+    _idt_gate(0x72,(unsigned long)int114, 0x8,3,0);
 	
 }

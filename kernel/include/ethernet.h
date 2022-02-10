@@ -7,6 +7,8 @@
 
 #include <stddef.h>
 
+#include <inet.h>
+
 #define ET_IPV4                         0x0800
 #define ET_ARP                          0x0806
 #define ET_IPV6                         0x86DD
@@ -42,19 +44,7 @@ extern unsigned char our_ip[SIZE_OF_IP];
 extern unsigned char router_ip[SIZE_OF_IP];
 extern unsigned char dns_ip[SIZE_OF_IP];
 extern unsigned char dhcp_ip[SIZE_OF_IP];
-
-
-static inline unsigned short htons(unsigned short nb)
-{
-    return (nb>>8) | (nb<<8);
-}
-
-static inline unsigned int htonl(unsigned int nb) {
-       return ((nb>>24)&0xff)      |
-              ((nb<<8)&0xff0000)   |
-              ((nb>>8)&0xff00)     |
-              ((nb<<24)&0xff000000);
-}
+extern unsigned char local_ip[SIZE_OF_IP];
 
 // DRIVER
 typedef struct _ethernet_device{
@@ -103,6 +93,12 @@ void register_ethernet_device(unsigned long send_package,unsigned long receive_p
 void initialise_ethernet();
 
 //
+void ethernet_port_setup();
+unsigned short get_port();
+unsigned short set_port(unsigned short port);
+int clean_port(unsigned short port);
+
+//
 void init_arp();
 int arp_save_address(unsigned char *ip, unsigned char *mac);
 int get_hardwere_ethernet(unsigned char *mac, unsigned int ip);
@@ -120,7 +116,7 @@ unsigned short src_port, unsigned short dst_port, unsigned int seq, unsigned int
 int init_tcp();
 int tcp_connect(unsigned int src_address, unsigned int dst_address,
 unsigned short src_port, unsigned short dst_port);
-int tcp_push_ack(unsigned int src_address, unsigned int dst_address,
+int tcp_ack(unsigned int src_address, unsigned int dst_address,
 unsigned short src_port, unsigned short dst_port, unsigned int seq,
 unsigned int ack, unsigned char flags, size_t len);
 int tcp_send_payload(unsigned int src_address, unsigned int dst_address,
@@ -132,6 +128,10 @@ unsigned short src_port, unsigned short dst_port, unsigned int ack);
 int dhcp_send(unsigned char *your_ip, unsigned char *server_ip, unsigned char message_type);
 int dhcp_parse_options(const void *buf);
 
+//
+void setup_vmnet();
+int vmnet_udp_send(unsigned int src_ip, unsigned int dst_ip,
+unsigned short src_port, unsigned short dst_port, const void *data, size_t length);
 
 
 #endif

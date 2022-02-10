@@ -126,6 +126,9 @@ int apic_send_msi( struct dev *dev, void (*fuc)()){
 
     unsigned short capp_addr = 0;
 
+    if(vector_msi > 32)
+        return 1;
+
     // MSI
     // Capabilities List Pointer
     capp_addr = pci_read_config_byte(bus,slot,function, 0x34);

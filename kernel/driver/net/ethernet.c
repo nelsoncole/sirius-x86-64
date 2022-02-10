@@ -32,6 +32,7 @@ unsigned char our_ip[SIZE_OF_IP];
 unsigned char router_ip[SIZE_OF_IP];
 unsigned char dns_ip[SIZE_OF_IP];
 unsigned char dhcp_ip[SIZE_OF_IP];
+unsigned char local_ip[SIZE_OF_IP];
 
 ethernet_device_t get_default_ethernet_device(){
     return default_ethernet_device;
@@ -149,7 +150,7 @@ loop:
                     end += htons(ipv4->len) - sizeof(ipv4_header_t);
                     len =  end - data;
                     if (tcp->flags == (TCP_ACK | TCP_SYN) || tcp->flags == (TCP_ACK | TCP_PSH) || tcp->flags == (TCP_ACK | TCP_FIN) ) {
-                        if (tcp_push_ack(ipv4->src, ipv4->dst, htons(tcp->src_port),htons(tcp->dst_port),htonl(tcp->seq), htonl(tcp->ack), tcp->flags, len))
+                        if (tcp_ack(ipv4->src, ipv4->dst, htons(tcp->src_port),htons(tcp->dst_port),htonl(tcp->seq), htonl(tcp->ack), tcp->flags, len))
                             break;
 
                         socket_server_receive(0, IP_PROTOCOL_TCP, ipv4->src, ipv4->dst, tcp->src_port,

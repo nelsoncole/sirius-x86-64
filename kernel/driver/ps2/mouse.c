@@ -215,36 +215,6 @@ void mouse_install()
 	mouse_write(MOUSE_DEFAULT);
 	kbdc_wait_ack(); // ACK 
 
-	/*
-	// Enable Z axis
-	mouse_write(0xF3);
-	mouse_wait_ack(); // ACK
-	
-	
-	mouse_write(200);
-	mouse_wait_ack(); // ACK
-	
-	
-	mouse_write(0xF3);
-	mouse_wait_ack(); // ACK
-	
-	
-	mouse_write(100);
-	mouse_wait_ack(); // ACK
-	
-	
-	mouse_write(0xF3);
-	mouse_wait_ack(); // ACK
-	
-	
-	mouse_write(0x80);
-	mouse_wait_ack(); // ACK
-
-
-	mouse_write(0xF2);
-	mouse_wait_ack(); // ACK
-	*/
-
 	// set sample rate
 	mouse_write(0xF3);
 	kbdc_wait_ack(); // ACK

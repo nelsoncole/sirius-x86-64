@@ -185,6 +185,10 @@ void shell() {
 		color(0xFFFFFF);
 		
 		fgets (argv,0x1000,stdin);
+        // limpar o '\n'
+        unsigned char *clean = (unsigned char*)argv;
+        clean += strlen(argv) - 1;
+        *clean = '\0';
 		
 		//argv = strtok(argv,DEL);
 		//argv_pointer[0] = (unsigned long)argv;

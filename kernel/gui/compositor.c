@@ -311,8 +311,6 @@ void compose()
 	memset(paint, 0,sizeof(PAINT));
 	paint_ready_queue = paint;
 
-	launcher = 0;
-
 	unsigned char *vram = ( unsigned char*)((long)gui->virtual_buffer);
 	unsigned char *zbuf  = ( unsigned char*)((long)gui->bank_buffer);
 	
@@ -323,7 +321,9 @@ void compose()
 	
 	mouseaddr->width = 18;
 	mouseaddr->height = 20;
-
+    
+    launcher = 0;
+    
     for (;;){
 
         paint_desktop(zbuf);
@@ -347,15 +347,3 @@ void compose()
   	}
   	
 } 	
-  	
-  	
-  	
-  	
-  	
-  	
-  	
-  	
-  	
-  	
-  	
-  	

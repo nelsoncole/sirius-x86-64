@@ -119,6 +119,15 @@ char* get_ip_from_name(char *addr, const char *name , int query_type){
         sprintf(addr, "%d.%d.%d.%d", (int)answer->address[0],
         (int)answer->address[1],(int)answer->address[2],(int)answer->address[3]);
      
+    }else if(htons(dns->answer_rr)&0x4){
+
+        //struct ANSWER *answer = (struct ANSWER*)((unsigned long)dns + sizeof(struct DNS_HEADER) + question_size);
+        struct ANSWER *answer = (struct ANSWER*)((unsigned long)dns + (count-sizeof(struct ANSWER)));
+        //printf("IP %d.%d.%d.%d\n", answer->address[0],answer->address[1],answer->address[2],answer->address[3]);
+
+        sprintf(addr, "%d.%d.%d.%d", (int)answer->address[0],
+        (int)answer->address[1],(int)answer->address[2],(int)answer->address[3]);
+
     }
     
 

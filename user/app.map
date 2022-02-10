@@ -507,306 +507,306 @@ Linker script and memory map
                 0x000000800000588c                getpathname
                 0x0000008000005acf                path_count
                 0x0000008000005b3a                getfilename
- .text          0x0000008000005c22      0x9a7 socket.o
+ .text          0x0000008000005c22      0x991 socket.o
                 0x0000008000005c22                socket_address
                 0x0000008000005c97                accept
                 0x0000008000005ccd                bind
                 0x0000008000005d9b                connect
-                0x0000008000005f41                listen
-                0x0000008000005f72                recv
-                0x00000080000060aa                recvfrom
-                0x0000008000006211                send
-                0x0000008000006343                sendto
-                0x000000800000648f                shutdown
-                0x000000800000657b                socket
- .text          0x00000080000065c9      0x2dc inet.o
-                0x00000080000065c9                inet_addr
-                0x00000080000067bd                inet_lnaof
-                0x00000080000067eb                inet_makeaddr
-                0x000000800000681a                inet_netof
-                0x0000008000006848                inet_network
-                0x0000008000006877                inet_ntoa
- .text          0x00000080000068a5      0x60f dns.o
-                0x0000008000006937                changeto_dns_name_format
-                0x0000008000006a0b                get_ip_from_name
- .text          0x0000008000006eb4      0x1ab gui.o
-                0x0000008000006eb4                put_pixel
-                0x0000008000006f4a                draw_char_transparent
- .text          0x000000800000705f        0x0 font8x16.o
- .text          0x000000800000705f     0x1197 window.o
-                0x000000800000705f                drawline
-                0x000000800000710e                _drawline
-                0x00000080000071d5                drawrect
-                0x000000800000737f                drawchar
-                0x00000080000074e9                drawstring
-                0x00000080000075a5                drawchar_trans
-                0x00000080000076c4                drawstring_trans
-                0x0000008000007780                window
-                0x0000008000007ce7                wcl
-                0x0000008000007dd3                update_window
-                0x0000008000007dfe                __window_clear
-                0x0000008000007e8b                __window_putchar
-                0x0000008000008138                color
-                0x0000008000008181                __window_puts
- .text          0x00000080000081f6      0x5c5 bmp.o
-                0x00000080000081f6                BitMAP
-                0x00000080000084d8                BitMAP2
- .text          0x00000080000087bb       0xdc font.o
-                0x00000080000087bb                put
- .text          0x0000008000008897      0x332 border.o
-                0x0000008000008897                border
- .text          0x0000008000008bc9       0x96 memcmp.o
-                0x0000008000008bc9                memcmp
- .text          0x0000008000008c5f       0x77 memcpy.o
-                0x0000008000008c5f                memcpy
- .text          0x0000008000008cd6       0x62 memset.o
-                0x0000008000008cd6                memset
- .text          0x0000008000008d38       0xbb strcasecmp.o
-                0x0000008000008d38                strcasecmp
- .text          0x0000008000008df3       0x7a strcat.o
-                0x0000008000008df3                strcat
- .text          0x0000008000008e6d       0x61 strchr.o
-                0x0000008000008e6d                strchr
- .text          0x0000008000008ece       0x9a strcmp.o
-                0x0000008000008ece                strcmp
- .text          0x0000008000008f68       0x7b strcpy.o
-                0x0000008000008f68                strcpy
- .text          0x0000008000008fe3      0x261 strcspn.o
-                0x0000008000008fe3                strchrnul
-                0x000000800000910e                strcspn
- .text          0x0000008000009244        0x0 string.o
- .text          0x0000008000009244       0x4c strlen.o
-                0x0000008000009244                strlen
- .text          0x0000008000009290       0xc8 strncasecmp.o
-                0x0000008000009290                strncasecmp
- .text          0x0000008000009358       0x80 strncmp.o
-                0x0000008000009358                strncmp
- .text          0x00000080000093d8       0x7d strncpy.o
-                0x00000080000093d8                strncpy
- .text          0x0000008000009455       0x72 strpbrk.o
-                0x0000008000009455                strpbrk
- .text          0x00000080000094c7       0x93 strrchr.o
-                0x00000080000094c7                strrchr
- .text          0x000000800000955a       0xbd strsep.o
-                0x000000800000955a                strsep
- .text          0x0000008000009617      0x133 strspn.o
-                0x0000008000009617                strspn
- .text          0x000000800000974a      0x18e strtok.o
-                0x000000800000974a                strtok_r
-                0x0000008000009881                strtok
- .text          0x00000080000098d8       0x98 strstr.o
-                0x00000080000098d8                strstr
- .text          0x0000008000009970       0xa0 strdup.o
-                0x0000008000009970                strdup
- .text          0x0000008000009a10       0xc2 memmove.o
-                0x0000008000009a10                memmove
- .text          0x0000008000009ad2       0x56 strcoll.o
-                0x0000008000009ad2                strcoll
- .text          0x0000008000009b28       0x50 strerror.o
-                0x0000008000009b28                strerror
- .text          0x0000008000009b78        0x0 ctype.o
- .text          0x0000008000009b78       0x55 tolower.o
-                0x0000008000009b78                tolower
- .text          0x0000008000009bcd       0x55 toupper.o
-                0x0000008000009bcd                toupper
- .text          0x0000008000009c22       0xa2 stdio.o
-                0x0000008000009c22                debug_o
- .text          0x0000008000009cc4       0x96 fopen.o
-                0x0000008000009cc4                fopen
- .text          0x0000008000009d5a       0x4b fclose.o
-                0x0000008000009d5a                fclose
- .text          0x0000008000009da5       0x4b fflush.o
-                0x0000008000009da5                fflush
- .text          0x0000008000009df0       0x53 putc.o
-                0x0000008000009df0                putc
- .text          0x0000008000009e43       0x98 getc.o
-                0x0000008000009e43                getc
- .text          0x0000008000009edb       0x53 fputc.o
-                0x0000008000009edb                fputc
- .text          0x0000008000009f2e       0x4b fgetc.o
-                0x0000008000009f2e                fgetc
- .text          0x0000008000009f79      0x15b fgets.o
-                0x0000008000009f79                fgets
- .text          0x000000800000a0d4       0xa4 fputs.o
-                0x000000800000a0d4                fputs
- .text          0x000000800000a178       0x5d fread.o
-                0x000000800000a178                fread
- .text          0x000000800000a1d5       0x5d fwrite.o
-                0x000000800000a1d5                fwrite
- .text          0x000000800000a232       0x4b remove.o
-                0x000000800000a232                remove
- .text          0x000000800000a27d       0x4c rewind.o
-                0x000000800000a27d                rewind
- .text          0x000000800000a2c9       0x59 fseek.o
-                0x000000800000a2c9                fseek
- .text          0x000000800000a322       0x59 feof.o
-                0x000000800000a322                feof
- .text          0x000000800000a37b       0x4b ftell.o
-                0x000000800000a37b                ftell
- .text          0x000000800000a3c6      0x93b vfprintf.o
-                0x000000800000a3c6                vfprintf
- .text          0x000000800000ad01       0xeb fprintf.o
-                0x000000800000ad01                fprintf
- .text          0x000000800000adec      0x9eb vsprintf.o
-                0x000000800000adec                _vsputs_r
-                0x000000800000ae58                vsprintf
- .text          0x000000800000b7d7      0x101 sprintf.o
-                0x000000800000b7d7                sprintf
- .text          0x000000800000b8d8       0xed snprintf.o
-                0x000000800000b8d8                snprintf
- .text          0x000000800000b9c5       0xd9 vsnprintf.o
-                0x000000800000b9c5                vsnprintf
- .text          0x000000800000ba9e       0x5c putchar.o
-                0x000000800000ba9e                putchar
- .text          0x000000800000bafa       0xa6 puts.o
-                0x000000800000bafa                puts
- .text          0x000000800000bba0       0xf5 printf.o
-                0x000000800000bba0                printf
- .text          0x000000800000bc95       0xa1 sscanf.o
-                0x000000800000bc95                sscanf
- .text          0x000000800000bd36       0x4c perror.o
-                0x000000800000bd36                perror
- .text          0x000000800000bd82      0x8ee vfscanf.o
-                0x000000800000c16a                vfscanf
- .text          0x000000800000c670       0xeb fscanf.o
-                0x000000800000c670                fscanf
- .text          0x000000800000c75b       0xf5 scanf.o
-                0x000000800000c75b                scanf
- .text          0x000000800000c850       0xb2 ungetc.o
-                0x000000800000c850                ungetc
- .text          0x000000800000c902       0x8d getchar.o
-                0x000000800000c902                getchar
- .text          0x000000800000c98f       0x59 freopen.o
-                0x000000800000c98f                freopen
- .text          0x000000800000c9e8       0xb9 tmpnam.o
-                0x000000800000c9e8                sysgettmpnam
-                0x000000800000ca21                tmpnam
- .text          0x000000800000caa1       0xf8 rename.o
-                0x000000800000caa1                rename
- .text          0x000000800000cb99      0x147 itoa.o
-                0x000000800000cb99                itoa
- .text          0x000000800000cce0      0x175 i2hex.o
-                0x000000800000cce0                i2hex
- .text          0x000000800000ce55       0x4d malloc.o
-                0x000000800000ce55                malloc
- .text          0x000000800000cea2       0x4f calloc.o
-                0x000000800000cea2                calloc
- .text          0x000000800000cef1       0x4c free.o
-                0x000000800000cef1                free
- .text          0x000000800000cf3d       0x53 realloc.o
-                0x000000800000cf3d                realloc
- .text          0x000000800000cf90       0x88 div.o
-                0x000000800000cf90                div
- .text          0x000000800000d018       0xaa ldiv.o
-                0x000000800000d018                ldiv
- .text          0x000000800000d0c2       0xaa lldiv.o
-                0x000000800000d0c2                lldiv
- .text          0x000000800000d16c      0x332 strtol.o
-                0x000000800000d16c                strtol
- .text          0x000000800000d49e       0x55 atoi.o
-                0x000000800000d49e                atoi
- .text          0x000000800000d4f3       0x55 atol.o
-                0x000000800000d4f3                atol
- .text          0x000000800000d548      0x24c strtoul.o
-                0x000000800000d548                strtoul
- .text          0x000000800000d794       0x39 exit.o
-                0x000000800000d794                exit
- .text          0x000000800000d7cd       0x77 getenv.o
-                0x000000800000d7cd                getenv
- .text          0x000000800000d844      0x49c qsort.o
-                0x000000800000dc5f                qsort
- .text          0x000000800000dce0       0x5c system.o
-                0x000000800000dce0                system
- .text          0x000000800000dd3c      0x335 strtod.o
-                0x000000800000dd3c                strtod
- .text          0x000000800000e071      0x24a ftoa.o
-                0x000000800000e0d0                ftoa
- .text          0x000000800000e2bb       0x50 atof.o
-                0x000000800000e2bb                atof
- .text          0x000000800000e30b       0x5a strtof.o
-                0x000000800000e30b                strtof
- .text          0x000000800000e365       0x5e strtold.o
-                0x000000800000e365                strtold
- .text          0x000000800000e3c3       0x34 abs.o
-                0x000000800000e3c3                abs
- .text          0x000000800000e3f7      0x225 ltoa.o
-                0x000000800000e3f7                ltoa_r
-                0x000000800000e56d                ltoa
- .text          0x000000800000e61c      0x18e utoa.o
-                0x000000800000e715                utoa
- .text          0x000000800000e7aa       0x2a srand.o
-                0x000000800000e7aa                srand
- .text          0x000000800000e7d4       0x27 rand.o
-                0x000000800000e7d4                rand
- .text          0x000000800000e7fb        0x0 errno.o
- .text          0x000000800000e7fb       0x2f time.o
-                0x000000800000e7fb                time
- .text          0x000000800000e82a       0x3b gmtime.o
-                0x000000800000e82a                gmtime
- .text          0x000000800000e865       0x3b localtime.o
-                0x000000800000e865                localtime
- .text          0x000000800000e8a0       0x3a strftime.o
-                0x000000800000e8a0                strftime
- .text          0x000000800000e8da       0x27 clock.o
-                0x000000800000e8da                clock
- .text          0x000000800000e901       0xf0 math.o
-                0x000000800000e901                log10
-                0x000000800000e93a                ldexp
-                0x000000800000e976                frexp
-                0x000000800000e9b3                atan2
- .text          0x000000800000e9f1       0x6e pow.o
-                0x000000800000e9f1                pow
- .text          0x000000800000ea5f       0x3b sqrt.o
-                0x000000800000ea5f                sqrt
- .text          0x000000800000ea9a       0x39 atan.o
-                0x000000800000ea9a                atan
- .text          0x000000800000ead3       0x39 acos.o
-                0x000000800000ead3                acos
- .text          0x000000800000eb0c       0x39 asin.o
-                0x000000800000eb0c                asin
- .text          0x000000800000eb45      0x1b8 sin.o
-                0x000000800000ec02                sin
- .text          0x000000800000ecfd       0x39 tan.o
-                0x000000800000ecfd                tan
- .text          0x000000800000ed36      0x1b3 cos.o
-                0x000000800000edf3                cos
- .text          0x000000800000eee9       0x39 floor.o
-                0x000000800000eee9                floor
- .text          0x000000800000ef22       0x54 ceil.o
-                0x000000800000ef22                ceil
- .text          0x000000800000ef76       0x61 exp.o
-                0x000000800000ef76                exp
- .text          0x000000800000efd7      0x11a log.o
-                0x000000800000efd7                log
- .text          0x000000800000f0f1       0x48 fmax.o
-                0x000000800000f0f1                fmax
- .text          0x000000800000f139       0x48 fmin.o
-                0x000000800000f139                fmin
- .text          0x000000800000f181       0x47 fminf.o
-                0x000000800000f181                fminf
- .text          0x000000800000f1c8       0x36 min.o
-                0x000000800000f1c8                min
- .text          0x000000800000f1fe       0x36 max.o
-                0x000000800000f1fe                max
- .text          0x000000800000f234       0x5f fabs.o
-                0x000000800000f234                fabs
- *fill*         0x000000800000f293        0xd 
- .text          0x000000800000f2a0        0x2 lbm.o
-                0x000000800000f2a0                __sin
-                0x000000800000f2a1                cosine
- .text          0x000000800000f2a2       0x32 locale.o
-                0x000000800000f2a2                setlocale
- .text          0x000000800000f2d4       0xbb signal.o
-                0x000000800000f2d4                signal
-                0x000000800000f332                sigaction
- *fill*         0x000000800000f38f        0x1 
- .text          0x000000800000f390       0x2c setjmp.o
-                0x000000800000f390                setjmp
- *fill*         0x000000800000f3bc        0x4 
- .text          0x000000800000f3c0       0x2f longjmp.o
-                0x000000800000f3c0                longjmp
+                0x0000008000005f2b                listen
+                0x0000008000005f5c                recv
+                0x0000008000006094                recvfrom
+                0x00000080000061fb                send
+                0x000000800000632d                sendto
+                0x0000008000006479                shutdown
+                0x0000008000006565                socket
+ .text          0x00000080000065b3      0x2dc inet.o
+                0x00000080000065b3                inet_addr
+                0x00000080000067a7                inet_lnaof
+                0x00000080000067d5                inet_makeaddr
+                0x0000008000006804                inet_netof
+                0x0000008000006832                inet_network
+                0x0000008000006861                inet_ntoa
+ .text          0x000000800000688f      0x6af dns.o
+                0x0000008000006921                changeto_dns_name_format
+                0x00000080000069f5                get_ip_from_name
+ .text          0x0000008000006f3e      0x1ab gui.o
+                0x0000008000006f3e                put_pixel
+                0x0000008000006fd4                draw_char_transparent
+ .text          0x00000080000070e9        0x0 font8x16.o
+ .text          0x00000080000070e9     0x1197 window.o
+                0x00000080000070e9                drawline
+                0x0000008000007198                _drawline
+                0x000000800000725f                drawrect
+                0x0000008000007409                drawchar
+                0x0000008000007573                drawstring
+                0x000000800000762f                drawchar_trans
+                0x000000800000774e                drawstring_trans
+                0x000000800000780a                window
+                0x0000008000007d71                wcl
+                0x0000008000007e5d                update_window
+                0x0000008000007e88                __window_clear
+                0x0000008000007f15                __window_putchar
+                0x00000080000081c2                color
+                0x000000800000820b                __window_puts
+ .text          0x0000008000008280      0x5c5 bmp.o
+                0x0000008000008280                BitMAP
+                0x0000008000008562                BitMAP2
+ .text          0x0000008000008845       0xdc font.o
+                0x0000008000008845                put
+ .text          0x0000008000008921      0x332 border.o
+                0x0000008000008921                border
+ .text          0x0000008000008c53       0x96 memcmp.o
+                0x0000008000008c53                memcmp
+ .text          0x0000008000008ce9       0x77 memcpy.o
+                0x0000008000008ce9                memcpy
+ .text          0x0000008000008d60       0x62 memset.o
+                0x0000008000008d60                memset
+ .text          0x0000008000008dc2       0xbb strcasecmp.o
+                0x0000008000008dc2                strcasecmp
+ .text          0x0000008000008e7d       0x7a strcat.o
+                0x0000008000008e7d                strcat
+ .text          0x0000008000008ef7       0x61 strchr.o
+                0x0000008000008ef7                strchr
+ .text          0x0000008000008f58       0x9a strcmp.o
+                0x0000008000008f58                strcmp
+ .text          0x0000008000008ff2       0x7b strcpy.o
+                0x0000008000008ff2                strcpy
+ .text          0x000000800000906d      0x261 strcspn.o
+                0x000000800000906d                strchrnul
+                0x0000008000009198                strcspn
+ .text          0x00000080000092ce        0x0 string.o
+ .text          0x00000080000092ce       0x4c strlen.o
+                0x00000080000092ce                strlen
+ .text          0x000000800000931a       0xc8 strncasecmp.o
+                0x000000800000931a                strncasecmp
+ .text          0x00000080000093e2       0x80 strncmp.o
+                0x00000080000093e2                strncmp
+ .text          0x0000008000009462       0x7d strncpy.o
+                0x0000008000009462                strncpy
+ .text          0x00000080000094df       0x72 strpbrk.o
+                0x00000080000094df                strpbrk
+ .text          0x0000008000009551       0x93 strrchr.o
+                0x0000008000009551                strrchr
+ .text          0x00000080000095e4       0xbd strsep.o
+                0x00000080000095e4                strsep
+ .text          0x00000080000096a1      0x133 strspn.o
+                0x00000080000096a1                strspn
+ .text          0x00000080000097d4      0x18e strtok.o
+                0x00000080000097d4                strtok_r
+                0x000000800000990b                strtok
+ .text          0x0000008000009962       0x98 strstr.o
+                0x0000008000009962                strstr
+ .text          0x00000080000099fa       0xa0 strdup.o
+                0x00000080000099fa                strdup
+ .text          0x0000008000009a9a       0xc2 memmove.o
+                0x0000008000009a9a                memmove
+ .text          0x0000008000009b5c       0x56 strcoll.o
+                0x0000008000009b5c                strcoll
+ .text          0x0000008000009bb2       0x50 strerror.o
+                0x0000008000009bb2                strerror
+ .text          0x0000008000009c02        0x0 ctype.o
+ .text          0x0000008000009c02       0x55 tolower.o
+                0x0000008000009c02                tolower
+ .text          0x0000008000009c57       0x55 toupper.o
+                0x0000008000009c57                toupper
+ .text          0x0000008000009cac       0xa2 stdio.o
+                0x0000008000009cac                debug_o
+ .text          0x0000008000009d4e       0x96 fopen.o
+                0x0000008000009d4e                fopen
+ .text          0x0000008000009de4       0x4b fclose.o
+                0x0000008000009de4                fclose
+ .text          0x0000008000009e2f       0x4b fflush.o
+                0x0000008000009e2f                fflush
+ .text          0x0000008000009e7a       0x53 putc.o
+                0x0000008000009e7a                putc
+ .text          0x0000008000009ecd       0x98 getc.o
+                0x0000008000009ecd                getc
+ .text          0x0000008000009f65       0x53 fputc.o
+                0x0000008000009f65                fputc
+ .text          0x0000008000009fb8       0x4b fgetc.o
+                0x0000008000009fb8                fgetc
+ .text          0x000000800000a003      0x16b fgets.o
+                0x000000800000a003                fgets
+ .text          0x000000800000a16e       0xa4 fputs.o
+                0x000000800000a16e                fputs
+ .text          0x000000800000a212       0x5d fread.o
+                0x000000800000a212                fread
+ .text          0x000000800000a26f       0x5d fwrite.o
+                0x000000800000a26f                fwrite
+ .text          0x000000800000a2cc       0x4b remove.o
+                0x000000800000a2cc                remove
+ .text          0x000000800000a317       0x4c rewind.o
+                0x000000800000a317                rewind
+ .text          0x000000800000a363       0x59 fseek.o
+                0x000000800000a363                fseek
+ .text          0x000000800000a3bc       0x59 feof.o
+                0x000000800000a3bc                feof
+ .text          0x000000800000a415       0x4b ftell.o
+                0x000000800000a415                ftell
+ .text          0x000000800000a460      0x93b vfprintf.o
+                0x000000800000a460                vfprintf
+ .text          0x000000800000ad9b       0xeb fprintf.o
+                0x000000800000ad9b                fprintf
+ .text          0x000000800000ae86      0x9eb vsprintf.o
+                0x000000800000ae86                _vsputs_r
+                0x000000800000aef2                vsprintf
+ .text          0x000000800000b871      0x101 sprintf.o
+                0x000000800000b871                sprintf
+ .text          0x000000800000b972       0xed snprintf.o
+                0x000000800000b972                snprintf
+ .text          0x000000800000ba5f       0xd9 vsnprintf.o
+                0x000000800000ba5f                vsnprintf
+ .text          0x000000800000bb38       0x5c putchar.o
+                0x000000800000bb38                putchar
+ .text          0x000000800000bb94       0xa6 puts.o
+                0x000000800000bb94                puts
+ .text          0x000000800000bc3a       0xf5 printf.o
+                0x000000800000bc3a                printf
+ .text          0x000000800000bd2f       0xa1 sscanf.o
+                0x000000800000bd2f                sscanf
+ .text          0x000000800000bdd0       0x4c perror.o
+                0x000000800000bdd0                perror
+ .text          0x000000800000be1c      0x8ee vfscanf.o
+                0x000000800000c204                vfscanf
+ .text          0x000000800000c70a       0xeb fscanf.o
+                0x000000800000c70a                fscanf
+ .text          0x000000800000c7f5       0xf5 scanf.o
+                0x000000800000c7f5                scanf
+ .text          0x000000800000c8ea       0xb2 ungetc.o
+                0x000000800000c8ea                ungetc
+ .text          0x000000800000c99c       0x8d getchar.o
+                0x000000800000c99c                getchar
+ .text          0x000000800000ca29       0x59 freopen.o
+                0x000000800000ca29                freopen
+ .text          0x000000800000ca82       0xb9 tmpnam.o
+                0x000000800000ca82                sysgettmpnam
+                0x000000800000cabb                tmpnam
+ .text          0x000000800000cb3b       0xf8 rename.o
+                0x000000800000cb3b                rename
+ .text          0x000000800000cc33      0x147 itoa.o
+                0x000000800000cc33                itoa
+ .text          0x000000800000cd7a      0x175 i2hex.o
+                0x000000800000cd7a                i2hex
+ .text          0x000000800000ceef       0x4d malloc.o
+                0x000000800000ceef                malloc
+ .text          0x000000800000cf3c       0x4f calloc.o
+                0x000000800000cf3c                calloc
+ .text          0x000000800000cf8b       0x4c free.o
+                0x000000800000cf8b                free
+ .text          0x000000800000cfd7       0x53 realloc.o
+                0x000000800000cfd7                realloc
+ .text          0x000000800000d02a       0x88 div.o
+                0x000000800000d02a                div
+ .text          0x000000800000d0b2       0xaa ldiv.o
+                0x000000800000d0b2                ldiv
+ .text          0x000000800000d15c       0xaa lldiv.o
+                0x000000800000d15c                lldiv
+ .text          0x000000800000d206      0x332 strtol.o
+                0x000000800000d206                strtol
+ .text          0x000000800000d538       0x55 atoi.o
+                0x000000800000d538                atoi
+ .text          0x000000800000d58d       0x55 atol.o
+                0x000000800000d58d                atol
+ .text          0x000000800000d5e2      0x24c strtoul.o
+                0x000000800000d5e2                strtoul
+ .text          0x000000800000d82e       0x39 exit.o
+                0x000000800000d82e                exit
+ .text          0x000000800000d867       0x77 getenv.o
+                0x000000800000d867                getenv
+ .text          0x000000800000d8de      0x49c qsort.o
+                0x000000800000dcf9                qsort
+ .text          0x000000800000dd7a       0x5c system.o
+                0x000000800000dd7a                system
+ .text          0x000000800000ddd6      0x335 strtod.o
+                0x000000800000ddd6                strtod
+ .text          0x000000800000e10b      0x24a ftoa.o
+                0x000000800000e16a                ftoa
+ .text          0x000000800000e355       0x50 atof.o
+                0x000000800000e355                atof
+ .text          0x000000800000e3a5       0x5a strtof.o
+                0x000000800000e3a5                strtof
+ .text          0x000000800000e3ff       0x5e strtold.o
+                0x000000800000e3ff                strtold
+ .text          0x000000800000e45d       0x34 abs.o
+                0x000000800000e45d                abs
+ .text          0x000000800000e491      0x225 ltoa.o
+                0x000000800000e491                ltoa_r
+                0x000000800000e607                ltoa
+ .text          0x000000800000e6b6      0x18e utoa.o
+                0x000000800000e7af                utoa
+ .text          0x000000800000e844       0x2a srand.o
+                0x000000800000e844                srand
+ .text          0x000000800000e86e       0x27 rand.o
+                0x000000800000e86e                rand
+ .text          0x000000800000e895        0x0 errno.o
+ .text          0x000000800000e895       0x2f time.o
+                0x000000800000e895                time
+ .text          0x000000800000e8c4       0x3b gmtime.o
+                0x000000800000e8c4                gmtime
+ .text          0x000000800000e8ff       0x3b localtime.o
+                0x000000800000e8ff                localtime
+ .text          0x000000800000e93a       0x3a strftime.o
+                0x000000800000e93a                strftime
+ .text          0x000000800000e974       0x27 clock.o
+                0x000000800000e974                clock
+ .text          0x000000800000e99b       0xf0 math.o
+                0x000000800000e99b                log10
+                0x000000800000e9d4                ldexp
+                0x000000800000ea10                frexp
+                0x000000800000ea4d                atan2
+ .text          0x000000800000ea8b       0x6e pow.o
+                0x000000800000ea8b                pow
+ .text          0x000000800000eaf9       0x3b sqrt.o
+                0x000000800000eaf9                sqrt
+ .text          0x000000800000eb34       0x39 atan.o
+                0x000000800000eb34                atan
+ .text          0x000000800000eb6d       0x39 acos.o
+                0x000000800000eb6d                acos
+ .text          0x000000800000eba6       0x39 asin.o
+                0x000000800000eba6                asin
+ .text          0x000000800000ebdf      0x1b8 sin.o
+                0x000000800000ec9c                sin
+ .text          0x000000800000ed97       0x39 tan.o
+                0x000000800000ed97                tan
+ .text          0x000000800000edd0      0x1b3 cos.o
+                0x000000800000ee8d                cos
+ .text          0x000000800000ef83       0x39 floor.o
+                0x000000800000ef83                floor
+ .text          0x000000800000efbc       0x54 ceil.o
+                0x000000800000efbc                ceil
+ .text          0x000000800000f010       0x61 exp.o
+                0x000000800000f010                exp
+ .text          0x000000800000f071      0x11a log.o
+                0x000000800000f071                log
+ .text          0x000000800000f18b       0x48 fmax.o
+                0x000000800000f18b                fmax
+ .text          0x000000800000f1d3       0x48 fmin.o
+                0x000000800000f1d3                fmin
+ .text          0x000000800000f21b       0x47 fminf.o
+                0x000000800000f21b                fminf
+ .text          0x000000800000f262       0x36 min.o
+                0x000000800000f262                min
+ .text          0x000000800000f298       0x36 max.o
+                0x000000800000f298                max
+ .text          0x000000800000f2ce       0x5f fabs.o
+                0x000000800000f2ce                fabs
+ *fill*         0x000000800000f32d        0x3 
+ .text          0x000000800000f330        0x2 lbm.o
+                0x000000800000f330                __sin
+                0x000000800000f331                cosine
+ .text          0x000000800000f332       0x32 locale.o
+                0x000000800000f332                setlocale
+ .text          0x000000800000f364       0xbb signal.o
+                0x000000800000f364                signal
+                0x000000800000f3c2                sigaction
+ *fill*         0x000000800000f41f        0x1 
+ .text          0x000000800000f420       0x2c setjmp.o
+                0x000000800000f420                setjmp
+ *fill*         0x000000800000f44c        0x4 
+ .text          0x000000800000f450       0x2f longjmp.o
+                0x000000800000f450                longjmp
                 0x0000008000010000                . = ALIGN (0x1000)
- *fill*         0x000000800000f3ef      0xc11 
+ *fill*         0x000000800000f47f      0xb81 
 
 .iplt           0x0000008000010000        0x0
  .iplt          0x0000008000010000        0x0 setup.o

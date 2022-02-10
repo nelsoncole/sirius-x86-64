@@ -86,6 +86,6 @@ install:
 	
 push:
 	git add ./
-	git commit -m "My cool logo"	
+	git commit -m "AF_LOCAL e implementação do vm net"	
 	git push -u origin main
 	

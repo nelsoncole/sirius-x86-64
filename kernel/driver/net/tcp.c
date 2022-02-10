@@ -8,6 +8,8 @@
 #include "tcp.h"
 #include "checksum.h"
 
+#include <mm.h>
+
 struct tcp_connect *queue_conn;
 
 int init_tcp(){
@@ -127,7 +129,7 @@ unsigned short src_port, unsigned short dst_port){
     return 0;
 }
 
-int tcp_push_ack(unsigned int src_address, unsigned int dst_address,
+int tcp_ack(unsigned int src_address, unsigned int dst_address,
 unsigned short src_port, unsigned short dst_port, unsigned int seq,
 unsigned int ack, unsigned char flags, size_t len){
 
@@ -164,8 +166,10 @@ unsigned int ack, unsigned char flags, size_t len){
     if(flags&TCP_FIN){
         conn->flags = TCP_FIN | TCP_ACK;
         conn->flags = tcp_send(conn->src_ip, conn->dst_ip, conn->src_port, conn->dst_port, conn->seq, conn->ack, conn->flags, 0, 0);
-        conn->busy == 0;
+        //conn->busy == 0;
+        conn->status == 1;
         // send TCP_FIN
+        return 2;
     }
 
 

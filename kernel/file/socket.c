@@ -58,6 +58,19 @@ int init_socket(int domain, int type, int protocol){
 
     return saddr->id;
 }
+void *socket_address(int socket){
+
+    struct socket *tmp = saddr_ready_queue;
+    while (tmp) {
+
+        if(tmp->id == socket)
+            break;
+
+    	tmp = tmp->next;
+    }
+    
+    return (void*)tmp;
+}
 
 int socket(int domain, int type, int protocol){
     
@@ -99,19 +112,15 @@ void socket_server_transmit(){
     unsigned len;
     unsigned int dest_ip, src_ip;
     unsigned short dest_port, src_port;
-    unsigned int seq;
-    unsigned int ack;
     unsigned char protocol_flags;
 
     if(current_saddr->flags&0x80){
         if(current_saddr->flags&0x1){
-            if(current_saddr->domain == AF_INET){
+            if(current_saddr->domain == AF_INET || current_saddr->domain == AF_LOCAL){
                 src_ip = current_saddr->src_ip;
                 dest_ip = current_saddr->dest_ip;
                 src_port = htons(current_saddr->src_port);
                 dest_port = htons(current_saddr->dest_port);
-                seq = current_saddr->seq;
-                ack = current_saddr->ack;
                 protocol_flags = current_saddr->protocol_flags;
                 buf = (char*)current_saddr->buf2;
                 len = current_saddr->length2;
@@ -129,13 +138,15 @@ void socket_server_transmit(){
 
                 switch(current_saddr->type){
                     case SOCK_DGRAM:
-                        udp_send(src_ip, dest_ip, src_port, dest_port, buf, len);
+                        if(current_saddr->domain == AF_INET)
+                            udp_send(src_ip, dest_ip, src_port, dest_port, buf, len);
+                        else
+                            vmnet_udp_send(src_ip, dest_ip, src_port, dest_port, buf, len);
                         break;
                     case SOCK_STREAM:
                         if(protocol_flags == TCP_SYN){
                             tcp_connect(src_ip, dest_ip, src_port, dest_port);
                         }else {
-                            //tcp_send(src_ip, dest_ip, src_port, dest_port, seq, ack, protocol_flags, buf, len);
                             tcp_send_payload(src_ip, dest_ip,src_port, dest_port, protocol_flags, buf, len);
                         }
                         break;
@@ -212,7 +223,7 @@ int socket_server_receive(int origem, int protocol, unsigned int src_ip, unsigne
     struct socket *saddr = saddr_ready_queue;
     while(saddr){
         if(saddr->flags&0x80){
-            if(saddr->domain == AF_INET){
+            if(saddr->domain == AF_INET || saddr->domain == AF_LOCAL){
                 if(saddr->src_port == dest_port){
                 
                     if(saddr->flags&2){
@@ -229,8 +240,6 @@ int socket_server_receive(int origem, int protocol, unsigned int src_ip, unsigne
                     saddr->dest_port = src_port;
 
                     if(IP_PROTOCOL_TCP == protocol ){
-                        saddr->seq = htonl(seq);
-                        saddr->ack = htonl(ack);
                         saddr->protocol_flags = flags;
                     }
                     

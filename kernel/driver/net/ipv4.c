@@ -4,6 +4,7 @@
 
 #include "ipv4.h"
 #include "ether.h"
+#include "checksum.h"
 
 
 unsigned char *ipv4_cache;

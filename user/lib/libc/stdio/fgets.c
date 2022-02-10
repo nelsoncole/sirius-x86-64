@@ -24,7 +24,10 @@ char *fgets (char *str,int length,FILE *fp)
 			else putc_r (c, stdout);
 		}
 		
-		if(c == '\n') break;
+		if(c == '\n'){
+            *s ++ = c;
+            break;
+        }
 		
 		if(of < length ) {
 			

@@ -10,6 +10,7 @@ extern void syscall_install();
 
 extern void intr_install();
 extern void msi_vector_install();
+extern void intr_vmnet();
 static void idt_null_install();
 
 idt_t idt[256];
@@ -30,9 +31,6 @@ unsigned char type, unsigned char dpl, unsigned char p, int ist)
             idt[n].offset_31_16 = offset >> 16 &0xFFFF;
             idt[n].offset_63_32 = offset >> 32 &0xFFFFFFFF;
             idt[n].reserved = 0;
-
-
-
 }
 
 
@@ -61,6 +59,9 @@ void idt_install(void)
 
     // 0x80
     msi_vector_install();
+
+    // vmnet
+    _idt_gate(0x80 +32,(unsigned long)intr_vmnet, 8,0,0);
 
 	idtr->limit = (sizeof(idt_t)*256)-1;
     idtr->base = (unsigned long)&idt;
@@ -94,5 +95,5 @@ static void idt_null_install()
 
 
 void intr_null_function(){
-    printf("XXXXXXXXX\n");
+    printf("IDT NULL\n");
 }

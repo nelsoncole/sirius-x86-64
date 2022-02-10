@@ -1109,6 +1109,59 @@ msi31:
 	push qword 31 
 	jmp msi_jmp
 
+global intr_vmnet
+extern handler_vmnet;
+intr_vmnet:
+	push gs
+	push fs
+	
+	push r15
+	push r14
+	push r13
+	push r12
+	push r11
+	push r10
+	push r9
+	push r8
+	push rdi
+	push rsi
+	push rbp
+	push rsp
+	push rbx
+	push rdx
+	push rcx
+	push rax
+      	
+	fxsave [SavedFloats2]
+	
+	mov rdi, [rsp + 0x90]
+	
+	call handler_vmnet
+	
+	fxrstor [SavedFloats2]
+
+	pop rax
+	pop rcx
+	pop rdx
+	pop rbx
+	pop rsp
+	pop rbp
+	pop rsi
+	pop rdi
+	pop r8
+	pop r9
+	pop r10
+	pop r11
+	pop r12
+	pop r13
+	pop r14
+	pop r15
+	
+	pop fs
+	pop gs
+	
+	iretq
+
 segment .data
 global SavedFloats
 align 16

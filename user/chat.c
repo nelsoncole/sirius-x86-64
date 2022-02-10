@@ -21,15 +21,15 @@ int main(int argc, char **argv) {
 
     struct sockaddr_in sera;
     struct sockaddr_in serb;
-    sera.sin_family        = AF_INET;
+    sera.sin_family        = AF_LOCAL;//AF_INET;
     sera.sin_addr.s_addr = htonl(INADDR_ANY);
     sera.sin_port  = htons(0);
 
-    serb.sin_family        = AF_INET;
+    serb.sin_family        = AF_LOCAL; //AF_INET;
     serb.sin_addr.s_addr = inet_addr(/*(const char*)ip*/argv[1]);
-    serb.sin_port  = htons(20001);
+    serb.sin_port  = htons(3000);
 
-    int socketid = socket(AF_INET, SOCK_DGRAM, 0);
+    int socketid = socket(AF_LOCAL/*AF_INET*/, SOCK_DGRAM, 0);
     if(socketid < 0) {
         printf("Cannot create socket!\n");
         return 1;

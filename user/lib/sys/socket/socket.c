@@ -24,15 +24,9 @@ struct socket
     unsigned int    dest_ip;
 
     // For TCP
-    unsigned int    seq;
-    unsigned int    ack;
     unsigned char   protocol_flags;
     unsigned short  src_win;
     unsigned short  dst_win;
-
-    // cache
-    unsigned int    seq_x;
-    unsigned int    ack_x;
 
     //
     unsigned char   connect;
@@ -126,8 +120,6 @@ int connect(int socket, const struct sockaddr *address,
     fd->flags |= 0x80;
 
     // TCP INIT
-    fd->seq = 0;
-    fd->ack = 0;
     fd->protocol_flags = TCP_SYN;
     fd->length2 = 0;
 
