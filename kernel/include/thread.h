@@ -55,7 +55,8 @@ THREAD *create_thread( void (*main)(), unsigned long rsp, unsigned long cr3, uns
 int pv, int argc, char **argv, char *pwd);
 THREAD *create_thread_child( void (*main)(), unsigned long rsp, unsigned long cr3, unsigned long rbx,
 int pv,int argc, char **argv, char *pwd, THREAD *thread);
-
+THREAD *pthread_create( void (*main)(), unsigned long rsp, int pv, THREAD *thread);
+int pthread_join(THREAD *thread);
 THREAD *thread(unsigned long pid);
 
 

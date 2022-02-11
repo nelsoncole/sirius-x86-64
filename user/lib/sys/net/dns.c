@@ -133,5 +133,8 @@ char* get_ip_from_name(char *addr, const char *name , int query_type){
 
     shutdown(socketid, 0);
 
+    if(!addr[0])
+        return 0;
+
     return addr;
 }

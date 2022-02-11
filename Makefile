@@ -43,6 +43,7 @@ mout_vhd:
 	./fs -g bmp/file.bmp disk.vhd
 	./fs -g bmp/text.bmp disk.vhd
 	./fs -g bin/test.bin disk.vhd
+	./fs -g bin/telnet.bin disk.vhd
 	./fs -g bin/chat.bin disk.vhd
 	./fs -g bin/pci.bin disk.vhd
 	./fs -g bin/cat.bin disk.vhd
@@ -86,6 +87,6 @@ install:
 	
 push:
 	git add ./
-	git commit -m "AF_LOCAL e implementação do vm net"	
+	git commit -m "Implementação da pthread.h"	
 	git push -u origin main
 	

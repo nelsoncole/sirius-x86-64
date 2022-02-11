@@ -104,10 +104,9 @@ unsigned long thread_setup() {
 THREAD *create_thread( void (*main)(), unsigned long rsp, unsigned long cr3, unsigned long rbx,
 int pv,int argc, char **argv, char *pwd)
 {
-	unsigned long v;
-
-    THREAD	*new_thread;//	=(THREAD*)malloc(sizeof(THREAD));
-	alloc_pages(0, 2, (unsigned long *)&new_thread); 
+	unsigned long v = 0;
+    alloc_pages(0, 2, (unsigned long *)&v); 
+    THREAD	*new_thread =(THREAD*)v;//malloc(sizeof(THREAD));
     memset(new_thread, 0, sizeof(THREAD));
     new_thread->pid 	= next_pid++;
 
@@ -224,8 +223,9 @@ THREAD *create_thread_child( void (*main)(), unsigned long rsp, unsigned long cr
 int argc, char **argv, char *pwd, THREAD *thread)
 {
 	THREAD	*t = thread;
-    THREAD	*new_thread;//	=(THREAD*)malloc(sizeof(THREAD));
-	alloc_pages(0, 2, (unsigned long *)&new_thread); 
+    unsigned long v = 0;
+    alloc_pages(0, 2, (unsigned long *)&v); 
+    THREAD	*new_thread =(THREAD*)v;//malloc(sizeof(THREAD));
     memset(new_thread, 0, sizeof(THREAD));
     new_thread->pid 	= next_pid++;
 
@@ -308,6 +308,96 @@ int argc, char **argv, char *pwd, THREAD *thread)
     t->tail = new_thread;
 
    	return (new_thread);
+}
+
+THREAD *pthread_create( void (*main)(), unsigned long rsp, int pv, THREAD *thread)
+{
+	THREAD	*t = thread;
+    unsigned long v = 0;
+    alloc_pages(0, 2, (unsigned long *)&v); 
+    THREAD	*new_thread =(THREAD*)v;//malloc(sizeof(THREAD));
+    memset(new_thread, 0, sizeof(THREAD));
+    new_thread->pid 	= next_pid++;
+
+	SaveSSE(new_thread->fxsave);
+    
+    new_thread->rsp 	= rsp;
+	new_thread->rip  	= (unsigned long)main;
+    new_thread->status  = THREAD_ZUMBI;
+    if((pv&1) == 1) { // processo do userspace
+    	new_thread->cs		= 0x1B;
+    	//new_thread->ds 	= 0x23;
+    	//new_thread->es 	= 0x23;
+    	//new_thread->fs 	= 0x23;
+    	//new_thread->gs 	= 0x23;
+    	new_thread->ss 	    = 0x23;
+
+		new_thread->alloc_addr = thread->alloc_addr;
+		 
+		new_thread->prv = 1;
+
+        new_thread->rflag 	= 0x3202;
+
+    } else if(!(pv&1)) { // processo do kernelspace
+    	new_thread->cs 	    = 0x8;
+    	//new_thread->ds 	= 0x10;
+    	//new_thread->es 	= 0x10;
+    	//new_thread->fs 	= 0x10;
+    	//new_thread->gs 	= 0x10;
+   		new_thread->ss 	    = 0x10;
+		new_thread->prv     = 0;
+
+        new_thread->rflag 	= 0x202;
+   	}
+   
+    new_thread->cr3    = thread->cr3;
+    	 	
+    new_thread->stdin  = t->stdin;
+	new_thread->stdout = t->stdout;
+	new_thread->stderr = t->stderr;
+	new_thread->pipe   = t->pipe;
+	
+	new_thread->mouse  = t->mouse;
+	
+	new_thread->window = t->window; 
+
+	
+	new_thread->rcx	= (unsigned long)new_thread->stdin;
+	new_thread->rdx	= (unsigned long)new_thread->stdout;
+	new_thread->rsi	= (unsigned long)new_thread->stderr;
+	new_thread->rdi	= (unsigned long)new_thread->window;
+	new_thread->rbx	= 0;//rbx;
+	new_thread->r8 = 0; // reserved
+	new_thread->r9		= new_thread->alloc_addr;
+	new_thread->r10	= (unsigned long)new_thread->pipe;
+
+	new_thread->rax	= (unsigned long)new_thread->mouse;
+	
+	new_thread->r11 = 0;//argc;
+	new_thread->r12 = (unsigned long)0; //argv;
+	new_thread->r13 = (unsigned long)0; // pwd
+
+    new_thread->next 	= NULL;
+    new_thread->tail 	= NULL;
+    
+
+    // Adicionar novo elemento, no final da lista
+    // tmp aponta para inicio da lista
+    THREAD *tmp = thread_ready_queue;
+    while (tmp->next) {
+    	
+    	tmp = tmp->next;
+    }
+    	
+    tmp->next = new_thread;
+    t->tail = new_thread;
+
+   	return (new_thread);
+}
+
+int pthread_join(THREAD *thread){
+    thread->status &=~THREAD_ZUMBI;
+    return 0;
 }
 
 

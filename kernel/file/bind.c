@@ -19,6 +19,11 @@ int bind(int socket, const struct sockaddr *address,
     if(saddr.sin_family != fd->domain)
         return -1;
 
+    if ( !set_port(htons(saddr.sin_port)) ){
+        // porta ocupada.
+        return -1;
+    }
+
     fd->src_port = saddr.sin_port;
     fd->src_ip = saddr.sin_addr.s_addr;
 

@@ -16,7 +16,7 @@
 #include <socket.h>
 
 
-#define SYSCALL_TABLE 17
+#define SYSCALL_TABLE 19
 
 unsigned long ret;
 
@@ -184,6 +184,17 @@ void syscall_get_socket_ready_queue()
     ret = (unsigned long) saddr_ready_queue;
 }
 
+void syscall_pthread_create(unsigned long rdi, unsigned long rsi)
+{
+    void *start = (void*)rdi;
+    ret = (unsigned long) pthread_create( start, rsi, 0x1,current_thread);
+}
+
+void syscall_pthread_join(unsigned long rdi)
+{
+    THREAD *thread = (THREAD *)rdi;
+    ret = (unsigned long) pthread_join(thread);
+}
 
 void *fnvetors_syscall[SYSCALL_TABLE] = {
 	&default_syscall, 	    // 0
@@ -203,7 +214,8 @@ void *fnvetors_syscall[SYSCALL_TABLE] = {
     &syscall_get_thread_id, // 14
     &syscall_create_socket, // 15
     &syscall_get_socket_ready_queue, // 16
-    
+    &syscall_pthread_create, // 17
+    &syscall_pthread_join, // 18
 };
 
 

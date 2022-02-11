@@ -1,6 +1,6 @@
 ASFLAGS64  :=-f elf64 -O0
 CFLAGS64 :=-Wall -O0 -m64 -std=c11 -ffreestanding -mcmodel=large -mno-red-zone \
--nostdinc -fno-stack-protector -I ./gui/include -I ./lib/libc/include -I ./lib/sys/include #-mno-mmx -mno-sse -mno-sse2
+-nostdinc -fno-stack-protector -I ./gui/include -I ./lib/libc/include -I ./lib/sys/include -I ./lib/pthread #-mno-mmx -mno-sse -mno-sse2
 
 
 LDFLAGS64  :=-m elf_x86_64 -T lib/link.ld -Map app.map
@@ -8,8 +8,9 @@ AS=nasm
 CC=gcc
 LD=ld
 
+pthread = pthread.o
 net = dns.o
-sys = file.o cfs.o alloc.o pipe.o path.o socket.o inet.o $(net)
+sys = file.o cfs.o alloc.o pipe.o path.o socket.o inet.o $(net) $(pthread)
 time = time.o gmtime.o localtime.o strftime.o clock.o
 errno = errno.o 
 stdlib = itoa.o i2hex.o malloc.o calloc.o free.o realloc.o div.o ldiv.o lldiv.o strtol.o atoi.o atol.o strtoul.o\
@@ -85,6 +86,8 @@ PCI = $(HEADER) pci.o $(sys) $(GUI) $(LIBC)
 
 TEST = $(HEADER) test.o $(sys) $(GUI) $(LIBC)
 
+TELNET = $(HEADER) telnet.o $(sys) $(GUI) $(LIBC)
+
 CHAT = $(HEADER) chat.o $(sys) $(GUI) $(LIBC)
 
 CAT = $(HEADER) cat.o $(sys) $(GUI) $(LIBC)
@@ -97,8 +100,8 @@ NANOJPEG = $(HEADER) nanojpeg.o $(sys) $(GUI) $(LIBC)
 
 NASM = $(HEADER) $(NASM_OBJS) $(sys) $(GUI) $(LIBC)
 
-.PHONY: all term.bin shell.bin explore.bin editor.bin cat.bin test.bin chat.bin lua.bin nasm.bin nanojpeg.bin pci.bin png
-all: launcher.bin term.bin shell.bin explore.bin editor.bin cat.bin test.bin chat.bin nanojpeg.bin pci.bin #lua.bin
+.PHONY: all term.bin shell.bin explore.bin editor.bin cat.bin test.bin telnet.bin chat.bin lua.bin nasm.bin nanojpeg.bin pci.bin png
+all: launcher.bin term.bin shell.bin explore.bin editor.bin cat.bin test.bin telnet.bin chat.bin nanojpeg.bin pci.bin #lua.bin
 
 launcher.bin: $(LAUNCHER)
 	$(LD) $(LDFLAGS64) -o $@ $^
@@ -130,6 +133,11 @@ cat.bin: $(CAT)
 	#rm *.o
 	
 test.bin: $(TEST)
+	$(LD) $(LDFLAGS64) -o $@ $^
+	#mv *.bin ../bin
+	#rm *.o
+
+telnet.bin: $(TELNET)
 	$(LD) $(LDFLAGS64) -o $@ $^
 	#mv *.bin ../bin
 	#rm *.o
@@ -216,6 +224,9 @@ lua.bin: $(LUA)
 	$(CC) $(CFLAGS64) -c -o $@ $<
 
 %.o: lib/sys/net/%.c
+	$(CC) $(CFLAGS64) -c -o $@ $<
+
+%.o: lib/pthread/%.c
 	$(CC) $(CFLAGS64) -c -o $@ $<
 	
 #%.o: lua3/%.c

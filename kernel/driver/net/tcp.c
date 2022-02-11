@@ -42,7 +42,7 @@ unsigned short src_port, unsigned short dst_port, unsigned int seq, unsigned int
     unsigned char *options = start;
     options += sizeof(tcp_header_t);
 
-    if (flags & TCP_SYN) {
+    if (flags & TCP_SYN || 1) {
 
         options[0] = TCP_OPT_MSS; // Maximum Segment Size (2)
         options[1] = 4;
@@ -91,8 +91,6 @@ unsigned short src_port, unsigned short dst_port, unsigned int seq, unsigned int
     return length;
 }
 
-
-
 int tcp_connect(unsigned int src_address, unsigned int dst_address,
 unsigned short src_port, unsigned short dst_port){
 
@@ -119,13 +117,15 @@ unsigned short src_port, unsigned short dst_port){
     conn->dst_port = dst_port;
     conn->seq = 0;
     conn->ack = 0;
-    conn->pack = conn->seq + 1;
+    conn->pack = 0;
     conn->flags = TCP_SYN;
     conn->status = 0;
     conn->busy = 1;
 
     tcp_send(conn->src_ip, conn->dst_ip, conn->src_port, conn->dst_port, conn->seq, conn->ack, conn->flags, 0, 0);
 
+    conn->seq += 1;
+    
     return 0;
 }
 
@@ -144,18 +144,23 @@ unsigned int ack, unsigned char flags, size_t len){
         conn++;   
     }
 
-    if (i <= 0 || conn->pack != ack) {
+    if (i <= 0) {
 		return 1;
-	}else if( conn->ack > seq){
+
+	}if(conn->seq != ack){
+        return 1;
+
+    }
+    /*
+    if( conn->pack == ack){
         // ACK
         // Retrasmit
         conn->flags = TCP_ACK;
         tcp_send(conn->src_ip, conn->dst_ip, conn->src_port, conn->dst_port, conn->seq, conn->ack, conn->flags, 0, 0);
         return 1;
     }
+    conn->pack = ack;*/
 
-
-    conn->seq = ack;
     conn->ack = seq;
     conn->ack += flags & TCP_PSH ? len : 1;
 
@@ -166,6 +171,7 @@ unsigned int ack, unsigned char flags, size_t len){
     if(flags&TCP_FIN){
         conn->flags = TCP_FIN | TCP_ACK;
         conn->flags = tcp_send(conn->src_ip, conn->dst_ip, conn->src_port, conn->dst_port, conn->seq, conn->ack, conn->flags, 0, 0);
+        conn->seq += 1;
         //conn->busy == 0;
         conn->status == 1;
         // send TCP_FIN
@@ -197,13 +203,11 @@ unsigned short src_port, unsigned short dst_port, unsigned char flags, const voi
     conn->flags = flags;
 
     tcp_send(conn->src_ip, conn->dst_ip, conn->src_port, conn->dst_port, conn->seq, conn->ack, conn->flags, data, len);
+    conn->seq += len;
 
     if(flags&TCP_FIN){
         // TCP_FIN
-        conn->pack = conn->seq + 1;
         conn->status == 1;
-    }else{
-        conn->pack = conn->seq + len;
     }
 
     return 0;
@@ -222,9 +226,14 @@ unsigned short src_port, unsigned short dst_port, unsigned int ack){
         conn++;   
     }
 
-    if (i <= 0 || conn->pack != ack) {
+    if (i <= 0) {
 		return;
 	}
+
+    if(conn->seq != ack){
+        return;
+
+    }
 
     conn->busy = 0;
 
