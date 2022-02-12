@@ -214,14 +214,8 @@ void paint_desktop(void *bankbuffer) {
 		        unsigned char *src = (unsigned char *) (start + (i*(width << 2)));
 				unsigned char *dst = (unsigned char *) (zbuf + (i*(gui->pixels_per_scan_line << 2)) + pos);
 				// alinhar 
-				if( (((unsigned long int)dst)%SSE_MMREG_SIZE) != 0 )  {
-         			unsigned long ajust = ((unsigned long)dst)/ SSE_MMREG_SIZE;
-  					ajust *= SSE_MMREG_SIZE;
-  		
-  					int n = (((unsigned long)dst) - ajust);
-  					dst += (SSE_MMREG_SIZE-n);
-  					
-         		}
+				int n = (((unsigned long)dst)%SSE_MMREG_SIZE);
+                dst -= n;
          		
          		
          		if (w->gid != 0) {

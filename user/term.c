@@ -22,9 +22,9 @@ static void loop(WINDOW *w);
 void main() {
 	
     app_memory = (char*)malloc(0x80000); // 512
-	WINDOW *w = window("@~Terminal",0, 0, -1, -1, 0x1f1f2f, 0x80101020, 0xFFFFFF, 0x30);
+	WINDOW *w = window("@~Terminal",0, 0, 500, 500, 0x1f1f2f, 0x80101020, 0xFFFFFF, 0x30);
 
-    w->style |= 0x80000000; 
+    //w->style |= 0x80000000; 
 	
 	menubox(w, &menu_file, "File\0",0,0, 8*5, 24, ID_MENU_FILE);
 	submenubox(menu_file, "Exit\0",  ID_MENU_EXIT);

@@ -115,7 +115,7 @@ int mm_mp( unsigned long phy_addr, unsigned long *virt_addr,unsigned size, int f
 // 0x3000000 -- 0x5000000 -- 48 MiB PAGE_BITMAP
 // 0x5000000 -- 0x5001000 -- 80 MiB ALLOC_PAGE_DIR
 // 0x5001000 -- 0x5201000 -- 80.04 MiB ALLOC_PAGE_TABLE
-// 0x5201000 -- 0x7800000 -- 120 MIB (TODO Reservado para page table)
+// 0x5201000 -- 0x7800000 -- 120 MiB (TODO Reservado para page table)
 
 unsigned char *RAM_BITMAP;
 unsigned char *PAGE_BITMAP;
