@@ -87,6 +87,6 @@ install:
 	
 push:
 	git add ./
-	git commit -m "Implementação da pthread.h"	
+	git commit -m "revisão no gerenciamento de memória"	
 	git push -u origin main
 	

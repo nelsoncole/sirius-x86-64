@@ -69,8 +69,6 @@ int main(int argc, char **argv){
         memset(buf2,0,0x1000);
         fgets(buf2,1024, stdin);
         char *a = buf2 + strlen(buf2) -1;
-        *a++ ='\r';
-        *a++ ='\n';
         send(client, buf2, strlen(buf2),0);
     }
 

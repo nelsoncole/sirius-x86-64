@@ -94,7 +94,6 @@ void handler_vmnet(){
                 data += sizeof(udp_header_t);
                 end += htons(hdr->len) - sizeof(struct vm_inet_header);
                 len =  end - data;
-                end =&hdr->dst;
                 socket_server_receive(0,IP_PROTOCOL_UDP, hdr->src, hdr->dst, udp->src_port, udp->dst_port, data, len, 0, 0, 0);
                 break;
             default:

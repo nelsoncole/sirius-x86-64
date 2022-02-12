@@ -47,22 +47,12 @@ int i965_pci_init(int bus, int dev, int fun)
 }
 
 
-int setup_i965(){
+int setup_i965(int bus, int slot, int function){
 
 
 	memset(gtt, 0, sizeof(i965_t));
 
-	unsigned int data = pci_scan_class(3);
-	
-	if(data == -1) {
-	
-		printf("panic: PCI Display Controller not found!\n");
-		return -1;
-	}
-
-    printf("Display Controller\n");
-
-	i965_pci_init(data  >>  24 &0xff,data  >> 16  &0xff,data &0xffff);
+    i965_pci_init(bus, slot, function);
 	
     /*
 
@@ -81,11 +71,6 @@ int setup_i965(){
 	if((gtt->vid &0xffff) != 0x8086 || (gtt->did != 0x116 && gtt->did != 0x166 && gtt->did != 0x156)  ) { 
 		
 		printf("Graphic Native Intel, not found, device id %x, vendor id %x\n",gtt->did,gtt->vid);
-		
-		unsigned long virt_addr;
-		mm_mp(gui->frame_buffer, (unsigned long*)&virt_addr, 0x800000/*8MiB*/, 0);
-		gui->virtual_buffer = virt_addr;
-		
 		return 1;
 	}
 	
@@ -145,19 +130,6 @@ int setup_i965(){
 	update_gui(gtt->memory, mode->width, mode->height, mode->pitch, mode->bpp );
 	
 	setup_cursor(gtt);
-/*	
-	printf("Graphic Native Intel,  mode->width %d, mode->height %d\n", mode->width,mode->height);
-
-    DISPLAY_PIPELINE *pipe = (DISPLAY_PIPELINE*)(gtt->mmio_base + 0x60000 + (0x1000 *0) );
-
-    printf("%d %d %d %d\n",pipe->htotal.active, pipe->vtotal.active,
-    pipe->pi_peasrc.h_image_size, pipe->pi_peasrc.v_image_size);
-
-    printf("\n\n%x %x %x\n",*(unsigned int*)(gtt->mmio_base + 0x70184 + 0*0x1000),
-    *(unsigned int*)(gtt->mmio_base + 0x70188 + 0*0x1000),
-    *(unsigned int*)(gtt->mmio_base + 0x7019c + 0*0x1000) );
-	
-    for(;;); */
 
 	return 0;
 }

@@ -164,7 +164,7 @@ void gmbus_read(i965_t *driver,unsigned int offset, void *buffer, int size);
 
 void setup_cursor(i965_t *dev);
 void update_graphic_cursor(int x, int y );
-int setup_i965();
+int setup_i965(int bus, int slot, int function);
 
 
 

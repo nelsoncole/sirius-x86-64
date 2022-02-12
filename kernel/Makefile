@@ -11,7 +11,8 @@ LD=ld
 GUI = gui.o compositor.o font8x16.o
 FILE = std.o cfs.o pipe.o socket.o elf.o bind.o inet.o recvfrom.o sendto.o
 DRIVER = pci.o  i965.o cursor.o acpi.o hpet.o lpc.o pit.o ps2.o mouse.o keyboard.o ahci.o ide.o \
-storage.o rtc.o hda.o speaker.o e1000.o ethernet.o arp.o udp.o ipv4.o dhcp.o tcp.o checksum.o rtl8169.o pcnet.o vmnet.o port.o
+storage.o rtc.o hda.o speaker.o e1000.o ethernet.o arp.o udp.o ipv4.o dhcp.o tcp.o checksum.o rtl8169.o pcnet.o vmnet.o port.o \
+bga.o video.o
 LIB = string.o vsprintf.o stdio.o stdlib.o
 OBJ = setup.o main.o io.o gdt.o tss.o idt.o vetor.o exception.o data.o server.o smp.o delay.o \
 paging.o mm.o cpuid.o msr.o lvt.o irq.o apic.o ioapic.o intr.o sleep.o thread.o exectve.o syscall.o asyscall.o \
@@ -63,6 +64,9 @@ kernel.bin: $(OBJ)
 	$(CC) $(CFLAGS64) -c -o $@ $<
 
 %.o: driver/net/%.c
+	$(CC) $(CFLAGS64) -c -o $@ $<
+
+%.o: driver/bochs/%.c
 	$(CC) $(CFLAGS64) -c -o $@ $<
 	
 %.o: file/%.c

@@ -112,10 +112,13 @@ int mm_mp( unsigned long phy_addr, unsigned long *virt_addr,unsigned size, int f
 
 // TODO
 // 0x2000000 -- 0x3000000 -- 32 MiB RAM_BITMAP
-// 0x6000000 -- 0x6001000 -- 4 KiB ALLOC_PAGE_DIR
-// 0x6001000 -- 0x6201000 -- 2 MiB ALLOC_PAGE_TABLE
+// 0x3000000 -- 0x5000000 -- 48 MiB PAGE_BITMAP
+// 0x5000000 -- 0x5001000 -- 80 MiB ALLOC_PAGE_DIR
+// 0x5001000 -- 0x5201000 -- 80.04 MiB ALLOC_PAGE_TABLE
+// 0x5201000 -- 0x7800000 -- 120 MIB (TODO Reservado para page table)
 
 unsigned char *RAM_BITMAP;
+unsigned char *PAGE_BITMAP;
 pae_page_directory_t *alloc_pde;
 pae_page_table_t *alloc_pte;
 unsigned long ram_setup(unsigned long entry_pointer_info)
@@ -145,7 +148,7 @@ unsigned long alloc_frame()
 	
 		for(int t = 0; t < 8; t++) {
 		
-			if( !(*bmp >> t &0x1) ) {
+			if( !((*bmp >> t) & 0x1) ) {
 
 				*bmp |= (1 << t);
 				return (i*8+t)*0x1000;
@@ -160,17 +163,17 @@ unsigned long alloc_frame()
 
 int free_frame(unsigned long addr)
 {
-
+    if (!addr || addr < 0x8000000) return 0;
+    
 	unsigned int block = addr/0x1000;
 	unsigned int byte = block/8;
 	unsigned int bit = block%8;
 	
 	unsigned char *bmp = (unsigned char*)(RAM_BITMAP + byte);
 
-	*bmp &=~ (1 << bit);
+	*bmp &=~(1 << bit);
 	
-	
-	return byte | bit << 24;
+	return byte | (bit << 24);
 }
 
 
@@ -180,12 +183,15 @@ unsigned long alloc_pages_setup(unsigned long entry_pointer_info)
 {
 	alloc_spin_lock = 0;
 
-	alloc_pde = (pae_page_directory_t *) (0x6000000);
+    PAGE_BITMAP = (unsigned char*) (0x3000000);
+    memset(PAGE_BITMAP, 0, 0x2000000);
+
+	alloc_pde = (pae_page_directory_t *) (0x5000000);
 	pae_page_directory_t *pde = alloc_pde;
 	memset( pde,0, 512*sizeof(pae_page_directory_t));
 	
 	
-	alloc_pte = (pae_page_table_t *) (0x6001000);
+	alloc_pte = (pae_page_table_t *) (0x5001000);
 	pae_page_table_t *pte = alloc_pte;
 	memset(pte, 0, 512*sizeof(pae_page_table_t) *512);
 	
@@ -246,100 +252,181 @@ int v_pool(pae_page_table_t *pte, unsigned len)
 	
 	return 0;
 }
+// 00 00 00 00
+static int linear(unsigned char *p, int len, int of){
+    unsigned char *bmp = p;
+    int a = 0;
+    for(int i=0; i < len; ){
+       
+        for(int x= of; x < 8; x +=2){
+            if(i >= len) break;
+            if(!(*bmp & (1<<x))) {
+              a ++;  
+            }else{
+                return 0;
+            }
+            i++; 
+        }
+        of = 0;
+        bmp ++;
+    }
+
+    return a;
+}
+
+static void masked(unsigned char *p, int len, int of){
+
+    int a = 0;
+
+    unsigned char *bmp =p;
+
+    for(int i=0; i < len;){
+        for(int x= of; x < 8; x +=2){
+            if(i >= len) break;
+            if(a == 0)
+                *bmp |= (1<<x);
+            else
+                *bmp |= (3<<x);
+
+            a = 1;
+            i++;
+        }
+        of = 0;
+        bmp ++;
+    }
+}
+static void umasked(unsigned char *p, int len, int of){
+    unsigned char *bmp = p;
+    for(int i=0; i < len;){
+        for(int x= of; x < 8; x +=2){
+            if(i >= len) break;
+            *bmp &=~(3<<x);
+            i++;
+        }
+        of = 0;
+        bmp ++;
+    }
+}
+int get_free_page(unsigned len){
+    // TODO 512GiB
+    unsigned char *bmp = PAGE_BITMAP;
+    int a = 0;
+    int z = 0;
+    for(int i =0; i < (268435456/8); i++){
+
+        for(int x=0; x < 8; x +=2){
+            if(!(*bmp & 1<<x)) {
+                z = linear(bmp, len, x);
+                if (len == z ){
+                    masked(bmp, len, x);
+                    return a;
+                }
+                
+            } 
+            a ++;
+        }
+
+        bmp++;
+    }
+
+    // panic
+    while(1){};
+}
+
+int get_busy_page_size(int index){
+    int a = 0;
+    unsigned char *bmp = PAGE_BITMAP;
+    int x = index/4;
+    bmp += x;
+    x = index%4;
+    x = x*2;
+    int sim = 0;
+    while(1){
+        for(int i=x; i < 8; i +=2){
+          if((*bmp & 3<<i) == (1 <<i) || (*bmp & 3<<i) == 0 ){
+            if(sim == 1)
+                return a;
+
+            sim = 1;
+          }
+          a++;  
+        }
+        bmp++;
+        x = 0;
+    }
+
+    return 0;
+}
+
 unsigned long alloc_pages(int type, unsigned len, unsigned long *addr)
 {
-
 	if(!len) return 0;
 
-	while(alloc_spin_lock);
-	
+	while(alloc_spin_lock){}
+
 	alloc_spin_lock++;
 
 	pae_page_table_t *pte = alloc_pte;
-	
-	int index = 0;
-	int first = 0;
-	
-	
-	
-	for(int i = 0; i < 512*512; i++)
-	{
-		if(pte->p == 0 && v_pool(pte,len) == 0) {
-			index = i;
 
-			
-			for(int y=0; y < len; y++) {
-				unsigned long frame = alloc_frame();
-				if(!frame){ printf("FIXME frame"); while(1){}}
-				
-				pte->p = 1;
-				
-				if(type) pte->us = 1;
-				
-				if(first)pte->ign = 1;
-				else first = 1;
-				
-				pte->frames = (frame >>12) &0xffffffffffff;
-				pte++;
-			}
-			flush_tlb();
-			break;
-		}
-	
+    int index = get_free_page(len);
+    pte += index;
+
+    for(int i=0; i < len; i++) {
+        unsigned long frame = alloc_frame();
+		if(!frame){ printf("FIXME frame"); while(1){}}
+        pte->p = 1;
+		if(type) pte->us = 1;
+        pte->frames = (frame >>12) &0xffffffffffff;
 		pte++;
-	}
-	
-	
-	
-	if(first) 
-		*(unsigned long*)(addr) = (ALLOC_PAGE_MEMORY + (index * 0x1000));
-	else
-		*(unsigned long*)(addr) = (0);
-	
-	alloc_spin_lock = 0;
+    
+    }
 
-	return (len);
+    flush_tlb();
+
+    *(unsigned long*)(addr) = (ALLOC_PAGE_MEMORY + (index * 0x1000));
+
+    alloc_spin_lock = 0;
+    return len;
 
 }
 
 void free_pages(void *addr)
 {
-	if(!addr)return;
-	
-	unsigned long v = (unsigned long)addr;
-	
-	int table = (int) (v >> 12 &0x1FF);
-    	int directory = (int) (v >> 21 &0x1FF);
-    	int directory_ptr = (int) (v >> 30 &0x1FF);
-    	//int pml4 = (int) (v >> 39 &0x1FF);
-	
-	pae_page_directory_t *pde = (pae_page_directory_t *)( pdpte[directory_ptr].phy_addr_pd << 12 &0xffffffffffff);
-	pae_page_table_t *pte  = (pae_page_table_t *) (pde[directory].phy_addr_pt << 12 &0xffffffffffff);
-	
-	
-	if(pte[table].ign != 0) return;
-	
-	while(alloc_spin_lock);
-	
+	if(!addr || 0)return;
+
+    while(alloc_spin_lock){}
+
 	alloc_spin_lock++;
-    	
-    	
-    	for(int i=0; 1 == 1; i++) {
-	
-		unsigned long phy = pte[table].frames << 12 &0xffffffffffff;
+
+	pae_page_table_t *pte = alloc_pte;
+    
+    unsigned char *bmp = PAGE_BITMAP;
+    unsigned long a = (unsigned long)addr;
+    a -= ALLOC_PAGE_MEMORY;
+    a /= 0x1000;
+    int index = (int)a;
+
+    pte += index;
+
+    int len = get_busy_page_size(index);
+   
+    bmp += index/4;
+    a = (index%4)*2;
+
+    umasked(bmp, len, a);
+
+    for(int i=0; i < len; i++){
+
+        unsigned long phy = pte->frames << 12;// &0xffffffffffff;
 		free_frame(phy);
-		
-		pte[table + i].p = 0;		
-		pte[table + i].us = 0;
-		pte[table + i].frames = 0;
-		pte[table + i].ign = 0;
-		
-		if(pte[table + i + 1].ign == 0) {
-			break;
-		}
-	}
-    	
-    	alloc_spin_lock = 0;
+		pte->p = 0;		
+		pte->us = 0;
+		pte->frames = 0;
+
+        pte++;
+    }
+
+    alloc_spin_lock = 0;
 }
 
 

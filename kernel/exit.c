@@ -28,14 +28,16 @@ void user_free(THREAD *thr )
 {
 	
 	__alloc_t *m = (__alloc_t *) thr->alloc_addr;
-	
+	__alloc_t *tmp = m;
 	for(int i=0; i < 256; i ++){
-    	 if(m->flag == 1 && m->addr != 0) free_pages((void*) m->addr);
+    	 if(m->flag == 1 && m->addr != 0)
+                free_pages((void*) m->addr);
+
     	 m++;
     	 
 	}
 	
-	free_pages(m);
+	free_pages(tmp);
 }
 
 void exit(int rc, THREAD *thr) {

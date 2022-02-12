@@ -151,18 +151,18 @@ unsigned int ack, unsigned char flags, size_t len){
         return 1;
 
     }
-    /*
-    if( conn->pack == ack){
+   
+    if( conn->ack >= (seq + (flags & TCP_PSH ? len : 1)) ){
         // ACK
-        // Retrasmit
+        // Retransmission
         conn->flags = TCP_ACK;
         tcp_send(conn->src_ip, conn->dst_ip, conn->src_port, conn->dst_port, conn->seq, conn->ack, conn->flags, 0, 0);
         return 1;
     }
-    conn->pack = ack;*/
+    conn->pack = ack;
 
     conn->ack = seq;
-    conn->ack += flags & TCP_PSH ? len : 1;
+    conn->ack += (flags & TCP_PSH ? len : 1);
 
     conn->flags = TCP_ACK;
     
@@ -173,7 +173,7 @@ unsigned int ack, unsigned char flags, size_t len){
         conn->flags = tcp_send(conn->src_ip, conn->dst_ip, conn->src_port, conn->dst_port, conn->seq, conn->ack, conn->flags, 0, 0);
         conn->seq += 1;
         //conn->busy == 0;
-        conn->status == 1;
+        conn->status = 1;
         // send TCP_FIN
         return 2;
     }
@@ -207,7 +207,7 @@ unsigned short src_port, unsigned short dst_port, unsigned char flags, const voi
 
     if(flags&TCP_FIN){
         // TCP_FIN
-        conn->status == 1;
+        conn->status = 1;
     }
 
     return 0;

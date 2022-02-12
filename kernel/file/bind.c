@@ -1,6 +1,7 @@
 #include <string.h>
 #include <socket.h>
 #include <inet.h>
+#include <ethernet.h>
 
 extern unsigned char our_ip[4];
 extern unsigned char local_ip[4];

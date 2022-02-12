@@ -71,7 +71,6 @@ void page_install(void)
 	// Linear Frame BUffer 8 MiB
 	addr = (unsigned long)gui->frame_buffer;
 	for(i=0;i < 512 * 4; i++) {
-		
 		pte->p = 1;
 		pte->rw = 1;
 		//pte->us = 1;

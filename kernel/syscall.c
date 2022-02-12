@@ -59,9 +59,8 @@ void syscall_kbd_foco(unsigned long rdi, unsigned long rsi, unsigned long rdx, u
 void syscall_alloc_pages(unsigned long rdi, unsigned long rsi, unsigned long rdx, unsigned long rcx)
 {
 	unsigned long addr = 0;
-	
-	alloc_pages(1, rcx, &addr);
 
+	alloc_pages(1, rcx, &addr);
 	ret  = addr;
 }
 

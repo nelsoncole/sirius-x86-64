@@ -313,6 +313,9 @@ void compose()
 
 	unsigned char *vram = ( unsigned char*)((long)gui->virtual_buffer);
 	unsigned char *zbuf  = ( unsigned char*)((long)gui->bank_buffer);
+
+    // TODO
+    //gui->virtual_buffer = zbuf;
 	
 	unsigned int len = gui->pitch * gui->height;
 	

@@ -155,8 +155,8 @@ void main(unsigned long entry_pointer_info)
     ioapic_umasked(11);
     ioapic_umasked(19);
 
-    printf("Setup I965 ...\\\\\n"); 
-	setup_i965();
+    printf("Setup Graphic Adapter ...\\\\\n"); 
+	initialize_graphic_adapter();
 	
 	char cpu_name[128];
 	memset(cpu_name,0,128);
@@ -217,8 +217,6 @@ void main(unsigned long entry_pointer_info)
 
     setup_vmnet();
 
-    
-	
 	create_thread( &compose, stack + 0x7FFF, (unsigned long)pml4e, 0, 0x80,0,0, 0);
 	done();
 

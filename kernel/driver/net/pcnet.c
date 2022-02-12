@@ -224,7 +224,7 @@ static void irq_pcnet(){
 
 int pcnet_send_package(ethernet_package_descriptor_t desc){
 
-    struct pcnet_softc *sc = (struct re_softc *)&pcnet_softc;
+    struct pcnet_softc *sc = (struct pcnet_softc *)&pcnet_softc;
 
     unsigned long long dest = sc->tx_buf_v + (8192*sc->tx_cur);
 
@@ -248,7 +248,7 @@ int pcnet_send_package(ethernet_package_descriptor_t desc){
 
 ethernet_package_descriptor_t *pcnet_recieve_package(){
 
-    struct pcnet_softc *sc = (struct re_softc *)&pcnet_softc;
+    struct pcnet_softc *sc = (struct pcnet_softc *)&pcnet_softc;
 
     ethernet_package_descriptor_t *desc = (ethernet_package_descriptor_t *)&packege_desc_buffer;
     ethernet_package_descriptor_t *first_desc = desc; 

@@ -385,14 +385,14 @@ FILE *open_file_r(directory_entry_t *d,super_block_t *f,part_t *p)
 
 FILE *open_file(const char *filename, const char *mode)
 {
-
-
 	char *path = (char*)malloc(0x1000 + 256);
+
 	char *tpath = path;
 	char *_filename = path + 0x1000 ;
-	
 	getpathname(tpath, filename);
 	getfilename(_filename, tpath);
+
+    
 
 
 	fs_directory = (directory_entry_t *) malloc(sizeof(directory_entry_t));

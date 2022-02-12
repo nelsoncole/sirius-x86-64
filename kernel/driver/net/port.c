@@ -21,8 +21,8 @@ unsigned short get_port(){
     unsigned char *bmp = port_bitmap;
     for( int i = 0; i < (65536/8); i++){
         for(int b =0; b < 8; b++){
-            if(!(*bmp & 1<<b)) {
-                *bmp |= 1<<b; 
+            if(!(*bmp & (1<<b))) {
+                *bmp |= (1<<b); 
                 goto end;
             }
             port++;
@@ -42,11 +42,11 @@ unsigned short set_port(unsigned short port){
     bmp += port/8;
     int b = port%8;
     
-    if((*bmp & 1<<b)) {
+    if((*bmp & (1<<b))) {
         return 0;
     }
  
-    *bmp |= 1<<b;
+    *bmp |= (1<<b);
 
     return port;   
 }
@@ -57,7 +57,7 @@ int clean_port(unsigned short port){
     bmp += port/8;
     int b = port%8;
  
-    *bmp &=~1<<b; 
+    *bmp &=~(1<<b); 
    
     return 0;   
 }
