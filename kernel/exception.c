@@ -95,14 +95,17 @@ char *exception_mensagem[32]={
 
 void fault_exception(int  n)
 {
+    VERBOSE = 1;
 
 	while(screan_spin_lock);
 	screan_spin_lock++;
 
-	unsigned long cr2,cr3,cr4;
+	unsigned long cr2, cr3, cr4;
 	puts(exception_mensagem[n]);
 
-    VERBOSE = 1;
+    int id = 0;
+	__asm__ __volatile__ ("mov $1, %%eax; cpuid; shrl $24, %%ebx;"
+	: "=b"(id) );
 	
 
 	if(n == 14)
@@ -119,6 +122,7 @@ void fault_exception(int  n)
 
 	}
 	
+    printf("Local APIC ID: %x\n",id);
 	printf("PID:%d\n",current_thread1->pid);
 	
 	for( ; ; );

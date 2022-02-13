@@ -44,6 +44,7 @@ extern unsigned long server_id[5];
 extern unsigned long thread_id;
 extern void console();
 extern void compose();
+extern void window_server();
 extern void setup_smp();
 
 extern void done();
@@ -57,9 +58,6 @@ char *syspwd;
 extern int setup_hda(void);
 
 extern int play_speaker(unsigned short frequence);
-
-
-extern unsigned long __exectve(int argc, char **argv, char *pwd, void *buf);
 
 static void kernel_thread(){
     int sd = socket(AF_LOCAL, SOCK_DGRAM, IPPROTO_UDP);
@@ -212,12 +210,13 @@ void main(unsigned long entry_pointer_info)
 	thread_setup();
 	mult_task = 1;
 	
-	unsigned long stack;
-	alloc_pages(1, 8, (unsigned long *)&stack);
-
+	unsigned long stack1, stack2;
+	alloc_pages(0, 8, (unsigned long *)&stack1);
+    alloc_pages(0, 8, (unsigned long *)&stack2);
     setup_vmnet();
 
-	create_thread( &compose, stack + 0x7FFF, (unsigned long)pml4e, 0, 0x80,0,0, 0);
+	create_thread( &compose, stack1 + 0x7FFF, (unsigned long)pml4e, 0, 0x80,0,0, 0);
+    create_thread( &window_server, stack2 + 0x7FFF, (unsigned long)pml4e, 0, 0x80,0,0, 0);
 	done();
 
 	//sti();
@@ -254,38 +253,7 @@ void main(unsigned long entry_pointer_info)
 	
 	
 	sti();
-	// HPET bug no vitual box
-	//sleep(1000);
-	
 	no++;
-	/*
-	unsigned long entry, rsp;
-	alloc_pages(1, 1, (unsigned long *)&entry);
-	alloc_pages(1, 2, (unsigned long *)&rsp);
-	
-	FILE *fz = fopen("a.bin", "r+b");
-	fread((void*)entry, 1, 0x1000,fz);
-	fclose(fz);
-	rsp += 0x1000;
-	
-	__asm__ __volatile__ (
-      	" movq $0, %%rax;    	\n"
-        " mov %%ax, %%ds;   	\n"
-        " mov %%ax, %%es;   	\n"
-        " mov %%ax, %%fs;  		\n"
-        " mov %%ax, %%gs; 		\n"
-        " movq %0, %%rax;		\n"
-        " movq %1, %%rcx;		\n"
-        " movq %1, %%rsp;		\n"
-        " movq $0, %%rbp;		\n"
-        " pushq $0x23;        	\n"
-        " pushq %%rcx;      	\n"
-        " pushq $0x3002;		\n"
-		" pushq $0x1B;     		\n"
-		" pushq %%rax;     		\n"
-		" iretq;				\n"::"D"(entry), "S"(rsp));*/
-		
-	//play_speaker(0x10000);
 
     VERBOSE = 0;
 

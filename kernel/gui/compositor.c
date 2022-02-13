@@ -19,13 +19,15 @@ extern void copymem(void *s1, const void *s2, unsigned long n);
 
 extern void *sse_memcpy(void * s1, const void * s2, size_t len);
 
-PAINT *paint, *paint_ready_queue;
+PAINT *paint, *paint_ready_queue, *paint_foco;
 
 extern mouse_t *mouse;
 unsigned long gid;
 
 unsigned long window_count;
-
+extern int launcher;
+int screan_spin_lock;
+extern int w_remove_spinlock;
 static void *trans_memcpy(void *s1, const void *s2, unsigned n)
 {
     unsigned p = n / 4;
@@ -72,35 +74,36 @@ void window_add(unsigned long addr) {
 
 
 	// tmp aponta para inicio da lista
-    	PAINT *tmp = paint_ready_queue;
-    	// verificar se ja esta registrada
-    	while (tmp) {
+    PAINT *tmp = paint_ready_queue;
+    // verificar se ja esta registrada
+    while (tmp) {
     	
-    		if(tmp->w == addr)
-    		{
-    			paint_ready_queue->spinlock = 0;
-    			return;
-    		}
+        if(tmp->w == addr)
+        {
+        	paint_ready_queue->spinlock = 0;
+        	return;
+        }
     	
-    		tmp = tmp->next;
-    	}
+        tmp = tmp->next;
+    }
     	
-    	memset(new, 0, 32);
+    memset(new, 0, 32);
 	new->w = addr;
 	new->next = 0;
 	
 	w->gid = gid ++; 
     	
     	
-    	tmp = paint_ready_queue;
-    	while (tmp->next) {
+    tmp = paint_ready_queue;
+    while (tmp->next) {
     	
-    		tmp = tmp->next;
-    	}
+    	tmp = tmp->next;
+    }
     	
-    	tmp->next = new;
-    	window_count ++;
-    	paint_ready_queue->spinlock = 0;
+    tmp->next = new;
+    paint_foco = new;
+    window_count ++;
+    paint_ready_queue->spinlock = 0;
 }
 
 void window_remove(unsigned long addr) {
@@ -109,8 +112,11 @@ void window_remove(unsigned long addr) {
 
 	//WINDOW *w = (WINDOW*) addr;
 	
-	while(paint_ready_queue->spinlock);
+	while(paint_ready_queue->spinlock != 0){}
 	paint_ready_queue->spinlock++;
+
+    while(w_remove_spinlock != 0){}
+    w_remove_spinlock ++;
 
 
 	// tmp aponta para inicio da lista
@@ -122,14 +128,16 @@ void window_remove(unsigned long addr) {
     	{
                 window_count --;
                 PAINT *save =  tmp->next;
-                tmp->next = tmp->next->next;     
+                tmp->next = tmp->next->next;
+                if(paint_foco == save) paint_foco = 0;     
                 free(save);
                 break;
     	}
     	
     		tmp = tmp->next;
     }
-    		    	
+    	    	
+    w_remove_spinlock = 0;
     paint_ready_queue->spinlock = 0;
 }
 
@@ -142,17 +150,14 @@ void window_foco(unsigned long addr) {
     PAINT *tmp = paint_ready_queue;
     PAINT *pre = tmp;
     while (tmp) {
-    		
+
     	if(tmp->w == addr) {
-    			
+    		paint_foco = tmp;
     		if(tmp->next != 0){
-    			
-    				
     			pre->next = tmp->next;
     			tmp->next = 0;
     			pre = paint_ready_queue;
     			while (pre->next) {
-    				
     				pre = pre->next;
     			}
     	
@@ -196,20 +201,16 @@ void paint_desktop(void *bankbuffer) {
 		    long len = width;
 		
 		    if( (x + width) > gui->pixels_per_scan_line ) {
-		
-			    len = width - ((x + width) - gui->pixels_per_scan_line );
-			
+			    len = width - ((x + width) - gui->pixels_per_scan_line );			
 		
 		    }
-		
-		
+				
 		    if( x > gui->pixels_per_scan_line ) {
 			    paint = paint->next;
                 w->spinlock = 0;
 			    continue;
 		    }
-  		
-		
+  				
 		    for(int i=0; i < height; i++) {
 		        unsigned char *src = (unsigned char *) (start + (i*(width << 2)));
 				unsigned char *dst = (unsigned char *) (zbuf + (i*(gui->pixels_per_scan_line << 2)) + pos);
@@ -224,10 +225,12 @@ void paint_desktop(void *bankbuffer) {
                             trans_memcpy( dst, src, len << 2);        			    
                         else
          				    sse_memcpy( dst, src, len << 2);
+                            //copymem(dst, src, len << 2);
          			}
          		} else { // launcher
          			if(i < gui->vertical_resolution) {
          				sse_memcpy( dst, src, len << 2);
+                        //copymem(dst, src, len << 2);
          			}
          		}
          		
@@ -285,14 +288,12 @@ void paint_cursor(unsigned char *zbuf, WINDOW *addr) {
 
 }
 
-extern int launcher;
-int screan_spin_lock;
 void compose()
 {
 
 	screan_spin_lock = 0;
     window_count = 0;
-
+    paint_foco = 0;
 	WINDOW *mouseaddr;
 
 	cli();
@@ -320,26 +321,19 @@ void compose()
 	mouseaddr->height = 20;
     
     launcher = 0;
-    
     for (;;){
-
+        
         paint_desktop(zbuf);
         paint_cursor(zbuf,mouseaddr);
-         	
+        
 
 		//#if WAIT_FOR_VERTICAL_RETRACE
         //while ((inportb(0x3DA) & 0x08));
         //while (!(inportb(0x3DA) & 0x08));
 		//#endif
 		
-  		
-  		while(screan_spin_lock){}
-		screan_spin_lock++;
-  		
   		//copymem(vram, zbuf, len);
   		sse_memcpy(vram, zbuf, len);
-  		
-  		screan_spin_lock = 0;
   		
   	}
   	

@@ -246,7 +246,7 @@ lvt_jmp:
 	
 	add rsp, 16
 	iretq
-
+extern lvt_function2
 lvt_jmp2:
 	push gs
 	push fs
@@ -271,7 +271,7 @@ lvt_jmp2:
 	;fxsave [SavedFloats2]
 
 	mov rdi, [rsp + 0x90]
-	call lvt_function
+	call lvt_function2
 
 	;fxrstor [SavedFloats2]
 
@@ -305,16 +305,23 @@ extern context_rdi, context_rsi
 extern context_rbp, context_rsp
 extern context_cs, context_es, context_ds, context_fs, context_gs, context_ss
 extern context_r15, context_r14, context_r13, context_r12, context_r11, context_r10, context_r9, context_r8
+
+extern context2_rip, context2_rflag, context2_cr3
+extern context2_rax, context2_rbx, context2_rcx, context2_rdx
+extern context2_rdi, context2_rsi
+extern context2_rbp, context2_rsp
+extern context2_cs, context2_es, context2_ds, context2_fs, context2_gs, context2_ss
+extern context2_r15, context2_r14, context2_r13, context2_r12, context2_r11, context2_r10, context2_r9, context2_r8
+
 extern task_switch, mult_task
 extern task_switch2
 
 extern context_fxsalve
 	
 lvt0:
-	
 	cmp byte [mult_task], 0
 	je no_mult_task
-	mov byte [mult_task], 0
+	;mov byte [mult_task], 0
 	
 
 	pop qword [context_rip	]
@@ -420,7 +427,7 @@ lvt0:
 	push qword [context_cs	 ]
 	push qword [context_rip ]
 	
-	mov byte [mult_task], 1
+	;mov byte [mult_task], 1
 
 no_mult_task:
 	push qword 0
@@ -447,67 +454,63 @@ lvt4:
 ; __MP__
 global timer1,timer2,timer3,timer4,timer5, timer6, timer7, timer8
 
-iv db 0
 timer1:
 ;ap_jmp:
-
-	cmp byte[iv], 1 ; isto vai bloquei o taskswiching do ap
-	je __no_mult_task
 
 	cmp byte [mult_task], 0
 	je __no_mult_task
 	
-	mov byte[iv], 1
+	;mov byte [mult_task], 0
 	
-	mov byte [mult_task], 0
-	
-	pop qword [context_rip	]
-    pop qword [context_cs	]
-    pop qword [context_rflag]
-    pop qword [context_rsp	]
-    pop qword [context_ss	]
+	pop qword [context2_rip	]
+    pop qword [context2_cs	]
+    pop qword [context2_rflag]
+    pop qword [context2_rsp	]
+    pop qword [context2_ss	]
 
 	;registers 
-    mov qword [context_rax], rax 
-    mov qword [context_rbx], rbx 
-    mov qword [context_rcx], rcx
-    mov qword [context_rdx], rdx
+    mov qword [context2_rax], rax 
+    mov qword [context2_rbx], rbx 
+    mov qword [context2_rcx], rcx
+    mov qword [context2_rdx], rdx
 
 	;registers  
-    mov qword [context_rdi], rdi
-    mov qword [context_rsi], rsi
+    mov qword [context2_rdi], rdi
+    mov qword [context2_rsi], rsi
 	
 	;registers
-	mov qword [context_rbp], rbp
+	mov qword [context2_rbp], rbp
 	
 	;registers
-	mov qword [context_r8], r8
-	mov qword [context_r9], r9
-	mov qword [context_r10], r10
-	mov qword [context_r11], r11
-	mov qword [context_r12], r12
-	mov qword [context_r13], r13
-	mov qword [context_r14], r14
-	mov qword [context_r15], r15
+	mov qword [context2_r8], r8
+	mov qword [context2_r9], r9
+	mov qword [context2_r10], r10
+	mov qword [context2_r11], r11
+	mov qword [context2_r12], r12
+	mov qword [context2_r13], r13
+	mov qword [context2_r14], r14
+	mov qword [context2_r15], r15
 	
 	;segments
     xor rax, rax
     mov rax, ds
-    mov word [context_ds], ax
+    mov word [context2_ds], ax
     mov rax, es
-    mov word [context_es], ax
+    mov word [context2_es], ax
     mov rax, fs
-    mov word [context_fs], ax
+    mov word [context2_fs], ax
     mov rax, gs
-    mov word [context_gs], ax
+    mov word [context2_gs], ax
 
 
 	mov rax, cr3
-    mov qword [context_cr3], rax
+    mov qword [context2_cr3], rax
     	
+    mov rdi, SavedFloats3
+    call SaveSSE
 
 	call task_switch2
-	mov rax, qword [context_cr3]
+	mov rax, qword [context2_cr3]
     mov cr3, rax
     	
     mov rcx, 4 ;TLB
@@ -515,56 +518,59 @@ timer1:
 	nop
 	loop .loop
 
+    mov rdi, SavedFloats3
+    call RestoreSSE
+
 	;segments
     xor rax, rax
-    mov ax,	word [context_ds]
+    mov ax,	word [context2_ds]
     mov ds,	ax
-	mov ax,	word [context_es]
+	mov ax,	word [context2_es]
     mov es,	ax
-	mov ax,	word [context_fs]
+	mov ax,	word [context2_fs]
     mov fs,	ax
-	mov ax,	word [context_gs]
+	mov ax,	word [context2_gs]
     mov gs,	ax
     	
 
 	;registers
-	mov rbp, qword [context_rbp]
+	mov rbp, qword [context2_rbp]
 
 	;registers  
-    mov rdi, qword [context_rdi]
-    mov rsi, qword [context_rsi]
+    mov rdi, qword [context2_rdi]
+    mov rsi, qword [context2_rsi]
 
 	;registers 
-    mov rax, qword [context_rax]
-    mov rbx, qword [context_rbx]
-    mov rcx, qword [context_rcx]
-    mov rdx, qword [context_rdx]
+    mov rax, qword [context2_rax]
+    mov rbx, qword [context2_rbx]
+    mov rcx, qword [context2_rcx]
+    mov rdx, qword [context2_rdx]
     	
     ;registers 
-    mov r8, qword [context_r8]
-    mov r9, qword [context_r9]
-    mov r10, qword [context_r10]
-    mov r11, qword [context_r11]
-    mov r12, qword [context_r12]
-    mov r13, qword [context_r13]
-    mov r14, qword [context_r14]
-    mov r15, qword [context_r15]
+    mov r8, qword [context2_r8]
+    mov r9, qword [context2_r9]
+    mov r10, qword [context2_r10]
+    mov r11, qword [context2_r11]
+    mov r12, qword [context2_r12]
+    mov r13, qword [context2_r13]
+    mov r14, qword [context2_r14]
+    mov r15, qword [context2_r15]
 
 
-	push qword [context_ss	 ]
-	push qword [context_rsp ]
-	push qword [context_rflag]
-	push qword [context_cs	 ]
-	push qword [context_rip ]
+	push qword [context2_ss	 ]
+	push qword [context2_rsp ]
+	push qword [context2_rflag]
+	push qword [context2_cs	 ]
+	push qword [context2_rip ]
 
-	mov byte [mult_task], 1
+	;mov byte [mult_task], 1
 __no_mult_task:
 	;ret
 
 	;call ap_jmp2
 	push qword 0
 	push qword 37
-	jmp lvt_jmp
+	jmp lvt_jmp2
 
 timer2:
 	push qword 0
@@ -1169,4 +1175,7 @@ SavedFloats: TIMES 512 db 0
 global SavedFloats2
 align 16
 SavedFloats2: TIMES 512 db 0
+global SavedFloats3
+align 16
+SavedFloats3: TIMES 512 db 0
 

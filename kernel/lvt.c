@@ -84,6 +84,70 @@ void lvt_function(int n)
 }
 
 
+void lvt_function2(int n)
+{
+
+	apic_eoi_register();
+	
+	switch(n - 0x20){
+		
+		case 0: // APIC Timer
+			apic_initial_count_timer(1000);
+			//printf("APIC_LVT_TIMER\n");
+		break;
+		case 1: // APIC_LVT_PERFORMANCE
+		
+			printf("APIC_LVT_PERFORMANCE\n");
+		break;
+		case 2: // APIC_LVT_LINT0
+			printf("APIC_LVT_LINT0\n");
+		break;
+		case 3: // APIC_LVT_LINT1
+			printf("APIC_LVT_LINT1\n");
+		break;
+		case 4: // APIC_LVT_ERROR
+
+			printf("APIC_LVT_ERROR\n");
+		break;
+		case 5: // APIC Timer1
+			apic_initial_count_timer(1000);
+			//printf("APIC_LVT_TIMER 1\n");
+		break;
+		case 6: // APIC Timer2
+			apic_initial_count_timer(1000);
+			//printf("APIC_LVT_TIMER 2\n");
+		break;
+		case 7: // APIC Timer3
+			apic_initial_count_timer(1000);
+			//printf("APIC_LVT_TIMER 3\n");
+		break;
+		case 8: // APIC Timer4
+			apic_initial_count_timer(1000);
+			//printf("APIC_LVT_TIMER\n");
+		break;
+		case 9: // APIC Timer5
+			apic_initial_count_timer(1000);
+			//printf("APIC_LVT_TIMER\n");
+		break;
+		case 10: // APIC Timer6
+			apic_initial_count_timer(1000);
+			//printf("APIC_LVT_TIMER\n");
+		break;
+		case 11: // APIC Timer7
+			apic_initial_count_timer(1000);
+			//printf("APIC_LVT_TIMER\n");
+		break;
+		case 12: // APIC Timer8
+			apic_initial_count_timer(1000);
+			//printf("APIC_LVT_TIMER\n");
+		break;
+		default:
+			printf("Default LVT n: %d\n",n - 0x20);
+		break;
+	}
+}
+
+
 void lvt_install()
 {
 	

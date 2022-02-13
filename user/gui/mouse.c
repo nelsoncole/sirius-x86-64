@@ -40,8 +40,8 @@ void fmouse(WINDOW *w)
 			if(y < 0 ) y = 0;
 			if(x < 0 ) x = 0;
 			
-			w->pos_x = x;
-			w->pos_y = y;
+			//w->pos_x = x;
+			//w->pos_y = y;
 			
 			//w->spinlock = 0;
 			

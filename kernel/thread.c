@@ -36,6 +36,30 @@ unsigned long context_pid, context_rsp0;
 
 char *context_fxsave;
 
+/*
+ *
+ */
+// registers
+unsigned long	context2_rip, context2_rflag, context2_cr3;
+
+//registers 
+unsigned long	context2_rax, context2_rbx, context2_rcx, context2_rdx;
+
+// registers 
+unsigned long	context2_rdi, context2_rsi;
+
+// registers
+unsigned long	context2_rbp, context2_rsp;
+
+// segments
+unsigned long	context2_cs, context2_es, context2_ds, context2_fs, context2_gs, context2_ss;
+
+unsigned long context2_r15, context2_r14, context2_r13, context2_r12, context2_r11, context2_r10, context2_r9, context2_r8;
+
+unsigned long context2_pid, context2_rsp0;
+
+char *context2_fxsave;
+
 
 THREAD	*current_thread;
 THREAD	*thread_ready_queue; // O início da lista.
@@ -47,18 +71,20 @@ THREAD	*current_thread2;
 unsigned long next_pid;
 
 extern void SavedFloats(void);
+extern void SavedFloats3(void);
 extern void SaveSSE(void *f);
-
+int first_thread2;
 
 unsigned long thread_setup() {
 
 	next_pid = 0;
-	
+    first_thread2 = 0;
+	unsigned long addr = 0;
 	context_fxsave = (char*) (unsigned long)&SavedFloats;
-
-	//thread_ready_queue = (THREAD*)malloc(sizeof(THREAD));
-	alloc_pages(0, 2, (unsigned long *)&thread_ready_queue);
-    current_thread 	= thread_ready_queue;
+    context2_fxsave = (char*) (unsigned long)&SavedFloats3;
+    alloc_pages(0, 2, &addr);
+	thread_ready_queue = (THREAD*)addr;
+    current_thread2 = current_thread 	= thread_ready_queue;
     	
     memset(current_thread, 0, sizeof(THREAD)); 
     	
@@ -403,20 +429,8 @@ int pthread_join(THREAD *thread){
 
 void task_switch()
 {
-
-	//printf("1 ");
-
-	THREAD *tmp = thread_ready_queue; 
-	while (tmp) {
-	
-		if(tmp == current_thread1) break;
     	
-    		tmp = tmp->next;
-    }
-    	
-    if(!tmp) return;
-    	
-    current_thread = current_thread1;
+    //current_thread = current_thread1;
 
     // Salve o contexto da actual tarefa
     // em execução   
@@ -458,8 +472,10 @@ void task_switch()
 	// Obter a próxima tarefa a ser executada.
 	current_thread 	= current_thread->next;
 	
-	if(current_thread->prv&0x80 || current_thread->status == THREAD_ZUMBI)// salta 
+    while((current_thread->prv & 0x80) || current_thread->status == THREAD_ZUMBI) {
+	    //if((current_thread->prv & 0x80) || current_thread->status == THREAD_ZUMBI)// salta 
 		current_thread = current_thread->next;
+    }
 
     // Se caímos no final da lista vinculada, 
     // comece novamente do início.
@@ -468,7 +484,7 @@ void task_switch()
     	current_thread = thread_ready_queue;
     }
 
-	current_thread1 	= current_thread;
+	//current_thread1 	= current_thread;
 
 
     // Restaura o contexto da próxima
@@ -527,101 +543,102 @@ void task_switch()
 
 void task_switch2()
 {
+	THREAD *tmp = current_thread2;	
+    if(!first_thread2){
+        goto __no;
+    }
 
-	THREAD *tmp = thread_ready_queue; 
-	while (tmp) {
-	
-		if(tmp == current_thread2) break;
+    // Salve o contexto da actual tarefa
+    // em execução   
+	tmp->rax 	= context2_rax;
+    tmp->rbx 	= context2_rbx;
+    tmp->rcx 	= context2_rcx;
+    tmp->rdx 	= context2_rdx;
+    tmp->rdi 	= context2_rdi;
+    tmp->rsi 	= context2_rsi;
+    tmp->rbp 	= context2_rbp;
+    tmp->rsp 	= context2_rsp;
+    tmp->rip 	= context2_rip;
     	
-    		tmp = tmp->next;
-    	}
-    	
-    	if(!tmp) return;
-    	
-    	if(!(tmp->prv&0x80)) goto __no;
-	
+    tmp->r8 	= context2_r8;
+    tmp->r9 	= context2_r9;
+    tmp->r10 	= context2_r10;
+    tmp->r11 	= context2_r11;
+    tmp->r12 	= context2_r12;
+    tmp->r13 	= context2_r13;
+    tmp->r14 	= context2_r14;
+    tmp->r15 	= context2_r15;
 
-    	// Salve o contexto da actual tarefa
-    	// em execução   
-	tmp->rax 	= context_rax;
-    tmp->rbx 	= context_rbx;
-    tmp->rcx 	= context_rcx;
-    tmp->rdx 	= context_rdx;
-    tmp->rdi 	= context_rdi;
-    tmp->rsi 	= context_rsi;
-    tmp->rbp 	= context_rbp;
-    tmp->rsp 	= context_rsp;
-    tmp->rip 	= context_rip;
-    	
-    tmp->r8 	= context_r8;
-    tmp->r9 	= context_r9;
-    tmp->r10 	= context_r10;
-    tmp->r11 	= context_r11;
-    tmp->r12 	= context_r12;
-    tmp->r13 	= context_r13;
-    tmp->r14 	= context_r14;
-    tmp->r15 	= context_r15;
+	tmp->cs 	= context2_cs;
+    tmp->ds 	= context2_ds;
+    tmp->es 	= context2_es;
+    tmp->fs 	= context2_fs;
+    tmp->gs 	= context2_gs;
+    tmp->ss 	= context2_ss;
 
-	tmp->cs 	= context_cs;
-    tmp->ds 	= context_ds;
-    tmp->es 	= context_es;
-    tmp->fs 	= context_fs;
-    tmp->gs 	= context_gs;
-    tmp->ss 	= context_ss;
+	tmp->rflag 	= context2_rflag;
+    tmp->cr3 	= context2_cr3;
 
-	tmp->rflag 	= context_rflag;
-    tmp->cr3 	= context_cr3;
+    for(int i=0;i<512;i++) tmp->fxsave[i] = context2_fxsave[i];
 
-	goto _a;
-__no:   
-	// Obter a próxima tarefa a ser executada.
-	while(tmp) {
-		if(tmp->prv&0x80)
-			break;
-		tmp 	= tmp->next;
+__no:  
+    // next
+    tmp 	= tmp->next;
+    int i;
+    for(i=0; i < 2; i++){
+        while(tmp) {
+		    if(tmp->prv & 0x80)
+			    break;
+		    tmp 	= tmp->next;
+	    }
+
+        if(tmp) break;
+
+        tmp = thread_ready_queue;
 	}
-	
-	if(!tmp) return;
+
+	if(tmp == 0 || i >= 2) return;
 
 	current_thread2 	= tmp;
-_a:
+    first_thread2       = 1;
+
     // Restaura o contexto da próxima
     // tarefa a ser executada...
-	context_rax 	= tmp->rax;
-    context_rbx 	= tmp->rbx;
-    context_rcx 	= tmp->rcx;
-    context_rdx 	= tmp->rdx;
-    context_rdi 	= tmp->rdi;
-    context_rsi 	= tmp->rsi;
-    context_rbp 	= tmp->rbp;
-    context_rsp 	= tmp->rsp;
-    context_rip 	= tmp->rip;
+	context2_rax 	= tmp->rax;
+    context2_rbx 	= tmp->rbx;
+    context2_rcx 	= tmp->rcx;
+    context2_rdx 	= tmp->rdx;
+    context2_rdi 	= tmp->rdi;
+    context2_rsi 	= tmp->rsi;
+    context2_rbp 	= tmp->rbp;
+    context2_rsp 	= tmp->rsp;
+    context2_rip 	= tmp->rip;
     	
-    context_r8 	    = tmp->r8;
-    context_r9 	    = tmp->r9;
-    context_r10 	= tmp->r10;
-    context_r11 	= tmp->r11;
-    context_r12 	= tmp->r12;
-    context_r13 	= tmp->r13;
-    context_r14 	= tmp->r14;
-    context_r15 	= tmp->r15;
+    context2_r8     = tmp->r8;
+    context2_r9     = tmp->r9;
+    context2_r10 	= tmp->r10;
+    context2_r11 	= tmp->r11;
+    context2_r12 	= tmp->r12;
+    context2_r13 	= tmp->r13;
+    context2_r14 	= tmp->r14;
+    context2_r15 	= tmp->r15;
 
-	context_cs 	= tmp->cs;
-    context_ds	= tmp->ds;
-    context_es	= tmp->es;
-    context_fs	= tmp->fs;
-    context_gs	= tmp->gs;
-    context_ss	= tmp->ss;
+	context2_cs 	= tmp->cs;
+    context2_ds	    = tmp->ds;
+    context2_es	    = tmp->es;
+    context2_fs	    = tmp->fs;
+    context2_gs	    = tmp->gs;
+    context2_ss	    = tmp->ss;
 
-	context_rflag	= tmp->rflag;
-    context_cr3	= tmp->cr3;
+	context2_rflag	= tmp->rflag;
+    context2_cr3	= tmp->cr3;
     	
-    	
-    context_pid	= tmp->pid;
-
+    context2_pid	= tmp->pid;
 
     // stack rsp0
 	// if(context_rsp0)tss_rsp0(context_rsp0);
+
+    for(int i=0;i<512;i++) context2_fxsave[i] = tmp->fxsave[i];
 
 }
 
