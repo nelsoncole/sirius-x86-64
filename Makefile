@@ -19,7 +19,7 @@ user:
 	$(MAKE) -C user/
 	
 mout_vhd:
-	dd if=/dev/zero of=disk.vhd bs=1024 count=8192 conv=noerror,sync
+	dd if=/dev/zero of=disk.vhd bs=4096 count=8192 conv=noerror,sync
 	./fs -f disk.vhd
 	./fs -g bin/stage1.bin disk.vhd
 	./fs -p bin disk.vhd

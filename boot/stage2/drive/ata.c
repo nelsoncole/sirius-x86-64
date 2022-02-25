@@ -336,10 +336,17 @@ static int ata_identify_device(int p,unsigned short *buffer)
 
 
 		// config ata[n]
-		    ata[p].dev_type	= (buffer[0]&0x8000)? 0xffff:ATADEV_PATA;
-        	ata[p].lba_type	= (buffer[83]&0x0400)? ATA_LBA48:ATA_LBA28;
-        	ata[p].mode 	= ATA_PIO_MODO;//FIXME(buffer[49]&0x0100)? ATA_DMA_MODO:ATA_PIO_MODO;
-		    ata[p].bps 	= 512; 
+	    ata[p].dev_type	= (buffer[0]&0x8000)? 0xffff:ATADEV_PATA;
+        ata[p].lba_type	= (buffer[83]&0x0400)? ATA_LBA48:ATA_LBA28;
+        ata[p].mode 	= ATA_PIO_MODO;//FIXME(buffer[49]&0x0100)? ATA_DMA_MODO:ATA_PIO_MODO;
+		ata[p].bps 	= 512;
+        // Total number of sectors = LBA28 60-61, LBA48 100-103
+        /*ata[p].sectors	= buffer[61];
+        ata[p].sectors	= (ata[p].sectors << 16) &0xffff0000;
+		ata[p].sectors	|= buffer[60] &0xffff;*/
+        ata[p].sectors	= *(unsigned int*)((short*)buffer+60);
+        printf("%d sectors, %d Mb\n ", ata[p].sectors, ((ata[p].sectors*512)/1024)/1024);
+        while(1){}
 
 			break;
 

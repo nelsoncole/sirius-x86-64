@@ -16,7 +16,7 @@ int main(int argc, char **argv)
 	
 	char *data = malloc(4096);
 	
-	for(int i=0; i < (1024*2); i ++) {
+	for(int i=0; i < (1024*8); i ++) {
 	
 		fread(data, 1, 4096, src);
 		fwrite(data, 1, 4096, dst);

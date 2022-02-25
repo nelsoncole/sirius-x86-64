@@ -471,10 +471,10 @@ void task_switch()
     
 	// Obter a próxima tarefa a ser executada.
 	current_thread 	= current_thread->next;
-	
-    while((current_thread->prv & 0x80) || current_thread->status == THREAD_ZUMBI) {
-	    //if((current_thread->prv & 0x80) || current_thread->status == THREAD_ZUMBI)// salta 
-		current_thread = current_thread->next;
+	 while(current_thread){
+        if((current_thread->prv & 0x80) || current_thread->status == THREAD_ZUMBI) {
+		    current_thread = current_thread->next;
+        }else break;
     }
 
     // Se caímos no final da lista vinculada, 
@@ -587,7 +587,7 @@ __no:
     int i;
     for(i=0; i < 2; i++){
         while(tmp) {
-		    if(tmp->prv & 0x80)
+		    if((tmp->prv & 0x80) && (tmp->status != THREAD_ZUMBI))
 			    break;
 		    tmp 	= tmp->next;
 	    }

@@ -105,7 +105,7 @@ int ata_wait_drq(int p)
 void ata_cmd_write(int p,unsigned int cmd)
 {
            
-    	// no_busy      	
+    // no_busy      	
 	ata_wait_not_busy(p);
 	outportb(ata[p].cmd_block_base_addr + ATA_REG_CMD,cmd);
 	ata_wait(p);  // Esperamos 400ns
@@ -125,8 +125,6 @@ void ata_pio_read(int p,void *buffer,unsigned size)
 	cld;\
         rep; insw"::"D"(buffer),
        	"d"(ata[p].cmd_block_base_addr + ATA_REG_DATA),"c"(size/2));
-
-
 }
 
 
@@ -167,8 +165,8 @@ static int detect_devtype (int p)
 	outportb(ata[p].cmd_block_base_addr + ATA_REG_LBA2,0);        	// LBA 23-16
 
     
-    	// Select device,
-    	outportb(ata[p].cmd_block_base_addr + ATA_REG_DEVSEL,0xA0| ata[p].dev_num << 4);
+    // Select device,
+    outportb(ata[p].cmd_block_base_addr + ATA_REG_DEVSEL,0xA0| ata[p].dev_num << 4);
 	ata_wait(p);
 
 	ata_wait_not_busy(p);
@@ -221,9 +219,14 @@ int ata_identify_device(int p,unsigned short *buffer)
 
 		// config ata[n]
 		ata[p].dev_type	= (buffer[0]&0x8000)? 0xffff:ATADEV_PATA;
-        	ata[p].lba_type	= (buffer[83]&0x0400)? ATA_LBA48:ATA_LBA28;
-        	ata[p].mode 	= ATA_PIO_MODO;//FIXME(buffer[49]&0x0100)? ATA_DMA_MODO:ATA_PIO_MODO;
+        ata[p].lba_type	= (buffer[83]&0x0400)? ATA_LBA48:ATA_LBA28;
+        ata[p].mode 	= ATA_PIO_MODO;//FIXME(buffer[49]&0x0100)? ATA_DMA_MODO:ATA_PIO_MODO;
 		ata[p].bps 	= 512; 
+        // Total number of sectors = LBA28 60-61, LBA48 100-103
+        /*ata[p].sectors	= buffer[61];
+        ata[p].sectors	= (ata[p].sectors << 16) &0xffff0000;
+		ata[p].sectors	|= buffer[60] &0xffff;*/
+        ata[p].sectors	= *(unsigned int*)((short*)buffer+60);
 
 			break;
 
