@@ -3,10 +3,9 @@
 	cli
 	mov ax,cs
 	mov ds,ax
-	mov ax, 0x9000
-	mov ss,ax
 	xor ax,ax
-	mov sp,ax
+    mov ss,ax
+	mov sp,0x600
 	jmp 0:start
 	
 	dv_num db 0
@@ -162,11 +161,27 @@ err_:
 times (0x1b8 - ($-$$)) nop
 
 uid times 0x04 db 0x80		; Unique Disk ID
-rsv times 0x02 db 0		; Optional, reserved 0x0000
-pt1 times 0x10 db 0x80    	; First Partition Entry
+rsv times 0x02 db 0		    ; Optional, reserved 0x0000
+
+; First Partition Entry
+pt1:
+.flag:      db 0x80
+.startH:    db 0
+.startC:    db 0
+.startS:    db 0
+
+.osType:    db 0xEF     ; efi
+.endH:      db 0
+.endC:      db 0
+.endS:      db 0
+
+.startLBA:  dd 1
+
+.partitionSize: dd 65536    ; in sectors. almost 32 mb
+
 pt2 times 0x10 db 0        	; Second Partition Entry
-pt3 times 0x10 db 0         	; Third Partition Entry
-pt4 times 0x10 db 0          	; Fourth Partition Entry
+pt3 times 0x10 db 0         ; Third Partition Entry
+pt4 times 0x10 db 0         ; Fourth Partition Entry
 
 times (510 - ($-$$)) nop
 dw 0xaa55

@@ -403,7 +403,7 @@ Linker script and memory map
                 0x000000000001391d                pci_scan_vendor
                 0x000000000001393f                pci_check_vendor
                 0x0000000000013961                pci_size
- .text          0x000000000001398b     0x15f5 ata.o
+ .text          0x000000000001398b     0x15ba ata.o
                 0x000000000001398b                ata_wait
                 0x0000000000013a1f                ata_status_read
                 0x0000000000013a59                ata_wait_not_busy
@@ -414,86 +414,86 @@ Linker script and memory map
                 0x0000000000013bbb                ata_soft_reset
                 0x0000000000013c36                ata_pio_read
                 0x0000000000013c70                ata_pio_write
-                0x0000000000014912                ata_read_sector
-                0x0000000000014a7c                ata_write_sector
-                0x0000000000014c32                ata_initialize
- .text          0x0000000000014f80     0x1326 ahci.o
-                0x0000000000014f80                ahci_initialize
-                0x000000000001601e                sata_read_sector
-                0x0000000000016162                sata_write_sector
- .text          0x00000000000162a6      0x1c6 storage.o
-                0x00000000000162a6                read_sector
-                0x0000000000016389                write_sector
- .text          0x000000000001646c      0x6de fs.o
-                0x000000000001646c                filename_cmp
-                0x0000000000016515                read_super_block
-                0x0000000000016555                read_directory_entry
-                0x000000000001665a                open_file_r
-                0x00000000000168e6                open_file
-                0x00000000000169eb                file_close
-                0x0000000000016a96                file_read_block
- .text          0x0000000000016b4a      0x19c cpuid.o
-                0x0000000000016b4a                cpuid_vendor
-                0x0000000000016b9b                cpuid_processor_brand
-                0x0000000000016c69                cpuid
-                0x0000000000016c92                cpuid_string
- .text          0x0000000000016ce6       0x78 msr.o
-                0x0000000000016ce6                getmsr
-                0x0000000000016d11                setmsr
- .text          0x0000000000016d5e      0x64c paging.o
-                0x0000000000016d5e                load_pae_page_directory_pointer_table
-                0x0000000000016d8e                load_pml4_table
-                0x0000000000016da8                enable_pae
-                0x0000000000016dc5                page_enable
-                0x0000000000016de4                page_install
- .text          0x00000000000173aa       0xda bootblock.o
-                0x00000000000173aa                cof_bootblock
- .text          0x0000000000017484       0x82 pic.o
-                0x0000000000017484                pic_install
- .text          0x0000000000017506       0xa1 ps2.o
-                0x0000000000017506                kbdc_wait
-                0x0000000000017580                kbdc_set_cmd
- .text          0x00000000000175a7      0x523 mouse.o
-                0x00000000000175a7                mouse_write
-                0x00000000000175f8                mouse_read
-                0x0000000000017630                MOUSE_BAT_TEST
-                0x000000000001767a                mouse_install
-                0x00000000000177f4                mouse_handler
- .text          0x0000000000017aca      0x1c7 keyboard.o
-                0x0000000000017aca                keyboard_read
-                0x0000000000017b02                keyboard_write
-                0x0000000000017b3c                KEYBOARD_BAT_TEST
-                0x0000000000017b86                keyboard_install
-                0x0000000000017bb0                keyboard_handler
- .text          0x0000000000017c91      0xe5a ehci.o
-                0x0000000000017c91                ehci_memset
-                0x0000000000017d6a                ehc_malloc
-                0x0000000000017db0                ehci_start
-                0x0000000000017de5                ehci_stop
-                0x0000000000017e1a                ehci_periodic_schedule_enable
-                0x0000000000017e3f                ehci_periodic_schedule_disable
-                0x0000000000017e64                ehci_asynchronous_schedule_enable
-                0x0000000000017e98                ehci_asynchronous_schedule_disable
-                0x0000000000017ebd                ehci_reset
-                0x0000000000017fc4                ehci_init
-                0x0000000000018337                ehci_sondagem
-                0x0000000000018409                ehci_port_init
-                0x00000000000185fc                ehci_set_device_address
-                0x000000000001872e                ehci_get_device_descriptor
-                0x0000000000018886                ehci_set_device_configuration
-                0x00000000000189bf                ehci_handler
- .text          0x0000000000018aeb      0x29b bulk.o
-                0x0000000000018aeb                ehci_wait_for_completion
-                0x0000000000018bed                ehci_int_td
-                0x0000000000018c93                ehci_init_qh
- .text          0x0000000000018d86      0x9dd hub.o
-                0x0000000000018d86                usb_hub_init
-                0x00000000000190b2                usb_control_msg
-                0x00000000000191dc                ehci_recieve_bulk
-                0x00000000000193a5                ehci_send_bulk
-                0x0000000000019545                usb_stick_send_and_recieve_scsi_command
+                0x00000000000148d7                ata_read_sector
+                0x0000000000014a41                ata_write_sector
+                0x0000000000014bf7                ata_initialize
+ .text          0x0000000000014f45     0x1326 ahci.o
+                0x0000000000014f45                ahci_initialize
+                0x0000000000015fe3                sata_read_sector
+                0x0000000000016127                sata_write_sector
+ .text          0x000000000001626b      0x1c6 storage.o
+                0x000000000001626b                read_sector
+                0x000000000001634e                write_sector
+ .text          0x0000000000016431      0x6de fs.o
+                0x0000000000016431                filename_cmp
+                0x00000000000164da                read_super_block
+                0x000000000001651a                read_directory_entry
+                0x000000000001661f                open_file_r
+                0x00000000000168ab                open_file
+                0x00000000000169b0                file_close
+                0x0000000000016a5b                file_read_block
+ .text          0x0000000000016b0f      0x19c cpuid.o
+                0x0000000000016b0f                cpuid_vendor
+                0x0000000000016b60                cpuid_processor_brand
+                0x0000000000016c2e                cpuid
+                0x0000000000016c57                cpuid_string
+ .text          0x0000000000016cab       0x78 msr.o
+                0x0000000000016cab                getmsr
+                0x0000000000016cd6                setmsr
+ .text          0x0000000000016d23      0x64c paging.o
+                0x0000000000016d23                load_pae_page_directory_pointer_table
+                0x0000000000016d53                load_pml4_table
+                0x0000000000016d6d                enable_pae
+                0x0000000000016d8a                page_enable
+                0x0000000000016da9                page_install
+ .text          0x000000000001736f       0xda bootblock.o
+                0x000000000001736f                cof_bootblock
+ .text          0x0000000000017449       0x82 pic.o
+                0x0000000000017449                pic_install
+ .text          0x00000000000174cb       0xa1 ps2.o
+                0x00000000000174cb                kbdc_wait
+                0x0000000000017545                kbdc_set_cmd
+ .text          0x000000000001756c      0x523 mouse.o
+                0x000000000001756c                mouse_write
+                0x00000000000175bd                mouse_read
+                0x00000000000175f5                MOUSE_BAT_TEST
+                0x000000000001763f                mouse_install
+                0x00000000000177b9                mouse_handler
+ .text          0x0000000000017a8f      0x1c7 keyboard.o
+                0x0000000000017a8f                keyboard_read
+                0x0000000000017ac7                keyboard_write
+                0x0000000000017b01                KEYBOARD_BAT_TEST
+                0x0000000000017b4b                keyboard_install
+                0x0000000000017b75                keyboard_handler
+ .text          0x0000000000017c56      0xe5a ehci.o
+                0x0000000000017c56                ehci_memset
+                0x0000000000017d2f                ehc_malloc
+                0x0000000000017d75                ehci_start
+                0x0000000000017daa                ehci_stop
+                0x0000000000017ddf                ehci_periodic_schedule_enable
+                0x0000000000017e04                ehci_periodic_schedule_disable
+                0x0000000000017e29                ehci_asynchronous_schedule_enable
+                0x0000000000017e5d                ehci_asynchronous_schedule_disable
+                0x0000000000017e82                ehci_reset
+                0x0000000000017f89                ehci_init
+                0x00000000000182fc                ehci_sondagem
+                0x00000000000183ce                ehci_port_init
+                0x00000000000185c1                ehci_set_device_address
+                0x00000000000186f3                ehci_get_device_descriptor
+                0x000000000001884b                ehci_set_device_configuration
+                0x0000000000018984                ehci_handler
+ .text          0x0000000000018ab0      0x29b bulk.o
+                0x0000000000018ab0                ehci_wait_for_completion
+                0x0000000000018bb2                ehci_int_td
+                0x0000000000018c58                ehci_init_qh
+ .text          0x0000000000018d4b      0x9dd hub.o
+                0x0000000000018d4b                usb_hub_init
+                0x0000000000019077                usb_control_msg
+                0x00000000000191a1                ehci_recieve_bulk
+                0x000000000001936a                ehci_send_bulk
+                0x000000000001950a                usb_stick_send_and_recieve_scsi_command
                 0x000000000001a000                . = ALIGN (0x1000)
- *fill*         0x0000000000019763      0x89d 
+ *fill*         0x0000000000019728      0x8d8 
 
 .iplt           0x000000000001a000        0x0
  .iplt          0x000000000001a000        0x0 stage2.o
@@ -574,10 +574,11 @@ Linker script and memory map
  .rodata        0x000000000001b19c      0x3d8 exception.o
  .rodata        0x000000000001b574     0x1532 pci.o
  *fill*         0x000000000001caa6        0x2 
- .rodata        0x000000000001caa8      0x1dd ata.o
- *fill*         0x000000000001cc85        0x3 
- .rodata        0x000000000001cc88       0xdb ahci.o
- .rodata        0x000000000001cd63       0x1d mouse.o
+ .rodata        0x000000000001caa8      0x1c9 ata.o
+ *fill*         0x000000000001cc71        0x3 
+ .rodata        0x000000000001cc74       0xdb ahci.o
+ .rodata        0x000000000001cd4f       0x1d mouse.o
+ *fill*         0x000000000001cd6c       0x14 
  .rodata        0x000000000001cd80      0x200 keyboard.o
                 0x000000000001cd80                ascii_minusculas
                 0x000000000001ce80                ascii_maiusculas
