@@ -11,7 +11,6 @@
 #include <math.h>
 #include <stdbool.h>
 
-
 #define APP_LIST_SIZE 1024
 char *app_memory;
 
@@ -284,7 +283,8 @@ const char *ss[60]={\
 };
 
 
-void tests();
+
+static void background(int width, void *frontbuffer);
 int main()
 {
     // register pipe launcher
@@ -332,6 +332,7 @@ int main()
     // area 8ba8aa
 	drawline(w->pos_x ,w->pos_y, w->width, w->height, 0x2f2f,w);
     //wp("w.ppm");
+    //background(w->width, (char*)&w->start);
 
 	// barra
 	drawline(w->pos_x ,w->height-36, w->width, WMENU_BAR_SIZE, 0x808080,w);
@@ -411,4 +412,219 @@ static void update(const char *id, WINDOW *w )
 	int len = strlen(id);
 	drawstring(id, _x + ( width/2 - (len*8/2)), _y + (height/2 - 8), fg, bg, &w->font, w);
 	
+}
+
+/*
+ *
+ *
+ */
+
+struct vec3
+{
+	double x;
+	double y;
+	double z;
+};
+
+struct color
+{
+        double x;
+        double y;
+        double z;
+};
+
+struct ray
+{
+	struct vec3 origin;
+	struct vec3 direction;
+};
+
+struct vec3 vec3(double x, double y, double z){
+	struct vec3 v;
+	v.x = x;
+	v.y = y;
+	v.z = z;
+	return v;
+}
+
+// norma
+double normsquared(struct vec3 *v){
+      	double x = ((v->x*v->x) + (v->y*v->y) + (v->z*v->z));
+	return x;
+}
+
+double norm(struct vec3 *v){
+	return sqrt(normsquared(v));
+}
+
+
+// operações
+struct vec3 divec3(struct vec3 *v, double t){
+	struct vec3 r;
+	/*
+	r.x = ((double)1/t)*v->x;
+	r.y = ((double)1/t)*v->y;
+	r.z = ((double)1/t)*v->z;*/
+
+	r.x = v->x / t;
+	r.y = v->y / t;
+	r.z = v->z / t;
+
+	return r;
+}
+
+struct vec3 mulvec3(struct vec3 *v, double t){
+        struct vec3 r;
+        r.x = v->x*t;
+        r.y = v->y*t;
+        r.z = v->z*t;
+        return r;
+}
+
+struct vec3 sumvec3(struct vec3 *v1, struct vec3 *v2){
+        struct vec3 r;
+        r.x = v1->x + v2->x;
+        r.y = v1->y + v2->y;
+        r.z = v1->z + v2->z;
+        return r;
+}
+
+struct vec3 subvec3(struct vec3 *u, struct vec3 *v){
+        struct vec3 r;
+        r.x = u->x - v->x;
+        r.y = u->y - v->y;
+        r.z = u->z - v->z;
+        return r;
+}
+
+
+
+// produto escalar
+double dot(struct vec3 *u, struct vec3 *v){
+	double r = (u->x*v->x);
+	r += (u->y*v->y);
+	r += (u->z*v->z);
+	return r;
+}
+
+
+//vector unitario
+struct vec3 unitvector(struct vec3 *v){
+	struct vec3 r = divec3(v, norm(v));
+	return r;
+}
+
+struct ray ray(struct vec3 *orig, struct vec3 *dir){
+	struct ray r;
+	r.origin.x = orig->x;
+	r.origin.y = orig->y;
+	r.origin.z = orig->z;
+
+	r.direction.x = dir->x;
+	r.direction.y = dir->y;
+	r.direction.z = dir->z;
+
+	return r;
+}
+
+struct vec3 rayat(double t, struct ray *r){
+	struct vec3 v;
+	v = mulvec3(&r->direction, t);
+	v = sumvec3(&r->origin, &v);
+	return v;
+}
+
+struct color vecolor(double x, double y, double z){
+	struct color c;
+	c.x = x;
+	c.y = y;
+	c.z = z;
+	return c;
+}
+
+struct color mulcolor(struct color *u, double t){
+	struct color c;
+	c.x = u->x*t;
+    c.y = u->y*t;
+    c.z = u->z*t;
+	return c;
+}
+
+struct color sumcolor(struct color *u, struct color *v){
+        struct color c;
+        c.x = u->x+v->x;
+        c.y = u->y+v->y;
+        c.z = u->z+v->z;
+        return c;
+}
+
+struct color ray_color(struct ray *r) {
+
+    struct vec3 unit_direction = unitvector(&r->direction);
+    double t = 0.5*(unit_direction.y + 1.0);
+	struct color a = vecolor(1.0, 1.0, 1.0);
+	a = mulcolor(&a, (double)1.0-t);
+	struct color b = vecolor(0.5, 0.7, 1.0);
+	b = mulcolor(&b, t);
+
+    return sumcolor(&a, &b);
+}
+
+unsigned int write_color(struct color *c){
+	unsigned char rgb[4];
+
+    rgb[0] = (unsigned char)(255.999 * c->z);
+    rgb[1] = (unsigned char)(255.999 * c->y);
+    rgb[2] = (unsigned char)(255.999 * c->x);
+	rgb[3] = 0;
+	return *(unsigned int*)&rgb;
+}
+
+
+
+static void background(int width, void *frontbuffer){
+
+    // Image
+	double aspect_ratio = 16.0 / 9.0;
+
+    const int image_width = width;
+    if(image_width == 800 || image_width == 1024){
+        aspect_ratio = 4.0 / 3.0;
+    }
+    const int image_height = (const int)(image_width / aspect_ratio);
+
+	// Camera
+	double viewport_height = 2.0;
+	double viewport_width = aspect_ratio * viewport_height;
+	double focal_length = 1.0;
+
+	struct vec3 origin = vec3(0.0, 0.0, 0.0);
+	struct vec3 horizontal = vec3(viewport_width, 0.0, 0.0);
+	struct vec3 vertical = vec3(0.0,viewport_height, 0.0);
+
+
+	struct vec3 vector1 = divec3(&horizontal, 2);
+	vector1 = subvec3(&origin, &vector1);
+	struct vec3 vector2 = vec3(0, 0, focal_length);
+	struct vec3 vector3 = divec3(&vertical, 2);
+	vector2 = subvec3(&vector3, &vector2);
+
+	struct vec3 lower_left_corner =subvec3(&vector1, &vector2);
+
+    // Render
+	for (int j = 0; j < image_height; ++j) {
+        for (int i = 0; i < image_width; ++i) {
+            double u = (double)i / (image_width-1);
+            double v = ((double)j - 1) / (image_height-1);
+			vector1 = mulvec3(&horizontal, u);
+			vector1 = sumvec3(&lower_left_corner, &vector1);
+			vector2 = mulvec3(&vertical, v);
+			vector1 = sumvec3(&vector1, &vector2);
+			struct vec3 dir = subvec3(&vector1, &origin);
+			struct ray r = ray(&origin, &dir);
+          	struct color pixel_color = ray_color(&r);
+			unsigned int rgb = write_color(&pixel_color);
+            put_pixel( i, j, width, rgb, frontbuffer);
+        }
+    }
 }
