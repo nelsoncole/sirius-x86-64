@@ -345,8 +345,6 @@ static int ata_identify_device(int p,unsigned short *buffer)
         ata[p].sectors	= (ata[p].sectors << 16) &0xffff0000;
 		ata[p].sectors	|= buffer[60] &0xffff;*/
         ata[p].sectors	= *(unsigned int*)((short*)buffer+60);
-        printf("%d sectors, %d Mb\n ", ata[p].sectors, ((ata[p].sectors*512)/1024)/1024);
-        while(1){}
 
 			break;
 
