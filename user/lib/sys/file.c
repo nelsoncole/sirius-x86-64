@@ -245,7 +245,7 @@ int getc_r (FILE *fp)
 	
 	if(fp->flags == 5) return 0; // pipe
 	
-	if(fp->flags == 2 || fp->flags == 3 || fp->flags == 4 ) { 
+	if(fp->flags == 3 || fp->flags == 4 ) { 
 	
 		r = stdgetc_r (fp);
 		

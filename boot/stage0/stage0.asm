@@ -5,7 +5,7 @@
 	mov ds,ax
 	xor ax,ax
     mov ss,ax
-	mov sp,0x600
+	mov sp,0x700
 	jmp 0:start
 	
 	dv_num db 0

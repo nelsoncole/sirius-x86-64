@@ -196,6 +196,7 @@ static int app_execute(int index, WINDOW *w)
             BitMAP( data, app[index].x1 , app[index].y1, 0xe0e0e0, w);
 
             // foco
+            //TODO 
             __asm__ __volatile__("int $0x72"::"d"(8),"S"( app[index].id),"c"(5));
 
         }
@@ -327,8 +328,16 @@ int main()
 	w->font.y = 16;
 	w->font.fg_color = 0;//0xfcfc00;
 	w->font.bg_color = 0xe0e0e0;
-	w->font.buf = (unsigned long)font8x16;
-	
+	char *tmp = (char*) malloc(FONT_DATA_SIZE);
+	memcpy(tmp, font8x16, FONT_DATA_SIZE);
+    w->font.buf = (unsigned long)tmp;
+
+    w->fg = w->font.fg_color;
+	w->bg = w->font.bg_color;
+	w->text_fg = 0;
+    w->cy = w->cx = 0;
+
+    
     // area 8ba8aa
 	drawline(w->pos_x ,w->pos_y, w->width, w->height, 0x2f2f,w);
     //wp("w.ppm");
@@ -461,11 +470,6 @@ double norm(struct vec3 *v){
 // operações
 struct vec3 divec3(struct vec3 *v, double t){
 	struct vec3 r;
-	/*
-	r.x = ((double)1/t)*v->x;
-	r.y = ((double)1/t)*v->y;
-	r.z = ((double)1/t)*v->z;*/
-
 	r.x = v->x / t;
 	r.y = v->y / t;
 	r.z = v->z / t;
@@ -558,10 +562,39 @@ struct color sumcolor(struct color *u, struct color *v){
         return c;
 }
 
+double hit_sphere(struct vec3 *center, double radius, struct ray *r){
+        struct vec3 oc = subvec3(&r->origin, center);
+        double a = dot(&r->direction, &r->direction);
+        double b = (double)2.0*dot(&oc, &r->direction);
+        double c = dot(&oc, &oc) - radius*radius;
+        double discriminant = b*b - 4*a*c;
+        if (discriminant < 0) {
+        	return -1.0;
+    	} else {
+        	double x =( (- b - sqrt(discriminant))/ a);
+		if(x < 0.0) x = x*(-1.0);
+		return x;
+    	}
+}
+
 struct color ray_color(struct ray *r) {
+    double t;
+    /*struct vec3 center =vec3(0.0, 0.0, -1.0);
+	t = hit_sphere(&center, 0.5, r);
+	if (t > (double)0.0){
+		struct vec3 u = rayat(t, r);
+		struct vec3 v = subvec3(&u, &center);
+		struct vec3 n =unitvector(&v);
+		struct color c1 = vecolor(1.0, 1.0, 1.0);
+		struct color c2 = vecolor(n.x,n.y,n.z);
+		c1 = sumcolor(&c1, &c2);
+		c1 = mulcolor(&c1, 0.5);
+        	return c1;
+
+	}*/
 
     struct vec3 unit_direction = unitvector(&r->direction);
-    double t = 0.5*(unit_direction.y + 1.0);
+    t = 0.5*(unit_direction.y + 1.0);
 	struct color a = vecolor(1.0, 1.0, 1.0);
 	a = mulcolor(&a, (double)1.0-t);
 	struct color b = vecolor(0.5, 0.7, 1.0);
@@ -612,10 +645,11 @@ static void background(int width, void *frontbuffer){
 	struct vec3 lower_left_corner =subvec3(&vector1, &vector2);
 
     // Render
-	for (int j = 0; j < image_height; ++j) {
+    int y=0;
+	for (int j = image_height-1; j >= 0; --j) {
         for (int i = 0; i < image_width; ++i) {
             double u = (double)i / (image_width-1);
-            double v = ((double)j - 1) / (image_height-1);
+            double v = (double)j / (image_height-1);
 			vector1 = mulvec3(&horizontal, u);
 			vector1 = sumvec3(&lower_left_corner, &vector1);
 			vector2 = mulvec3(&vertical, v);
@@ -624,7 +658,9 @@ static void background(int width, void *frontbuffer){
 			struct ray r = ray(&origin, &dir);
           	struct color pixel_color = ray_color(&r);
 			unsigned int rgb = write_color(&pixel_color);
-            put_pixel( i, j, width, rgb, frontbuffer);
+            put_pixel( i, y, width, rgb, frontbuffer);
         }
+
+        y ++;
     }
 }

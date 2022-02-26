@@ -10,7 +10,6 @@ int getc (FILE *fp)
 	int c = getc_r (fp);
 
 	if(fp->flags == 2) { // stdin
-	
 		putc_r (c, stdout);
 	}
 	return (c);

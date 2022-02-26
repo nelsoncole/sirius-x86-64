@@ -47,6 +47,9 @@ int setup_bga(int bus, int slot, int function){
     int bpp = 32;
     int pitch = width*(bpp/8);
 
+	/*double aspect_ratio = 16.0 / 9.0;
+    height = (const int)(width / aspect_ratio);*/
+
     unsigned long memory = 0;
     unsigned long frame_buffer = 0;//VBE_DISPI_LFB_PHYSICAL_ADDRESS;
 

@@ -113,12 +113,12 @@ unsigned long thread_setup() {
 	current_thread->mouse = (mouse_t*) malloc(sizeof(mouse_t));
 	
 
-	current_thread->prv	= 0;
+	current_thread->prv	    = 0;
 
    
     current_thread->next 	= 0;
     	
-    current_thread1 	= current_thread;
+    current_thread1 = current_thread;
     current_thread2	= current_thread; 
 
 	return (current_thread->pid);
@@ -585,12 +585,17 @@ __no:
     // next
     tmp 	= tmp->next;
     int i;
+    int x = 0;
     for(i=0; i < 2; i++){
         while(tmp) {
-		    if((tmp->prv & 0x80) && (tmp->status != THREAD_ZUMBI))
+		    if((tmp->prv&0x80) && (tmp->status != THREAD_ZUMBI)) {
+                x = 1;
 			    break;
+            }
 		    tmp 	= tmp->next;
 	    }
+
+        if(x == 1) break;
 
         if(tmp) break;
 

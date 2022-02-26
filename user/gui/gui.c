@@ -1,7 +1,5 @@
 #include <gui.h>
 
-
-
 void put_pixel(long x, long y, unsigned int scanline,unsigned int color,void *buffer)
 {
 	WINDOW *w = (WINDOW*) (__window);

@@ -15,15 +15,22 @@
 	%include "strcmp.asm"
 	%include "cmd.asm"
 
+debug1 db "BIOSes Get Device Parameters",10,13,0
+debug2 db "Habilita Gate A20",10,13,0
+debug3 db "Carregar o setup ou stage2.bin",10,13,0
+debug4 db "Carregar ap.bin",10,13,0
+debug5 db "Carregar o kernel.bin",10,13,0
+debug6 db "Definir EDID",10,13,0
+debug7 db "Definir o modo VESA",10,13,0
+
 start:
 	cli
 	mov ax,cs
 	mov ds,ax
 	mov es,ax
-	mov ax,0x9000 
-	mov ss,ax  ; stack = 0x90000
 	xor ax,ax
-	mov sp,ax
+	mov ss,ax 
+	mov sp, 0x7E00
 	sti
 
 ; Salvar informações de disco
@@ -37,9 +44,13 @@ start:
 	cli
 	
 ; BIOSes Get Device Parameters
+    mov si, debug1
+	call print
 	call GetDeviceParameters
 
 ; Habilita Gate A20
+    mov si, debug2
+	call print
 	call gatea20
 
 ; Testa a Gate A20 
@@ -50,7 +61,8 @@ start:
 
 ; Carregar o setup ou stage2.bin
 
-
+    mov si, debug3
+	call print
 	mov word[file_sector_count], 0
 
 	mov di, filename
@@ -75,6 +87,8 @@ start:
 ;
 ; Carregar ap.bin
 ;
+    mov si, debug4
+	call print
 	mov word[file_sector_count], 0
 	
 	mov di, filename3
@@ -103,6 +117,9 @@ start:
 ; Carregar o kernel.bin, NOTA: esta solução é provisória.
 ;
 ;
+    mov si, debug5
+	call print
+
 	mov word[file_sector_count], 0
 	;jmp ._ok2 ; controla a leitura do kernel em modo bios
 	mov di, filename2
@@ -131,7 +148,11 @@ start:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; Definir o modo VESA
+    mov si, debug6
+	call print
 	call edid
+    mov si, debug7
+	call print
 	call vesa_vbe_mode
 	
 ; Mascara interrupções e desabilita NMI

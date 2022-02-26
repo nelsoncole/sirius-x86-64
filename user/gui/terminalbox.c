@@ -64,4 +64,3 @@ HANDLE_T *terminalbox(int x, int y, int width, int height, int fg, int bg, WINDO
 void m_terminalbox(HANDLE_T *obj){
 
 }
-

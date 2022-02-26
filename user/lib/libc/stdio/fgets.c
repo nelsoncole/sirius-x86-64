@@ -15,7 +15,7 @@ char *fgets (char *str,int length,FILE *fp)
 	
 	while(1){
 	
-		c = getc_r (fp);
+		c = getc(fp);
 		if(c == EOF) break;
 		
 		if(fp->flags == 2) { // stdin

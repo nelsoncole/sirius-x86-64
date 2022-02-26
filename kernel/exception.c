@@ -123,7 +123,11 @@ void fault_exception(int  n)
 	}
 	
     printf("Local APIC ID: %x\n",id);
-	printf("PID:%d\n",current_thread1->pid);
+    THREAD	*tmp = current_thread1;
+    if(id > 0){
+        tmp = current_thread2;
+    }
+	printf("PID:%d\n",tmp->pid);
 	
 	for( ; ; );
 	screan_spin_lock = 0;
