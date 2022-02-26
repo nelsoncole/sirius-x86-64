@@ -178,12 +178,10 @@ void shell() {
 	
 		memset((char*)argv_pointer, 0, sizeof(unsigned long)*COUNT_ARGV);
 		memset(argv,0,0x1000);
-		
 		sprintf(name, "<%s> ~ $",getenv("PWD"));
 		color(0xff00);
 		printf("%s ", name);
 		color(0xFFFFFF);
-		
 		fgets (argv,0x1000,stdin);
         // limpar o '\n'
         unsigned char *clean = (unsigned char*)argv;

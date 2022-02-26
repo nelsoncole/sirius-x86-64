@@ -220,6 +220,7 @@ void main(unsigned long entry_pointer_info)
 	done();
 
 	//sti();
+    printf("Wait launcher == 0\n");
 	while(launcher){}
 	//cli();
 	
@@ -234,6 +235,7 @@ void main(unsigned long entry_pointer_info)
 	syspwd = (char*) malloc(0x1000);
 	strcpy(syspwd,"A:");
 
+    printf("initialize launcher.bin\n");
 	FILE *fp = fopen("launcher.bin","r+b");
 	if(fp) {
 
@@ -243,14 +245,15 @@ void main(unsigned long entry_pointer_info)
         char *bf = (char*)malloc(0x40000);
         fread (bf, 1, e, fp);
 
-		exectve(0, 0, syspwd, bf);
+		unsigned long r = exectve(0, 0, syspwd, bf);
         free(bf);
 		fclose(fp);
+        if(r)printf("successfull\n");
+        else printf("error, elf not found\n");
 	}else {
 		printf("fopen error launcher.bin\n");
 		//for(;;);
 	}
-	
 	
 	sti();
 	no++;

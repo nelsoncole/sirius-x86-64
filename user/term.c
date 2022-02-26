@@ -25,7 +25,7 @@ void main() {
 	WINDOW *w = window("@~Terminal",0, 0, 700, 500, 0x1f1f2f, 0x80101020, 0xFFFFFF, 0x30);
 
     //w->style |= 0x80000000;
-    w->terminal = 0x1234; 
+    //w->terminal = 0x1234; 
 	
 	menubox(w, &menu_file, "File\0",0,0, 8*5, 24, ID_MENU_FILE);
 	submenubox(menu_file, "Exit\0",  ID_MENU_EXIT);
