@@ -130,9 +130,13 @@ void main(unsigned long entry_pointer_info)
 	ram_setup(entry_pointer_info);
 	alloc_pages_setup(entry_pointer_info);
 	
+    printf("Setup SSE ...\\\\\n");
 	setup_sse();
+    printf("Setup ACPI ...\\\\\n");
 	setup_acpi();
+    printf("Setup Local APIC ...\\\\\n");
 	setup_apic();
+    printf("Setup IOAPIC ...\\\\\n");
 	setup_ioapic();
 
 

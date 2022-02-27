@@ -14,6 +14,41 @@ void apic_initial_count_timer(int value)
 	local_apic_write_command( APIC_INITIAL_COUNT_TIMER, value);
 
 }
+
+void pit_prepare_sleep(int hz)
+{
+    // Initialize PIT Ch 2 in one-shot mode
+    // waiting 1 sec could slow down boot time considerably,
+	// so we'll wait 1/100 sec, and multiply the counted ticks
+
+    int val = 0;
+
+    unsigned int divisor = 1193182/hz;
+    
+    val = (inportb(0x61) & 0xfd) | 0x1;
+    outportb(0x61, val);
+    outportb(0x43, 0xb2);
+
+    outportb(0x42,(unsigned char)(divisor & 0xFF));		// LSB
+    inportb(0x60); // Short delay
+	outportb(0x42,(unsigned char)(divisor >> 8) & 0xFF); // MSB
+
+
+
+}
+
+void pit_perform_sleep(){
+    
+    // Reset PIT one-short counter (start counting)
+    int val = 0;
+    val = (inportb(0x61) & 0xfe);
+    outportb(0x61, val); // gate low
+    val = val | 1;
+    outportb(0x61, val); // gate high
+
+    while((inportb(0x61) & 0x20) == 0){}
+}
+
 int apic_timer()
 {
     // Map APIC timer to an interrupt, and by that enable it in one-shot mode
@@ -23,34 +58,14 @@ int apic_timer()
 	//Divide Configuration Register, to divide by 16
 	local_apic_write_command( APIC_DIVIDE_TIMER, 0x3);
 
-    // Initialize PIT Ch 2 in one-shot mode
-    // waiting 1 sec could slow down boot time considerably,
-	// so we'll wait 1/100 sec, and multiply the counted ticks
-    unsigned char byte = inportb(0x61);
-    byte = byte &0xfd;
-    byte = byte | 1;
-    outportb(0x61, byte);
-
-    byte = 0b10110010;
-    outportb(0x43, byte);
-
-    // 1193180/100 Hz = 11931 = 0x2e9b
-    outportb(0x42, 0x9b); // LSB
-    byte = inportb(0x60); // Short delay
-    outportb(0x42, 0x2e); // MSB
-
-    // Reset PIT one-short counter (start counting)
-    byte = inportb(0x61);
-    byte = byte &0xfe;
-    outportb(0x61, byte); // gate low
-    byte = byte | 1;
-    outportb(0x61, byte); // gate high
+   
+    pit_prepare_sleep(100);
 
     // Rest APIC Timer (set counter to -1)
     local_apic_write_command( APIC_INITIAL_COUNT_TIMER, 0xFFFFFFFF);
 
     // Now wait until PIT counter reaches zero
-    while(inportb(0x61)&0x20){}
+    pit_perform_sleep();
 
     // Stop APIC Timer
 	local_apic_write_command( APIC_LVT_TIMER, 1 << 16);
@@ -60,6 +75,10 @@ int apic_timer()
     apic_timer_ticks = local_apic_read_command( APIC_CURRENT_COUNT_TIMER);
     // It is counted down from -1, make it positive
     apic_timer_ticks = 0xFFFFFFFF - apic_timer_ticks;
+    apic_timer_ticks++;
+
+    printf("apic_timer_ticks %d\n", apic_timer_ticks);
+
     
     // Finally re-enable timer in periodic mode
 	val = APIC_CONFIG_DATA_LVT(1/*periodic mode*/,1/*masked*/,null,null,0,null,0x20/*vetor*/);

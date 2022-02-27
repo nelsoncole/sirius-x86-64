@@ -119,6 +119,7 @@ int setup_apic() {
 	
 	printf("APIC Global enable 0x%x\n",getapicbase());
 	
+    printf("Setup APIC Timer 0 ...\\\\\n");
 	apic_timer(lapicbase);
 	
 	
