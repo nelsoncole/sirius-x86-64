@@ -116,7 +116,7 @@ start32:
     or      eax, 0x20000 ; periodic mode
 	mov 	dword[0xFEE00000 + 0x320], eax
 	
-	mov 	eax, 0x10
+	mov 	eax, 1234
 	mov 	dword[0xFEE00000 + 0x380], eax
 
     mov 	eax, 0x3
