@@ -2,7 +2,7 @@
 #include <msr.h>
 #include <io.h>
 #include <apic.h>
-
+#include <pit.h>
 
 #include <stdio.h>
 
@@ -15,40 +15,6 @@ void apic_initial_count_timer(int value)
 
 }
 
-void pit_prepare_sleep(int hz)
-{
-    // Initialize PIT Ch 2 in one-shot mode
-    // waiting 1 sec could slow down boot time considerably,
-	// so we'll wait 1/100 sec, and multiply the counted ticks
-
-    int val = 0;
-
-    unsigned int divisor = 1193182/hz;
-    
-    val = (inportb(0x61) & 0xfd) | 0x1;
-    outportb(0x61, val);
-    outportb(0x43, 0xb2);
-
-    outportb(0x42,(unsigned char)(divisor & 0xFF));		// LSB
-    inportb(0x60); // Short delay
-	outportb(0x42,(unsigned char)(divisor >> 8) & 0xFF); // MSB
-
-
-
-}
-
-void pit_perform_sleep(){
-    
-    // Reset PIT one-short counter (start counting)
-    int val = 0;
-    val = (inportb(0x61) & 0xfe);
-    outportb(0x61, val); // gate low
-    val = val | 1;
-    outportb(0x61, val); // gate high
-
-    while((inportb(0x61) & 0x20) == 0){}
-}
-
 int apic_timer()
 {
     // Map APIC timer to an interrupt, and by that enable it in one-shot mode
@@ -58,13 +24,14 @@ int apic_timer()
 	//Divide Configuration Register, to divide by 16
 	local_apic_write_command( APIC_DIVIDE_TIMER, 0x3);
 
-   
+    // Prepare the PIT to sleep for 10ms (10000µs)
+    // 1193180/100 Hz
     pit_prepare_sleep(100);
 
     // Rest APIC Timer (set counter to -1)
     local_apic_write_command( APIC_INITIAL_COUNT_TIMER, 0xFFFFFFFF);
 
-    // Now wait until PIT counter reaches zero
+    // Perform PIT-supported sleep
     pit_perform_sleep();
 
     // Stop APIC Timer
@@ -78,7 +45,7 @@ int apic_timer()
     apic_timer_ticks++;
 
     printf("apic_timer_ticks %d\n", apic_timer_ticks);
-
+    //while(1){}
     
     // Finally re-enable timer in periodic mode
 	val = APIC_CONFIG_DATA_LVT(1/*periodic mode*/,1/*masked*/,null,null,0,null,0x20/*vetor*/);

@@ -67,3 +67,37 @@ void timer_wait(unsigned long  ticks)
 	}
 
 }
+
+
+void pit_prepare_sleep(int hz)
+{
+    // Initialize PIT Ch 2 in one-shot mode
+    // waiting 1 sec could slow down boot time considerably,
+	// so we'll wait 1/100 sec, and multiply the counted ticks
+
+    int val = 0;
+
+    unsigned int divisor = 1193182/hz;
+    
+    val = (inportb(0x61) & 0xfd) | 0x1;
+    outportb(0x61, val);
+    outportb(0x43, 0xb2);
+
+    outportb(0x42,(unsigned char)(divisor & 0xFF));		// LSB
+    inportb(0x60); // Short delay
+	outportb(0x42,(unsigned char)(divisor >> 8) & 0xFF); // MSB
+
+}
+
+void pit_perform_sleep(){
+    
+    // Reset PIT one-short counter (start counting)
+    int val = 0;
+    val = (inportb(0x61) & 0xfe);
+    outportb(0x61, val); // gate low
+    val = val | 1;
+    outportb(0x61, val); // gate high
+
+    // Now wait until PIT counter reaches zero
+    while((inportb(0x61) & 0x20) == 0){}
+}
