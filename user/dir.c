@@ -30,7 +30,7 @@ int dir(){
  	if(d->attr&0x40) {
  		color(0xFFFF00);
  		printf("%s\n", d->file_name);
- 		color(-1);
+ 		color(0xFFFFFF);
  	}else
  		printf("%s\n", d->file_name);
  	

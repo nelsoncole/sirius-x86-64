@@ -333,7 +333,7 @@ void compose()
 		//#endif
 		
   		//copymem(vram, zbuf, len);
-  		//sse_memcpy(vram, zbuf, len);
+  		sse_memcpy(vram, zbuf, len);
   		
   	}
   	

@@ -20,12 +20,17 @@ char *app_memory;
 static void loop(WINDOW *w);
 
 void main() {
+    WINDOW *z = (WINDOW*) __window;
+    double aspect_ratio = 16.0 / 9.0;
+    int image_width = (z->rx/2);
+    int image_height = (const int)(image_width / aspect_ratio);
 	
     app_memory = (char*)malloc(0x80000); // 512
-	WINDOW *w = window("@~Terminal",0, 0, 700, 500, 0x1f1f2f, 0x80101020, 0xFFFFFF, 0x30);
+	WINDOW *w = window("@~Terminal",0, 0, image_width, image_height, 0x1f1f2f, 0x80101020, 0xFFFFFF, 0x30);
 
-    //w->style |= 0x80000000;
-    //w->terminal = 0x1234; 
+    w->style |= 0x80000000;
+    w->stdin = (unsigned long)stdin;
+    w->terminal = 0x1234; 
 	
 	menubox(w, &menu_file, "File\0",0,0, 8*5, 24, ID_MENU_FILE);
 	submenubox(menu_file, "Exit\0",  ID_MENU_EXIT);

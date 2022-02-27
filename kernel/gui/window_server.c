@@ -57,7 +57,7 @@ void window_server(){
 
             // terminal
             if(w->terminal == 0x1234){
-                FILE *fp = 0;
+                FILE *fp = (FILE *)w->stdin;
                 if(fp != 0)
                 if(fp->off > tx){
                     fp->curp = (unsigned char*)(fp->buffer + tx);

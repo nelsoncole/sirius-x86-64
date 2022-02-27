@@ -53,11 +53,7 @@ int stdgetc_r(FILE *fp)
 		while(fp->off < fp->off2)__asm__ __volatile__ ("pause"); // TODO wait
 		
 		fp->curp = (unsigned char*)(fp->buffer + fp->off2 - 1);
-		r = *(unsigned char*)(fp->curp) &0xff;
-			
-		//call putc
-		//stdputc_r (r, stdout);
-		
+		r = *(unsigned char*)(fp->curp) &0xff;		
 
 	}else if( fp->flags == 3 || fp->flags == 4)  { // stdout or stderr
 

@@ -11,7 +11,7 @@ int getc (FILE *fp)
 
 	if(fp->flags == 2) { // stdin
 	
-		putc_r (c, stdout);
+		//putc_r (c, stdout);
 	}
 	return (c);
 

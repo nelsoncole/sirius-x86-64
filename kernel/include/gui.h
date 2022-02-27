@@ -65,10 +65,11 @@ typedef struct __WINDOW {
 	unsigned int 	cy, cx;
 	font_t		    font;
     unsigned int    terminal;
+    unsigned long   stdin;
 	
 	unsigned int	style;
 	unsigned int	gid;
-	char		    rsv[4096 - 108];
+	char		    rsv[4096 - 116];
 	unsigned long 	start;
 }__attribute__ ((packed)) WINDOW;
 

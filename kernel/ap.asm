@@ -10,6 +10,7 @@ COPY_GDTR: 	dq 0
 COPY_IDTR: 	dq 0
 PML4E: 	    dq 0
 func_enter: dq 0
+apic_tmr_vector: dd 0
 
 align 16
 gdt:
@@ -69,7 +70,7 @@ start32:
 	
 	mov 	eax, dword[0xFEE00000 + 0xD0]
 	or 	    eax, 1
-	;mov 	dword[0xFEE00000 + 0xD0], eax	
+	mov 	dword[0xFEE00000 + 0xD0], eax	
 	
 	;Task Priority Register (TPR), to inhibit softint delivery
 	xor 	eax, eax
@@ -80,8 +81,10 @@ start32:
     mov 	dword[0xFEE000F0], eax
 	
 	;Timer interrupt vector, to disable timer interrupts
-	mov 	eax, 0x10024
+	mov 	eax, 0x24
 	add	    eax, dword[aprunning]	; vector 37++
+    mov     dword[apic_tmr_vector], eax
+    or      eax, 0x10000
 	mov 	dword[0xFEE00000 + 0x320], eax
 
 
@@ -108,18 +111,18 @@ start32:
     wrmsr
 	
 	
-	; Timer umasked
-    mov 	eax, dword[0xFEE00000 + 0x320]
-	and 	eax, 0xFFFEFFFF
+	; Timer
+    mov 	eax, dword[apic_tmr_vector]
+    or      eax, 0x20000 ; periodic mode
 	mov 	dword[0xFEE00000 + 0x320], eax
 	
-	mov 	eax, 0xA
-	mov 	dword[0xFEE00000 + 0x3e0], eax
-	
-	mov 	eax, 12345
+	mov 	eax, 0x10
 	mov 	dword[0xFEE00000 + 0x380], eax
+
+    mov 	eax, 0x3
+	mov 	dword[0xFEE00000 + 0x3e0], eax
 	  	    	
-	; PAE
+; PAE
 	mov 	eax, cr4
     or	    eax, 0x20	
     mov 	cr4, eax
