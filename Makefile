@@ -87,6 +87,6 @@ install:
 	
 push:
 	git add ./
-	git commit -m "revisão no gerenciamento de memória"	
+	git commit -m "revisão do apic timer"	
 	git push -u origin main
 	

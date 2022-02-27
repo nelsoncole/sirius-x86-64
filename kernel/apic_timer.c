@@ -7,6 +7,7 @@
 #include <stdio.h>
 
 #define null 0
+unsigned int apic_timer_ticks;
 
 void apic_initial_count_timer(int value)
 {
@@ -52,36 +53,14 @@ int apic_timer()
     while(inportb(0x61)&0x20){}
 
     // Stop APIC Timer
-    apic_timer_masked();
+	local_apic_write_command( APIC_LVT_TIMER, 1 << 16);
 
     // Now do the math...
     // Get current counter value
-    unsigned int counter = local_apic_read_command( APIC_CURRENT_COUNT_TIMER);
-
+    apic_timer_ticks = local_apic_read_command( APIC_CURRENT_COUNT_TIMER);
     // It is counted down from -1, make it positive
-    counter = 0xFFFFFFFF - counter;
-    counter ++;
-    // We used divide value different than 1, so now we have to multiply the result by 16
-    counter = counter*16;// >> 4; // *16
-
-    // Moreover, PIT did not wait a whole sec, only a fraction, so multiply by that too
-    counter = counter * 100; // *PITHz
-    // -----edx:eax now holds the CPU bus frequency-----
-    // now calculate timer counter value of your choice
-	// this means that tasks will be preempted 1000 times in a second. 100 is popular too.
-    counter = counter / 1000;
-
-    // Again, we did not use divide value of 1
-    counter = counter/16;  //<< 4; // /16
-
-    // Sanity check, min 16
-    if(counter != 0x10){
-        counter = 0x10;
-    }
+    apic_timer_ticks = 0xFFFFFFFF - apic_timer_ticks;
     
-    // Now eax holds appropriate number of ticks, use it as APIC timer counter initializer
-    local_apic_write_command( APIC_INITIAL_COUNT_TIMER, counter);
-
     // Finally re-enable timer in periodic mode
 	val = APIC_CONFIG_DATA_LVT(1/*periodic mode*/,1/*masked*/,null,null,0,null,0x20/*vetor*/);
     local_apic_write_command( APIC_LVT_TIMER, val);
@@ -89,6 +68,9 @@ int apic_timer()
     // Setting divide value register again not needed by the manuals
     // Although I have found buggy hardware that required it
     local_apic_write_command( APIC_DIVIDE_TIMER, 0x3);
+
+    // Now eax holds appropriate number of ticks, use it as APIC timer counter initializer
+    local_apic_write_command( APIC_INITIAL_COUNT_TIMER, apic_timer_ticks);
 	
 	return 0;
 	

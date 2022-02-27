@@ -101,7 +101,8 @@ void setup_smp() {
 		*(unsigned long*)(0x8000 + 8*3) =(unsigned long)gdtr;
 		*(unsigned long*)(0x8000 + 8*4) =(unsigned long)idtr;
 		*(unsigned long*)(0x8000 + 8*5) =(unsigned long)pml4e;
-		*(unsigned long*)(0x8000 + 8*6) =(unsigned long)&ap_startup; // test
+        *(unsigned long*)(0x8000 + 8*6) =(unsigned long)apic_timer_ticks;
+		*(unsigned long*)(0x8000 + 8*7) =(unsigned long)&ap_startup; // test
 		
 		apstatck = apstatck - 0x40000; // - 256KiB
 

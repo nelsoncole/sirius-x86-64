@@ -30,7 +30,7 @@ start:
 	mov es,ax
 	xor ax,ax
 	mov ss,ax 
-	mov sp, 0x7E00
+	mov sp, 0x7C00
 	sti
 
 ; Salvar informações de disco

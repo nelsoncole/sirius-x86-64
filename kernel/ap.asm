@@ -9,6 +9,7 @@ stack: 	    dq 0
 COPY_GDTR: 	dq 0
 COPY_IDTR: 	dq 0
 PML4E: 	    dq 0
+apic_ticks: dq 0
 func_enter: dq 0
 apic_tmr_vector: dd 0
 
@@ -115,12 +116,12 @@ start32:
     mov 	eax, dword[apic_tmr_vector]
     or      eax, 0x20000 ; periodic mode
 	mov 	dword[0xFEE00000 + 0x320], eax
-	
-	mov 	eax, 1234
-	mov 	dword[0xFEE00000 + 0x380], eax
 
     mov 	eax, 0x3
 	mov 	dword[0xFEE00000 + 0x3e0], eax
+	
+	mov 	eax, dword[apic_ticks]
+	mov 	dword[0xFEE00000 + 0x380], eax
 	  	    	
 ; PAE
 	mov 	eax, cr4

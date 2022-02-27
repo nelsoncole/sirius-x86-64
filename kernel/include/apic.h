@@ -70,6 +70,7 @@
 
 extern unsigned int localId;
 extern unsigned long lapicbase;
+extern unsigned int apic_timer_ticks;
 
 unsigned int local_apic_read_command(unsigned short addr);
 void local_apic_write_command(unsigned short addr,unsigned int val);

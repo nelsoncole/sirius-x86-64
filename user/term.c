@@ -22,7 +22,7 @@ static void loop(WINDOW *w);
 void main() {
     WINDOW *z = (WINDOW*) __window;
     double aspect_ratio = 16.0 / 9.0;
-    int image_width = (z->rx/2);
+    int image_width = z->rx - (z->rx/4);
     int image_height = (const int)(image_width / aspect_ratio);
 	
     app_memory = (char*)malloc(0x80000); // 512
