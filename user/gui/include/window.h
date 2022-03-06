@@ -48,13 +48,18 @@ typedef struct __WINDOW {
 	unsigned int  	fg, bg, text_fg;
 	
 	unsigned int 	cy, cx;
+    unsigned int 	chcounter;
+    unsigned int 	scrollx;
+    unsigned int 	scrolly;
 	font_t		    font;
 	unsigned int    terminal;
     unsigned long   stdin;
+    unsigned long   stdout;
+    unsigned long   stderr;
 
 	unsigned int	style;
 	unsigned int	gid;
-	char		    rsv[4096 - 116];
+	char		    rsv[4096 - 144];
 	unsigned long 	start;
 	
 }__attribute__ ((packed)) WINDOW;

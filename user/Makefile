@@ -30,7 +30,7 @@ locale = locale.o
 signal = signal.o
 setjmp = setjmp.o longjmp.o
 
-GUI = gui.o font8x16.o window.o bmp.o font.o border.o
+GUI = gui.o font8x16.o window.o bmp.o font.o border.o libterm.o
 GUI2 = editbox.o mouse.o menubox.o obj.o message.o dialog.o button.o listbox.o terminalbox.o
 
 HEADER = setup.o crt0.o

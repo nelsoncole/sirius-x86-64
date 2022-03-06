@@ -175,7 +175,7 @@ void window_foco(unsigned long addr) {
 
 void paint_desktop(void *bankbuffer) {
     int count = 0;
-	while(paint_ready_queue->spinlock);
+	while(paint_ready_queue->spinlock){}
 	paint_ready_queue->spinlock++;
 
 	paint = paint_ready_queue->next;

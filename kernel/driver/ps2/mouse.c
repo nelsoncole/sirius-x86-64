@@ -85,22 +85,23 @@ int MOUSE_BAT_TEST(){
 // Este é o manipulador do IRQ12
 void mouse_handler(void) {
 
+    int val = inportb(0x60);
 	switch(count_mouse++) 
 	{
-		case 0: 
-			buttons = inportb(0x60);
+		case 0:
+			buttons = val;
 			break;
 		case 1:
 			if(buttons & 0x10) // negative
-				mouse_x = (int) inportb(0x60) | 0xFFFFFF00;
+				mouse_x = (int) val | 0xFFFFFF00;
 			else
-				mouse_x = (int) inportb(0x60);
+				mouse_x = (int) val;
 			break;
 		case 2:
 			if(buttons & 0x20) // negative
-				mouse_y = (int)  inportb(0x60) | 0xFFFFFF00;
+				mouse_y = (int)  val | 0xFFFFFF00;
 			else
-				mouse_y = (int) inportb(0x60);
+				mouse_y = (int) val;
 			
 			if( (buttons & 0x80) || (buttons & 0x40) == 0 ) { 
 				// x/y overflow ?
@@ -111,7 +112,6 @@ void mouse_handler(void) {
 
 			break;
 		default:
-			inportb(0x60);
 			count_mouse = 0;
 			break;
 	}	

@@ -30,7 +30,9 @@ void foco(unsigned long pid, unsigned long id){
     	
     	if(!tmp) return;
 
-	_stdin = (FILE *) tmp->stdin;
+	_stdin  = (FILE *) tmp->stdin;
+    _stdout = (FILE *) tmp->stdout;
+    _stderr = (FILE *) tmp->stderr;
 	mouse2 = (mouse_t*) tmp->mouse;
 
 	window_foco((unsigned long)tmp->window);
@@ -41,8 +43,10 @@ void foco_default()
 {
     THREAD *tmp = thread_ready_queue;
 
-    _stdin = (FILE *) tmp->stdin;
-	mouse2 = (mouse_t*) tmp->mouse;
+    _stdin  = (FILE *) tmp->stdin;
+    _stdout = (FILE *) tmp->stdout;
+    _stderr = (FILE *) tmp->stderr;
+	mouse2  = (mouse_t*) tmp->mouse;
 }
 
 

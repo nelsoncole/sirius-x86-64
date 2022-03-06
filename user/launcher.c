@@ -84,7 +84,7 @@ static int app_fixe(unsigned long status, const char *pathname, const char *icon
         if(size <= 0x3000) {
 		    fread(data, 1, size, f);
 
-		    BitMAP( data, app[app_index].x1 , app[app_index].y1, 0x808080, w);
+		    BitMAP( data, app[app_index].x1 , app[app_index].y1, 0x404040, w);
 	    }
 
 		fclose(f);
@@ -174,7 +174,7 @@ static void app_remove_foco(WINDOW *w)
 
     char *data = (char*) app[app_index_foco].icone_addr;
 
-    BitMAP( data, app[app_index_foco].x1 , app[app_index_foco].y1, 0x808080, w);
+    BitMAP( data, app[app_index_foco].x1 , app[app_index_foco].y1, 0x404040, w);
 
     app_index_foco = -1;
 }
@@ -344,7 +344,7 @@ int main()
     background(w->width, (char*)&w->start);
 
 	// barra
-	drawline(w->pos_x ,w->height-36, w->width, WMENU_BAR_SIZE, 0x808080,w);
+	drawline(w->pos_x ,w->height-36, w->width, WMENU_BAR_SIZE, 0x404040,w);
 
 	// register 
 	//wcl(w);
@@ -411,7 +411,7 @@ static void update(const char *id, WINDOW *w )
 	int height = 20;
 	
 	int fg = 0xFFFFFF;//-1; 
-	int bg = 0x808080;//0x80808080;
+	int bg = 0x404040;//0x80808080;
 	
 	//drawline(_x, _y, width, height, bg, w);
 	//drawrect(_x, _y, width, height, bg - 0x10101010, w );

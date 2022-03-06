@@ -33,6 +33,9 @@ unsigned long *__tm;
 
 char *pwd;
 
+extern int term_fg_color;
+extern int term_bg_color;
+
 void ctr0(unsigned long rdi, unsigned long rsi, unsigned long rdx, unsigned long rcx,
 unsigned long r8, unsigned long r9) {
 	
@@ -56,6 +59,10 @@ unsigned long r8, unsigned long r9) {
 	obj_list = 0;
 	
 	pwd = (char *) pwd_ptr;
+
+
+    term_fg_color = term_bg_color = -1;
+
 	int ret = main(argc, (char**)argv);
 	
 	exit(ret);

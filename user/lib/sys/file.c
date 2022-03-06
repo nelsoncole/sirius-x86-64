@@ -1,11 +1,8 @@
 #include <stdio.h>
-
 #include <file.h>
 
-
-#include <window.h>
-
-extern int _putchar( unsigned short int c);
+extern int term_fg_color;
+extern int term_bg_color;
 
 int stdputc_r (int c, FILE *fp)
 {
@@ -14,27 +11,40 @@ int stdputc_r (int c, FILE *fp)
 
 		fp->off = fp->off2 = 0;
 		fp->level = 0;
+        fp->fsize = 0;
 	}
 	
 	
 	if(fp->flags == 4/*stderr*/)
 		stdputc_r (c,stdout);
 
-	
-	fp->curp = (unsigned char*)(fp->buffer + fp->off);
-	*(unsigned char*)(fp->curp) = c &0xff;
-
-	// Update offset
-	fp->off++;
-	
-
-	if(fp->off > fp->fsize ) fp->fsize++;
-	
 	if(fp->flags == 3/*stdout*/) {
-		//flush TODO
-		// // display console
-		if( __window) __window_putchar(c);
-	
+
+        unsigned short val = c &0xff;
+
+        int fg = term_fg_color;
+        int bg = term_bg_color;
+        if(bg > 15 || bg < 0) bg = 0;
+        if(fg > 15 || fg < 0) fg = 0;
+        if(fg == 15 && bg == 15) bg = fg = 0;
+
+        unsigned char clor = ((bg << 4) &0xf0) | (fg &0xf);
+        val |=  clor << 8;
+
+        fp->curp = (unsigned char*)(fp->buffer + fp->off);
+	    *(unsigned short*)(fp->curp) = val &0xffff;
+
+	    // Update offset
+	    fp->off += 2;
+	    if(fp->off > fp->fsize ) fp->fsize += 2;
+
+    }else {
+	    fp->curp = (unsigned char*)(fp->buffer + fp->off);
+	    *(unsigned char*)(fp->curp) = c &0xff;
+
+	    // Update offset
+	    fp->off += 1;
+	    if(fp->off > fp->fsize ) fp->fsize += 1;
 	}
 	
 	return (c);
@@ -53,9 +63,11 @@ int stdgetc_r(FILE *fp)
 		while(fp->off < fp->off2)__asm__ __volatile__ ("pause"); // TODO wait
 		
 		fp->curp = (unsigned char*)(fp->buffer + fp->off2 - 1);
-		r = *(unsigned char*)(fp->curp) &0xff;		
+		r = *(unsigned char*)(fp->curp) &0xff;
 
-	}else if( fp->flags == 3 || fp->flags == 4)  { // stdout or stderr
+        //stdputc_r (r, stdout);		
+
+	}else if(fp->flags == 4)  { // stderr
 
 
 		if(!fp->off) return EOF;
@@ -67,7 +79,16 @@ int stdgetc_r(FILE *fp)
 
 		fp->off2++;
 
-	}
+	}else if(fp->flags == 3){ // stdout
+        if(!fp->off) return EOF;
+
+		if(fp->off2 >= fp->off ) return EOF;
+
+		fp->curp = (unsigned char*)(fp->buffer + fp->off2);
+		r = *(unsigned char*)(fp->curp) &0xff;
+
+		fp->off2 += 2;
+    }
 
 
 	return (r);

@@ -7,6 +7,8 @@
 #include <file.h>
 #include <path.h>
 
+extern void term_color(int fg, int bg);
+
 void shell();
 int main()
 {
@@ -179,9 +181,9 @@ void shell() {
 		memset((char*)argv_pointer, 0, sizeof(unsigned long)*COUNT_ARGV);
 		memset(argv,0,0x1000);
 		sprintf(name, "<%s> ~ $",getenv("PWD"));
-		color(0xff00);
+        term_color(2, -1);
 		printf("%s ", name);
-		color(0xFFFFFF);
+		term_color(-1, -1);
 		fgets (argv,0x1000,stdin);
         // limpar o '\n'
         unsigned char *clean = (unsigned char*)argv;

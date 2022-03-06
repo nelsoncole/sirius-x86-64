@@ -155,7 +155,7 @@ void keyboard_handler(void)
 	
 	// Control kernel
     if(scancode == KEY_F1) {
-        _stdin = stdin;
+        //_stdin = stdin;
         scaps = 0;
         return;
     }
@@ -231,7 +231,6 @@ void keyboard_handler(void)
     if( (keyboard_charset[0] &0xff) != 0) { 
 		
     fputc(keyboard_charset[0] &0xff, _stdin);
-			
     //printf("%c ", keyboard_charset[0] &0xff );
     }	
 

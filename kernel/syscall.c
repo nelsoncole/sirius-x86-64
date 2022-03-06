@@ -50,7 +50,9 @@ void syscall_window(unsigned long rdi, unsigned long rsi, unsigned long rdx, uns
 
 void syscall_kbd_foco(unsigned long rdi, unsigned long rsi, unsigned long rdx, unsigned long rcx)
 {
-	_stdin = (FILE *)rdi;
+	_stdin = (FILE *)current_thread->stdin;
+    _stdout = (FILE *)current_thread->stdout;
+    _stderr = (FILE *)current_thread->stderr;
 	mouse2 = (mouse_t*) current_thread->mouse;
 
 }

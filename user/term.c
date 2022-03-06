@@ -30,6 +30,8 @@ void main() {
 
     w->style |= 0x80000000;
     w->stdin = (unsigned long)stdin;
+    w->stdout = (unsigned long)stdout;
+    w->stderr = (unsigned long)stderr;
     w->terminal = 0x1234; 
 	
 	menubox(w, &menu_file, "File\0",0,0, 8*5, 24, ID_MENU_FILE);

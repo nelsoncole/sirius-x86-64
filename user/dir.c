@@ -28,9 +28,9 @@ int dir(){
  for(int i=0;i < count; i ++){
  	
  	if(d->attr&0x40) {
- 		color(0xFFFF00);
+ 		term_color(14, -1);
  		printf("%s\n", d->file_name);
- 		color(0xFFFFFF);
+ 		term_color(-1, -1);
  	}else
  		printf("%s\n", d->file_name);
  	
