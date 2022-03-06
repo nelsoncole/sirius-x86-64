@@ -175,8 +175,8 @@ void window_foco(unsigned long addr) {
 
 void paint_desktop(void *bankbuffer) {
     int count = 0;
-	while(paint_ready_queue->spinlock){}
-	paint_ready_queue->spinlock++;
+	while(paint_ready_queue->spinlock != 0){}
+	paint_ready_queue->spinlock = 1;
 
 	paint = paint_ready_queue->next;
 	while(paint){
@@ -184,8 +184,8 @@ void paint_desktop(void *bankbuffer) {
             count++;
 		    WINDOW *w = (WINDOW*) paint->w;
 		
-		    while(w->spinlock != 0)__asm__ __volatile__("pause;");
-		    w->spinlock++;
+		    while(*(unsigned char *)&w->spinlock != 0){};
+		    *(unsigned char *)&w->spinlock = 1;
       
 		    unsigned long start  = (unsigned long) &w->start;
 		    unsigned long zbuf  = ( unsigned long) bankbuffer;
@@ -207,7 +207,7 @@ void paint_desktop(void *bankbuffer) {
 				
 		    if( x > gui->pixels_per_scan_line ) {
 			    paint = paint->next;
-                w->spinlock = 0;
+                *(unsigned char *)&w->spinlock = 0;
 			    continue;
 		    }
   				
@@ -236,7 +236,7 @@ void paint_desktop(void *bankbuffer) {
          		
          	}
            
-            w->spinlock = 0;
+            *(unsigned char *)&w->spinlock = 0;
        }
        	paint = paint->next;
     }

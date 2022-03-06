@@ -26,7 +26,7 @@ int apic_timer()
 
     // Prepare the PIT to sleep for 10ms (10000µs)
     // 1193180/100 Hz
-    pit_prepare_sleep(10000);
+    pit_prepare_sleep(100);
 
     // Rest APIC Timer (set counter to -1)
     local_apic_write_command( APIC_INITIAL_COUNT_TIMER, 0xFFFFFFFF);

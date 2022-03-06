@@ -49,7 +49,7 @@ void window_server(){
 			
 			            if(y < 0 ) y = 0;
 			            if(x < 0 ) x = 0;
-			
+
 			            w->pos_x = x;
 			            w->pos_y = y;
    		            }   
@@ -60,10 +60,10 @@ void window_server(){
             if(w->terminal == 0x1234){
                 int c = fgetc((FILE *)w->stdout);
                 if(c != EOF && c != 0){
-                    while(paint_ready_queue->spinlock){}
-	                paint_ready_queue->spinlock++;
+                    while(*(unsigned char *)&w->spinlock != 0){};
+		            *(unsigned char *)&w->spinlock = 1;
                     window_putchar( c &0xff, (c >> 8) &0xff, w, (FILE *)w->stdout);
-                    paint_ready_queue->spinlock = 0;
+                    *(unsigned char *)&w->spinlock = 0;
                 }
             }
         }
