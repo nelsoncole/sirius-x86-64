@@ -87,6 +87,6 @@ install:
 	
 push:
 	git add ./
-	git commit -m "revisão do apic timer"	
+	git commit -m "scroll no terminal virtual"	
 	git push -u origin main
 	

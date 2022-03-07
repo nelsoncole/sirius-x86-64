@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <mm.h>
 #include <thread.h>
+#include <gui.h>
 
 
 extern void isr00();	extern void isr10();	extern void isr20();	extern void isr30();		
@@ -96,6 +97,7 @@ char *exception_mensagem[32]={
 void fault_exception(int  n)
 {
     VERBOSE = 1;
+    gui->font.fg_color = 0xFF0000;
 
 	while(screan_spin_lock);
 	screan_spin_lock++;

@@ -11,6 +11,8 @@
 #include <math.h>
 #include <stdbool.h>
 
+#include <sys/communication.h>
+
 #define APP_LIST_SIZE 1024
 char *app_memory;
 
@@ -197,7 +199,12 @@ static int app_execute(int index, WINDOW *w)
 
             // foco
             //TODO 
-            __asm__ __volatile__("int $0x72"::"d"(8),"S"( app[index].id),"c"(5));
+            //__asm__ __volatile__("int $0x72"::"d"(8),"S"( app[index].id),"c"(5));
+            struct communication commun, commun2;
+            commun.type = COMMUN_TYPE_FOCO;
+            commun.pid = 0;
+            commun.apid = app[index].id;
+            communication(&commun, &commun2);
 
         }
     }

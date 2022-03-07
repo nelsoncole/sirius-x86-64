@@ -13,12 +13,11 @@ FILE *_stdin, *_stdout, *_stderr;
 FILE *std_open_file(const char *filename, const char *mode)
 {
 
-    int bsz = BUFSIZ;
 	char *m = (char*) mode;
 	int flag = 0;
 	
 	if(memcmp(m, "stdin", 5) == 0) flag	= 0x2;
-	else if(memcmp(m, "stdout", 6) == 0){ flag	= 0x3; bsz = 65536;}
+	else if(memcmp(m, "stdout", 6) == 0) flag	= 0x3;
 	else if(memcmp(m, "stderr", 6) == 0) flag	= 0x4;
 	else return 0;
 	
@@ -26,13 +25,13 @@ FILE *std_open_file(const char *filename, const char *mode)
 	FILE *fp = (FILE *)malloc(sizeof(FILE));
 	memset(fp,0,sizeof(FILE));
 	
-	fp->bsize 	= (unsigned) bsz;
-	fp->buffer 	= (unsigned char*) malloc(bsz);
+	fp->bsize 	= (unsigned) BUFSIZ;
+	fp->buffer 	= (unsigned char*) malloc(BUFSIZ);
 	fp->fsize	= 0;
 	fp->mode 	= 0x2;
 	fp->flags	= flag;
 	
-	memset(fp->buffer, 0, bsz);
+	memset(fp->buffer, 0, BUFSIZ);
 	
 
 	return (fp);
@@ -90,7 +89,8 @@ int std_putc (int c, FILE *fp)
 int std_getc (FILE *fp)
 {	
 	int r = 0;
-	
+	if(!fp->fsize) return EOF;
+
 	if(fp->flags == 2 ) { // stdin
 
 		fp->off2++;

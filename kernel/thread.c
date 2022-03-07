@@ -112,6 +112,7 @@ unsigned long thread_setup() {
 	
 	current_thread->mouse = (mouse_t*) malloc(sizeof(mouse_t));
 	
+    current_thread->head    = 0;
 
 	current_thread->prv	    = 0;
 
@@ -228,6 +229,7 @@ int pv,int argc, char **argv, char *pwd)
 	new_thread->r12 = (unsigned long)argv;
 	new_thread->r13 = (unsigned long)pwd;
 
+    new_thread->head    = NULL;
     new_thread->next 	= NULL;
     new_thread->tail 	= NULL;
     
@@ -318,6 +320,7 @@ int argc, char **argv, char *pwd, THREAD *thread)
 	new_thread->r12 = (unsigned long)argv;
 	new_thread->r13 = (unsigned long)pwd;
 
+    new_thread->head    = thread;
     new_thread->next 	= NULL;
     new_thread->tail 	= NULL;
     
@@ -647,7 +650,21 @@ __no:
 
 }
 
-THREAD *thread(unsigned long pid)
+unsigned long getpid(){
+    return current_thread->pid;
+}
+
+unsigned long getpid2(){
+
+    THREAD	*thread = current_thread->head;
+    if(!thread){
+        thread = current_thread;
+    }
+
+    return thread->pid;
+}
+
+THREAD *get_thread(unsigned long pid)
 {
 	THREAD *t = thread_ready_queue;
 	

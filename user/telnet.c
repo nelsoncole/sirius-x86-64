@@ -4,6 +4,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <pthread.h>
+#include <sys/socket.h>
 
 extern char* get_ip_from_name(char *addr, const char *name , int query_type);
 int client;

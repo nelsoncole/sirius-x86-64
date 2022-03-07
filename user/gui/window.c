@@ -263,15 +263,7 @@ void update_window(WINDOW *w)
 
 void __window_clear(WINDOW *w)
 {
-	w->cy = w->cx =0;
-    w->chcounter = 0;
-    w->scrolly = 0;
-
-	drawline(w->area_x , w->area_y, w->area_width, w->area_height, w->bg, w);
-
-    stdout->off = stdout->off2 = 0;
-	stdout->level = 0;
-    stdout->fsize = 0;
+    w->terminal_clear = 1;
 }
 
 int __window_putchar( unsigned short int c)

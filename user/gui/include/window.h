@@ -53,13 +53,15 @@ typedef struct __WINDOW {
     unsigned int 	scrolly;
 	font_t		    font;
 	unsigned int    terminal;
+    unsigned int    terminal_clear;
+    unsigned long   terminal_buffer;
     unsigned long   stdin;
     unsigned long   stdout;
     unsigned long   stderr;
 
 	unsigned int	style;
 	unsigned int	gid;
-	char		    rsv[4096 - 144];
+	char		    rsv[4096 - 156];
 	unsigned long 	start;
 	
 }__attribute__ ((packed)) WINDOW;

@@ -35,9 +35,11 @@ void default_syscall(unsigned long rdi, unsigned long rsi, unsigned long rdx, un
 }
 
 
-void syscall_puts(unsigned long rdi, unsigned long rsi, unsigned long rdx, unsigned long rcx) {
+void syscall_getpid(unsigned long rdi, unsigned long rsi, unsigned long rdx, unsigned long rcx) {
 
-	puts( (char*)rdi );
+
+    if(rcx == 1234) ret = getpid2();
+    else ret = getpid();
 }
 
 
@@ -199,7 +201,7 @@ void syscall_pthread_join(unsigned long rdi)
 
 void *fnvetors_syscall[SYSCALL_TABLE] = {
 	&default_syscall, 	    // 0
-    &syscall_puts, 	        // 1
+    &syscall_getpid,        // 1
     &syscall_window,	    // 2
     &syscall_kbd_foco,	    // 3
     &syscall_alloc_pages,	// 4

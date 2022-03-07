@@ -21,14 +21,13 @@ void foco(unsigned long pid, unsigned long id){
 	THREAD *tmp = thread_ready_queue;
 	 
 	while (tmp) {
-	
+
 		if(tmp->id == id) 
 			break;
+        tmp = tmp->next;
+    }
     	
-    		tmp = tmp->next;
-    	}
-    	
-    	if(!tmp) return;
+    if(!tmp) return;
 
 	_stdin  = (FILE *) tmp->stdin;
     _stdout = (FILE *) tmp->stdout;
@@ -86,10 +85,10 @@ loop:
 	
 			}
 					
-			if(!exectve_child(argc, argv, pwd, buf, thread(pid)))
+			if(!exectve_child(argc, argv, pwd, buf, get_thread(pid)))
             {
 				// error
-				thr = thread(pid);
+				thr = get_thread(pid);
 				pipe_write ( pipe, thr->pipe);
 			}
 	
@@ -106,26 +105,6 @@ loop:
 			memset(server_id, 0, sizeof(unsigned long)*5);
 			sti();
 				break;
-		case 3:
-			reboot();
-			break;
-		case 4:	
-			poweroff();
-			break;
-		case 5:
-			cli();
-			foco(server_id[4], server_id[2]);
-			memset(server_id, 0, sizeof(unsigned long)*5);
-			sti();
-			break;
-		case 6:
-			cli();
-			pid = server_id[4];
-			thr = thread(pid);
-			exit(0, thr);
-			memset(server_id, 0, sizeof(unsigned long)*5);
-			sti();
-			break;
 		default: 
             // processar socket
             //cli();

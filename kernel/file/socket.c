@@ -129,7 +129,7 @@ void socket_server_transmit(){
                     fillIP((unsigned char*)&current_saddr->src_ip, our_ip);
                     src_ip = current_saddr->src_ip;
                 }
-
+                // TODO define porta, temporario
                 if(!src_port) {
                     if(port < 2000) port = 2000;
                     current_saddr->src_port = htons(port++);

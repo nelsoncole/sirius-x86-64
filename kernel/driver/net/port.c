@@ -46,7 +46,7 @@ unsigned short set_port(unsigned short port){
         return 0;
     }
  
-    *bmp |= (1<<b);
+    *bmp |= (1 << b);
 
     return port;   
 }

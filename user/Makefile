@@ -10,7 +10,7 @@ LD=ld
 
 pthread = pthread.o
 net = dns.o
-sys = file.o cfs.o alloc.o pipe.o path.o socket.o inet.o $(net) $(pthread)
+sys = file.o cfs.o alloc.o pipe.o path.o socket.o inet.o communication.o sys_exit.o $(net) $(pthread)
 time = time.o gmtime.o localtime.o strftime.o clock.o
 errno = errno.o 
 stdlib = itoa.o i2hex.o malloc.o calloc.o free.o realloc.o div.o ldiv.o lldiv.o strtol.o atoi.o atol.o strtoul.o\

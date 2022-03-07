@@ -58,40 +58,7 @@ char *syspwd;
 extern int setup_hda(void);
 
 extern int play_speaker(unsigned short frequence);
-
-static void kernel_thread(){
-    int sd = socket(AF_LOCAL, SOCK_DGRAM, IPPROTO_UDP);
-    struct sockaddr_in sera;
-    struct sockaddr_in serb;
-
-    sera.sin_family        = AF_LOCAL;
-    sera.sin_addr.s_addr = inet_addr("127.0.0.1");
-    sera.sin_port  = htons(3000);
-
-    serb.sin_family        = AF_LOCAL;
-    serb.sin_addr.s_addr = htonl(INADDR_ANY);
-    serb.sin_port  = htons(0);
-
-    if(sd < 0) {
-        printf("Cannot create socket!\n");
-        while(1){}
-    }
-    int r = bind( sd, (struct sockaddr*)&sera, sizeof(struct sockaddr_in));
-    if(r) {
-        printf("Cannot bind socket!\n");
-        while(1){}
-    }
-
-    char b[1024];
-    char *message = "sirius operating system\n\0";
-    while(1){
-        socklen_t len;
-        ssize_t to = recvfrom(sd, b, 1024, 0, (struct sockaddr*)&serb, &len);
-        ssize_t count = sendto(sd, message, strlen(message), 0, (struct sockaddr*)&serb, sizeof(struct sockaddr_in));
-    }
-
-
-}
+extern void kernel_thread_communication();
 
 void main(unsigned long entry_pointer_info)
 {
@@ -234,7 +201,7 @@ void main(unsigned long entry_pointer_info)
 	
     unsigned long addr =0;
 	alloc_pages(0, 2, (unsigned long *)&addr);
-	create_thread( &kernel_thread/*&console*/, /*stack*/addr + 0x1FF0, (unsigned long)pml4e, 0, 0,0,0, 0);
+	create_thread( &kernel_thread_communication/*&console*/, /*stack*/addr + 0x1FF0, (unsigned long)pml4e, 0, 0,0,0, 0);
 	
 	syspwd = (char*) malloc(0x1000);
 	strcpy(syspwd,"A:");
@@ -261,7 +228,7 @@ void main(unsigned long entry_pointer_info)
 	
 	sti();
 	no++;
-
+    clears_creen();
     VERBOSE = 0;
 
     // TODO initialize service

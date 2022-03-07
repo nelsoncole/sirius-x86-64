@@ -32,6 +32,8 @@ void main() {
     w->stdin = (unsigned long)stdin;
     w->stdout = (unsigned long)stdout;
     w->stderr = (unsigned long)stderr;
+    w->terminal_buffer =(unsigned long)malloc(0x10000); // 64KiB
+    memset((void*)w->terminal_buffer, 0, 0x10000);
     w->terminal = 0x1234; 
 	
 	menubox(w, &menu_file, "File\0",0,0, 8*5, 24, ID_MENU_FILE);

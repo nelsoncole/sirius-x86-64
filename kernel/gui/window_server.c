@@ -137,7 +137,7 @@ static int window_putchar_scroll(WINDOW *window, FILE *fd){
 
     int bsize = fd->bsize;
     int fsize = fd->fsize;
-    unsigned short *buffer = (unsigned short*)fd->buffer;
+    unsigned short *buffer = (unsigned short *)w->terminal_buffer;
 
     // clear
     drawline(w->area_x , w->area_y, w->area_width, w->area_height, w->bg, w);
@@ -168,12 +168,11 @@ static int window_putchar_scroll(WINDOW *window, FILE *fd){
     for( ;i > 1; --i){
 
         unsigned short val = *c++;
-        unsigned char a = val &0xff;
-        unsigned char b = (val >> 8) &0xff;
-        unsigned char color = b;
+        unsigned char ch = val &0xff;
+        unsigned char color = (val >> 8) &0xff;
 
-        if(a != '\b' && a != '\t'){
-            if(a == '\n'){
+        if(ch != '\b' && ch != '\t'){
+            if(ch == '\n'){
                 w->cy++;
                 w->cx = 0;
             }else{
@@ -183,15 +182,11 @@ static int window_putchar_scroll(WINDOW *window, FILE *fd){
                 if((color&0xf) < 16 && (color&0xf) != 0 )
                     fg = color_table[(color&0xf)];
 
-		        drawchar( a, 4 + w->area_x + w->font.x*w->cx, 4 + w->area_y + w->font.y*w->cy, 
+		        drawchar( ch, 4 + w->area_x + w->font.x*w->cx, 4 + w->area_y + w->font.y*w->cy, 
 		        fg, bg, &w->font, w);
                 
 		        w->cx++;
 
-                if( b == 0xFF){
-                    w->cy++;
-                    w->cx = 0;
-                }
             }
         }
 
@@ -208,19 +203,24 @@ int window_putchar( unsigned short int c, unsigned char color, WINDOW *window, F
 
 	WINDOW *w = (WINDOW*)window;
     if(!w)return 0;
+
+    unsigned short *buf = (unsigned short *)w->terminal_buffer;
 	
 	int limitx = (w->area_width-4)/w->font.x;
 	int limity = (w->area_height-4)/w->font.y;
 	
 	w->font.fg_color = w->text_fg;
 
-    if((w->chcounter*2) >= fd->bsize || (w->chcounter*2) > fd->fsize ){
-        w->chcounter = 0;
+    if((w->chcounter*2) >= 0x10000 || w->terminal_clear == 1){
         //clear
+        w->terminal_clear = 0;
         drawline(w->area_x , w->area_y, w->area_width, w->area_height, w->bg, w);
         w->cx =0;
         w->cy =0;
-        w->scrolly = 0;   
+        w->scrolly = 0;
+        w->chcounter = 0;
+    
+        if(c == '\n') return c;
     }
 		
 	if(c == '\b' && (w->cx > 0))
@@ -232,19 +232,48 @@ int window_putchar( unsigned short int c, unsigned char color, WINDOW *window, F
         if((color&0xf) < 16 && (color&0xf) != 0 )
             fg = color_table[(color&0xf)];
 
+        w->chcounter--;
+        buf[w->chcounter] =' ' | color << 8;
 		drawchar( ' ', 4 + w->area_x + w->font.x*w->cx, 4 + w->area_y + w->font.y*w->cy, 
 		fg, bg, &w->font, w);
 		//w->cx++;
-        w->chcounter++;
-	} else if(c == '\t') {
-		w->cx += 8;
-		w->chcounter++;
+        
 	} else if(c == '\n') {
 	
 		w->cx = 0;
 		w->cy++;
+        buf[w->chcounter] ='\n' | color << 8;
         w->chcounter++;
 		
+	} else if(c == '\t') {
+
+        unsigned int fg = w->font.fg_color;
+        unsigned int bg = w->font.bg_color;
+
+        if((color&0xf) < 16 && (color&0xf) != 0 )
+            fg = color_table[(color&0xf)];
+        buf[w->chcounter] = c | color << 8;
+        w->chcounter++;
+        for(int i=0; i < 8; i++) {
+		    drawchar(' ', 4 + w->area_x + w->font.x*w->cx, 4 + w->area_y + w->font.y*w->cy, fg, bg, &w->font, w);
+		    w->cx++;
+
+            if(w->cx >= limitx) {
+		        w->cx =0;
+		        w->cy++;
+
+                fd->curp = (unsigned char*)(fd->buffer + (fd->off2-2)+ 0);
+	            *(unsigned char*)(fd->curp) = ' ';
+
+                fd->curp = (unsigned char*)(fd->buffer + (fd->off2-2)+ 1);
+	            *(unsigned char*)(fd->curp) = 0xFF;
+	        }
+ 
+            if(w->cy >= limity){
+		        w->scrolly = window_putchar_scroll(window,fd);	
+	        }
+        }
+
 	} else if(c >= ' ') {
 
         unsigned int fg = w->font.fg_color;
@@ -256,22 +285,22 @@ int window_putchar( unsigned short int c, unsigned char color, WINDOW *window, F
 		drawchar( c, 4 + w->area_x + w->font.x*w->cx, 4 + w->area_y + w->font.y*w->cy, 
 		fg, bg, &w->font, w);
 		w->cx++;
+
+        buf[w->chcounter] = c | color << 8;
         w->chcounter++;
-	}
+
+	}else { w->chcounter++; }
 
 
     if(w->cx >= limitx &&  c != '\n') {
 		w->cx =0;
 		w->cy++;
-        //return fputc('\n', fd);
-        fd->curp = (unsigned char*)(fd->buffer + (fd->off2-2)+ 1);
-	    *(unsigned char*)(fd->curp) = 0xFF;
+        buf[w->chcounter] = '\n' | 0xFF << 8;
+        w->chcounter++;
 	}
  
     if(w->cy >= limity){
 		w->scrolly = window_putchar_scroll(window,fd);
-		return c;
-		
 	}
 	return c;
 }

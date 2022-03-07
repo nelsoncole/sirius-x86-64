@@ -74,8 +74,6 @@ void exit(int rc, THREAD *thr) {
 	    free_pages((void*)tmp->pde_addr);
 	    free_pages((void*)tmp->pte_addr);
 	 
-	    user_free(tmp);
-	 
 	    if(tmp->prv&0x10) {
 	        // remover window 
             window_remove(tmp->window);
@@ -105,6 +103,8 @@ void exit(int rc, THREAD *thr) {
 
 	        pipe_write ( pipe, pipe_launcher);
 	    }
+
+        user_free(tmp);
 	 	
 	    tmp = tmp->tail;
 	}

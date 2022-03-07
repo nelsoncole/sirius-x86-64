@@ -39,7 +39,9 @@ typedef struct _THREAD {
 	
 	char fxsave[512]__attribute__((aligned(16)));
 	
-	
+
+    struct _THREAD *head;	
+
 	// linker do próximo     
     struct _THREAD *next;
     struct _THREAD *tail;
@@ -57,7 +59,10 @@ THREAD *create_thread_child( void (*main)(), unsigned long rsp, unsigned long cr
 int pv,int argc, char **argv, char *pwd, THREAD *thread);
 THREAD *pthread_create( void (*main)(), unsigned long rsp, int pv, THREAD *thread);
 int pthread_join(THREAD *thread);
-THREAD *thread(unsigned long pid);
+
+unsigned long getpid();
+unsigned long getpid2();
+THREAD *get_thread(unsigned long pid);
 
 
 #endif

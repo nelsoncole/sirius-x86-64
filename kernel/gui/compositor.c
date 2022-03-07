@@ -118,7 +118,6 @@ void window_remove(unsigned long addr) {
     while(w_remove_spinlock != 0){}
     w_remove_spinlock ++;
 
-
 	// tmp aponta para inicio da lista
     PAINT *tmp = paint_ready_queue;
     // procura janela

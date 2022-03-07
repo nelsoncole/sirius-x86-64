@@ -4,11 +4,8 @@
 
 #undef        exit
 
+extern void sys_exit(int rc);
 void exit(int rc)
 {
-	__asm__ __volatile__("int $0x72"::"d"(8),"c"(6));
-	for(;;) {
-        __asm__ __volatile__("pause;");
-    };
-
+	sys_exit(rc);
 }

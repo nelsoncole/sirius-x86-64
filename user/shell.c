@@ -7,6 +7,8 @@
 #include <file.h>
 #include <path.h>
 
+#include <sys/communication.h>
+
 extern void term_color(int fg, int bg);
 
 void shell();
@@ -199,23 +201,23 @@ void shell() {
 
 		for(int i=0;i < SHELL_CMD_NUM;i++) 	{
 			
-			
+            if(*cmd == '\0') break;
 			if(argv != 0)	{
             			if((strcmp(cmd,cmd_table[i].name)) == 0) 	{
-					call_loader = (void(*)(int,char **))(cmd_table[i].fun);
-					call_loader(argc, (char**) argv_pointer);
-					//call_function(cmd_table[i].fun, argc, (char**) argv_pointer);
+					        call_loader = (void(*)(int,char **))(cmd_table[i].fun);
+					        call_loader(argc, (char**) argv_pointer);
+					        //call_function(cmd_table[i].fun, argc, (char**) argv_pointer);
                 			break;
             			}
             			else if(i == (SHELL_CMD_NUM - 1)) 	{
             				printf("%s: command not found\n", (char*)cmd);
             			}else {
             				if((strncmp(cmd,"./",2)) == 0 ) {
-        					call_loader = (void(*)(int,char **))(cmd_run);
-						call_loader(argc, (char**) argv_pointer);
-						//call_function(cmd_run, argc, (char**) argv_pointer);
-						break;
-        				}
+        					    call_loader = (void(*)(int,char **))(cmd_run);
+						        call_loader(argc, (char**) argv_pointer);
+						        //call_function(cmd_run, argc, (char**) argv_pointer);
+						        break;
+        				    }
             			
             			}
             		}
@@ -244,7 +246,11 @@ int cmd_time(int argc,char **argv)
 }
 int cmd_shutdown(int argc,char **argv)
 {
-	__asm__ __volatile__("int $0x72"::"d"(8),"c"(4));
+	//__asm__ __volatile__("int $0x72"::"d"(8),"c"(4));
+    struct communication commun, commun2;
+    commun.type = COMMUN_TYPE_POWEROFF;
+    communication(&commun, &commun2);
+    printf("%s", commun2.message);
 	return 0;
 }
 int cmd_rename(int argc,char **argv)
@@ -258,7 +264,11 @@ int cmd_rename(int argc,char **argv)
 }
 int cmd_reboot(int argc,char **argv)
 {
-    	__asm__ __volatile__("int $0x72"::"d"(8),"c"(3));
+    //__asm__ __volatile__("int $0x72"::"d"(8),"c"(3));
+    struct communication commun, commun2;
+    commun.type = COMMUN_TYPE_REBOOT;
+    communication(&commun, &commun2);
+    printf("%s", commun2.message);
    	return 0;
 }
 int cmd_new(int argc,char **argv)
@@ -308,8 +318,15 @@ int cmd_help(int argc,char **argv)
 }
 int cmd_exit(int argc,char **argv)
 {
-	//puts("Function not implemented\n");
-	//exit(0);
+    unsigned long pid = 0;
+    // getpid2()
+    __asm__ __volatile__("int $0x72":"=a"(pid):"d"(1),"c"(1234));
+
+    struct communication commun, commun2;
+    commun.type = COMMUN_TYPE_EXIT;
+    commun.pid = pid;
+    communication(&commun, &commun2);
+    printf("%s", commun2.message);
 
 	return 0;
 }
@@ -341,7 +358,8 @@ int cmd_del(int argc,char **argv)
 }
 int cmd_date(int argc,char **argv)
 {
-	puts("Function not implemented\n");
+
+    puts("Function not implemented\n");
 
 	return 0;
 }
