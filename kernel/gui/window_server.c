@@ -9,7 +9,7 @@ extern int launcher;
 extern int screan_spin_lock;
 
 int w_remove_spinlock;
-int window_putchar( unsigned short int c, unsigned char color, WINDOW *window, FILE *fd);
+int window_putchar( unsigned short int c, unsigned char color, WINDOW *window);
 void window_server(){
 
     w_remove_spinlock = 0;
@@ -62,7 +62,7 @@ void window_server(){
                 if(c != EOF && c != 0){
                     while(*(unsigned char *)&w->spinlock != 0){};
 		            *(unsigned char *)&w->spinlock = 1;
-                    window_putchar( c &0xff, (c >> 8) &0xff, w, (FILE *)w->stdout);
+                    window_putchar( c &0xff, (c >> 8) &0xff, w);
                     *(unsigned char *)&w->spinlock = 0;
                 }
             }
@@ -131,12 +131,10 @@ void drawline(int x1, int y1, int x2, int y2, int rgb, WINDOW *w)
 	}	
 }
 
-static int window_putchar_scroll(WINDOW *window, FILE *fd){
+static int window_putchar_scroll(WINDOW *window){
     WINDOW *w = (WINDOW*)window;
     if(!w)return 0;
 
-    int bsize = fd->bsize;
-    int fsize = fd->fsize;
     unsigned short *buffer = (unsigned short *)w->terminal_buffer;
 
     // clear
@@ -149,10 +147,9 @@ static int window_putchar_scroll(WINDOW *window, FILE *fd){
 
     for(i=w->chcounter; i > 0; --i){
         unsigned short val = *c++;
-        unsigned char a = val &0xff;
-        unsigned char b = (val >> 8) &0xff;
+        unsigned char ch = val &0xff;
 
-        if( a == '\n' || b == '\n' ){
+        if( ch == '\n'){
             if(!scrolly)
                 break;
 
@@ -198,7 +195,7 @@ static int window_putchar_scroll(WINDOW *window, FILE *fd){
     return (int)(w->scrolly + 1);
 }
 
-int window_putchar( unsigned short int c, unsigned char color, WINDOW *window, FILE *fd)
+int window_putchar( unsigned short int c, unsigned char color, WINDOW *window)
 {
 
 	WINDOW *w = (WINDOW*)window;
@@ -261,16 +258,12 @@ int window_putchar( unsigned short int c, unsigned char color, WINDOW *window, F
             if(w->cx >= limitx) {
 		        w->cx =0;
 		        w->cy++;
-
-                fd->curp = (unsigned char*)(fd->buffer + (fd->off2-2)+ 0);
-	            *(unsigned char*)(fd->curp) = ' ';
-
-                fd->curp = (unsigned char*)(fd->buffer + (fd->off2-2)+ 1);
-	            *(unsigned char*)(fd->curp) = 0xFF;
+                buf[w->chcounter] = '\n' | 0xFF << 8;
+                w->chcounter++;
 	        }
  
             if(w->cy >= limity){
-		        w->scrolly = window_putchar_scroll(window,fd);	
+		        w->scrolly = window_putchar_scroll(window);	
 	        }
         }
 
@@ -300,7 +293,7 @@ int window_putchar( unsigned short int c, unsigned char color, WINDOW *window, F
 	}
  
     if(w->cy >= limity){
-		w->scrolly = window_putchar_scroll(window,fd);
+		w->scrolly = window_putchar_scroll(window);
 	}
 	return c;
 }

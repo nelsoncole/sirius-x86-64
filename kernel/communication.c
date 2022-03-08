@@ -29,27 +29,27 @@ int commun_switch(struct communication *commun, struct communication *ret)
 
     switch(commun->type){
         case COMMUN_TYPE_REBOOT:
-            strcpy(&ret->message,"reboot\n" );
+            strcpy((char*)ret->message,"reboot\n" );
             reboot();
             return 0;
         case COMMUN_TYPE_POWEROFF:
-            strcpy(&ret->message,"poweroff\n" );
+            strcpy((char*)ret->message,"poweroff\n" );
             poweroff();
             return 0;
         case COMMUN_TYPE_EXIT:
-            strcpy(&ret->message,"exit\n" );
+            strcpy((char*)ret->message,"exit\n" );
             thread = get_thread(commun->pid);
-			exit(0, thread);
+            exit(0, thread);
             return 0;
         case COMMUN_TYPE_FOCO:
-            strcpy(&ret->message,"foco\n" );
+            strcpy((char*)ret->message,"foco\n" );
             foco(commun->pid,commun->apid);
             return 0;
         case COMMUN_TYPE_EXEC:
-            strcpy(&ret->message,"exective\n" );
+            strcpy((char*)ret->message,"exective\n" );
             return 0;
         case COMMUN_TYPE_EXEC_CHILD:
-            strcpy(&ret->message,"exective child\n" );
+            strcpy((char*)ret->message,"exective child\n" );
             return 0;
     }
 

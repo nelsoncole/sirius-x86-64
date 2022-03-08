@@ -61,7 +61,7 @@ int std_putc (int c, FILE *fp)
     }
 
     if(fp->flags == 2/*stdin*/) {
-        std_putc (c,_stdout);
+        //std_putc (c,_stdout);
     }
 
     if(fp->flags == 3/*stdout*/) {
