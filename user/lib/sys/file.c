@@ -9,9 +9,8 @@ int stdputc_r (int c, FILE *fp)
 	
 	if(fp->level >= fp->bsize || fp->off >= fp->bsize) {
 
-		fp->off = fp->off2 = 0;
+		fp->off = 0;
 		fp->level = 0;
-        fp->fsize = 0;
 	}
 	
 	
@@ -55,15 +54,20 @@ int stdputc_r (int c, FILE *fp)
 int stdgetc_r(FILE *fp)
 {	
 	int r = 0;
+
+    if(fp->off2 >= fp->bsize) {
+	
+		fp->off2 = 0;
+	}
 	
 	if(fp->flags == 2 ) { // stdin
 
-		fp->off2++;
+		while(fp->off <= fp->off2 && fp->off >= fp->off2){} // wait
 		
-		while(fp->off < fp->off2)__asm__ __volatile__ ("pause"); // TODO wait
-		
-		fp->curp = (unsigned char*)(fp->buffer + fp->off2 - 1);
+		fp->curp = (unsigned char*)(fp->buffer + fp->off2);
 		r = *(unsigned char*)(fp->curp) &0xff;
+
+        fp->off2++;
 
         //stdputc_r (r, stdout);		
 
@@ -80,9 +84,8 @@ int stdgetc_r(FILE *fp)
 		fp->off2++;
 
 	}else if(fp->flags == 3){ // stdout
-        if(!fp->off) return EOF;
 
-		if(fp->off2 >= fp->off ) return EOF;
+		if(fp->off2 == fp->off ) return EOF;
 
 		fp->curp = (unsigned char*)(fp->buffer + fp->off2);
 		r = *(unsigned char*)(fp->curp) &0xff;

@@ -966,85 +966,85 @@ Linker script and memory map
                 0x0000000000422ceb                drawline
                 0x0000000000423022                window_putchar
  .text          0x0000000000423643        0x0 font8x16.o
- .text          0x0000000000423643      0x559 std.o
+ .text          0x0000000000423643      0x556 std.o
                 0x0000000000423643                std_open_file
                 0x00000000004237f2                std_file_close
                 0x0000000000423861                std_putc
-                0x00000000004239f5                std_getc
- .text          0x0000000000423b9c      0xaaa cfs.o
-                0x0000000000423b9c                filename_cmp
-                0x0000000000423c83                read_super_block
-                0x0000000000423cec                read_directory_entry
-                0x0000000000423e77                open_file_r
-                0x00000000004241f8                open_file
-                0x000000000042445f                file_close
-                0x0000000000424568                file_read_block
- .text          0x0000000000424646      0x2ed pipe.o
-                0x0000000000424646                pipe_open_file
-                0x0000000000424732                pipe_write
-                0x0000000000424836                pipe_read
- .text          0x0000000000424933      0xfc3 socket.o
-                0x0000000000424972                init_socket
-                0x0000000000424bf2                socket_address
-                0x0000000000424c54                socket
-                0x0000000000424dd3                socket_server_transmit
-                0x0000000000425496                socket_execute_row
-                0x0000000000425756                socket_server_receive
- .text          0x00000000004258f6      0x2b2 elf.o
-                0x00000000004258f6                load_elf64_header
-                0x0000000000425ac9                load_elf64_segment
- .text          0x0000000000425ba8      0x224 bind.o
-                0x0000000000425be7                bind
- .text          0x0000000000425dcc       0x5d inet.o
-                0x0000000000425dcc                inet_addr
- .text          0x0000000000425e29      0x169 recvfrom.o
-                0x0000000000425e29                recvfrom
- .text          0x0000000000425f92      0x14e sendto.o
-                0x0000000000425f92                sendto
- .text          0x00000000004260e0      0x2b3 string.o
-                0x00000000004260e0                memset
-                0x0000000000426145                memcpy
-                0x00000000004261bc                strcpy
-                0x0000000000426237                strlen
-                0x0000000000426283                strcmp
-                0x000000000042631d                memcmp
- .text          0x0000000000426393      0x4e4 vsprintf.o
-                0x00000000004263ff                vsprintf
- .text          0x0000000000426877      0x818 stdio.o
-                0x0000000000426877                putchar
-                0x00000000004268d7                puts
-                0x0000000000426967                printf
-                0x0000000000426a94                fopen
-                0x0000000000426bb5                fclose
-                0x0000000000426c59                rewind
-                0x0000000000426cc2                fseek
-                0x0000000000426da0                ftell
-                0x0000000000426de1                fputc
-                0x0000000000426e5f                fgetc
-                0x0000000000426fd2                fread
- .text          0x000000000042708f      0x4fb stdlib.o
-                0x000000000042708f                malloc
-                0x00000000004270fe                free
-                0x000000000042714a                i2hex
-                0x00000000004273b8                utoa
-                0x0000000000427443                itoa
- .text          0x000000000042758a      0x14a sse_memcpy.o
-                0x000000000042758a                sse_memcpy
- .text          0x00000000004276d4      0x140 panic.o
-                0x00000000004276d4                kernel_panic
- .text          0x0000000000427814      0xa9d msi.o
-                0x0000000000427814                msi_vector_install
-                0x0000000000427e6e                default_mas
-                0x0000000000427ecd                msi_function
-                0x0000000000427f83                apic_send_msi
-                0x000000000042827e                apic_send_msix
- .text          0x00000000004282b1      0x6f6 communication.o
-                0x0000000000428343                commun_switch
-                0x0000000000428769                kernel_thread_communication
- .text          0x00000000004289a7      0x1e4 argv.o
-                0x0000000000428a5c                format_argv
+                0x00000000004239d9                std_getc
+ .text          0x0000000000423b99      0xaaa cfs.o
+                0x0000000000423b99                filename_cmp
+                0x0000000000423c80                read_super_block
+                0x0000000000423ce9                read_directory_entry
+                0x0000000000423e74                open_file_r
+                0x00000000004241f5                open_file
+                0x000000000042445c                file_close
+                0x0000000000424565                file_read_block
+ .text          0x0000000000424643      0x2e7 pipe.o
+                0x0000000000424643                pipe_open_file
+                0x000000000042472f                pipe_write
+                0x0000000000424833                pipe_read
+ .text          0x000000000042492a      0xfc3 socket.o
+                0x0000000000424969                init_socket
+                0x0000000000424be9                socket_address
+                0x0000000000424c4b                socket
+                0x0000000000424dca                socket_server_transmit
+                0x000000000042548d                socket_execute_row
+                0x000000000042574d                socket_server_receive
+ .text          0x00000000004258ed      0x2b2 elf.o
+                0x00000000004258ed                load_elf64_header
+                0x0000000000425ac0                load_elf64_segment
+ .text          0x0000000000425b9f      0x224 bind.o
+                0x0000000000425bde                bind
+ .text          0x0000000000425dc3       0x5d inet.o
+                0x0000000000425dc3                inet_addr
+ .text          0x0000000000425e20      0x169 recvfrom.o
+                0x0000000000425e20                recvfrom
+ .text          0x0000000000425f89      0x14e sendto.o
+                0x0000000000425f89                sendto
+ .text          0x00000000004260d7      0x2b3 string.o
+                0x00000000004260d7                memset
+                0x000000000042613c                memcpy
+                0x00000000004261b3                strcpy
+                0x000000000042622e                strlen
+                0x000000000042627a                strcmp
+                0x0000000000426314                memcmp
+ .text          0x000000000042638a      0x4e4 vsprintf.o
+                0x00000000004263f6                vsprintf
+ .text          0x000000000042686e      0x818 stdio.o
+                0x000000000042686e                putchar
+                0x00000000004268ce                puts
+                0x000000000042695e                printf
+                0x0000000000426a8b                fopen
+                0x0000000000426bac                fclose
+                0x0000000000426c50                rewind
+                0x0000000000426cb9                fseek
+                0x0000000000426d97                ftell
+                0x0000000000426dd8                fputc
+                0x0000000000426e56                fgetc
+                0x0000000000426fc9                fread
+ .text          0x0000000000427086      0x4fb stdlib.o
+                0x0000000000427086                malloc
+                0x00000000004270f5                free
+                0x0000000000427141                i2hex
+                0x00000000004273af                utoa
+                0x000000000042743a                itoa
+ .text          0x0000000000427581      0x14a sse_memcpy.o
+                0x0000000000427581                sse_memcpy
+ .text          0x00000000004276cb      0x140 panic.o
+                0x00000000004276cb                kernel_panic
+ .text          0x000000000042780b      0xa9d msi.o
+                0x000000000042780b                msi_vector_install
+                0x0000000000427e65                default_mas
+                0x0000000000427ec4                msi_function
+                0x0000000000427f7a                apic_send_msi
+                0x0000000000428275                apic_send_msix
+ .text          0x00000000004282a8      0x6f6 communication.o
+                0x000000000042833a                commun_switch
+                0x0000000000428760                kernel_thread_communication
+ .text          0x000000000042899e      0x1e4 argv.o
+                0x0000000000428a53                format_argv
                 0x0000000000429000                . = ALIGN (0x1000)
- *fill*         0x0000000000428b8b      0x475 
+ *fill*         0x0000000000428b82      0x47e 
 
 .iplt           0x0000000000429000        0x0
  .iplt          0x0000000000429000        0x0 setup.o

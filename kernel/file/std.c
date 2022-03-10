@@ -50,9 +50,8 @@ int std_putc (int c, FILE *fp)
 	
 	if(fp->level >= fp->bsize || fp->off >= fp->bsize) {
 
-		fp->off = fp->off2 = 0;
+		fp->off = 0;
 		fp->level = 0;
-        fp->fsize = 0;
 	}
 	
 	
@@ -91,14 +90,19 @@ int std_getc (FILE *fp)
 	int r = 0;
 	if(!fp->fsize) return EOF;
 
+    if(fp->off2 >= fp->bsize) {
+	
+		fp->off2 = 0;
+	}
+
 	if(fp->flags == 2 ) { // stdin
 
-		fp->off2++;
-		while(fp->off < fp->off2) pause(); // wait
+        while(fp->off <= fp->off2 && fp->off >= fp->off2) pause(); // wait
 		
-		
-		fp->curp = (unsigned char*)(fp->buffer + fp->off2 - 1);
+		fp->curp = (unsigned char*)(fp->buffer + fp->off2);
 		r = *(unsigned char*)(fp->curp) &0xff;
+
+        fp->off2++;
 
 	}else if(fp->flags == 4)  { // stderr
 
@@ -114,9 +118,7 @@ int std_getc (FILE *fp)
 
 	}else if(fp->flags == 3){ // stdout
 
-        if(!fp->off) return EOF;
-
-		if(fp->off2 >= fp->off ) return EOF;
+		if(fp->off2 == fp->off ) return EOF;
 
 		fp->curp = (unsigned char*)(fp->buffer + fp->off2);
 		r = *(unsigned short*)(fp->curp) &0xffff;

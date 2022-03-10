@@ -87,6 +87,6 @@ install:
 	
 push:
 	git add ./
-	git commit -m "scroll no terminal virtual"	
+	git commit -m "removendo os bugs..."	
 	git push -u origin main
 	

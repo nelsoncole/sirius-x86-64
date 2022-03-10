@@ -46,7 +46,7 @@ int pipe_read ( void *buf, FILE *fp)
 	    fp->off2 = 0;
 	}
 		
-	while(fp->off <= fp->off2 || ( (int)fp->off - (int)fp->off2 ) < 0) pause(); // wait
+	while(fp->off <= fp->off2 && fp->off >= fp->off2) pause(); // wait
 		
 	for(i=0 ; i < PIPE_SIZE; i ++){
 	
