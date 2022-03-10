@@ -100,19 +100,24 @@ int stdgetc_r(FILE *fp)
 
 int getkey() {
 
-	FILE *fp = stdin;	
+	FILE *fp = stdin;
+
+    if(fp->off2 >= fp->bsize) {
+	
+		fp->off2 = 0;
+	}	
 
 	int r = 0;
 	
 	if(fp->flags == 2 ) { // stdin
 
 		
-		if(fp->off <= fp->off2) return 0;
+		if(fp->off <= fp->off2 && fp->off >= fp->off2) return 0;
 		
 		fp->curp = (unsigned char*)(fp->buffer + fp->off2);
 		r = *(unsigned char*)(fp->curp) &0xff;
-		
-		fp->off2 ++;
+
+        fp->off2++;
 		
 		// if(r == EOF) r = 0;
 	}
@@ -127,16 +132,21 @@ int getkeyw() {
 	FILE *fp = stdin;	
 
 	int r = 0;
+
+    if(fp->off2 >= fp->bsize) {
+	
+		fp->off2 = 0;
+	}
 	
 	if(fp->flags == 2 ) { // stdin
 
 		
-		fp->off2++;
+		while(fp->off <= fp->off2 && fp->off >= fp->off2){} // wait
 		
-		while(fp->off < fp->off2)__asm__ __volatile__ ("pause"); // TODO wait
-		
-		fp->curp = (unsigned char*)(fp->buffer + fp->off2 - 1);
+		fp->curp = (unsigned char*)(fp->buffer + fp->off2);
 		r = *(unsigned char*)(fp->curp) &0xff;
+
+        fp->off2++;
 		
 		// if(r == EOF) r = 0;
 	}

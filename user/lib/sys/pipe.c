@@ -74,7 +74,7 @@ int pipe_read_2x ( void *buf, FILE *fp)
 	}
 	
 
-    if(fp->off <= fp->off2 || ( (int)fp->off - (int)fp->off2 ) < 0){
+    if(fp->off <= fp->off2 && fp->off >= fp->off2){
         return 0;
     }
 		
