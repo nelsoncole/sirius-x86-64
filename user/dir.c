@@ -5,6 +5,8 @@
 #include <file.h>
 
 
+extern void term_color(int fg, int bg);
+
 int dir(){
 
  directory_entry_t *d = (directory_entry_t *) malloc(0x2000);

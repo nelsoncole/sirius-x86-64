@@ -87,7 +87,6 @@ void handler_ethernet_package_received(){
     ether_header_t *eh;
     arp_header_t *arp;
     ipv4_header_t *ipv4;
-    ipv4_header_t *ipv4_cp;
     udp_header_t *udp;
     tcp_header_t *tcp;
 

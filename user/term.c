@@ -83,7 +83,7 @@ void main() {
         commun.type = COMMUN_TYPE_EXEC_CHILD;
         commun.pid = pid;
         unsigned long *addr = (unsigned long*)((unsigned long)&commun.message);
-        addr[0] = app_memory;
+        addr[0] = (unsigned long)((unsigned long*)app_memory);
         strcpy( (char*)&addr[1],pwd);
         char *arg = (char*)&addr[1];
         arg += strlen(pwd) + 1;

@@ -21,6 +21,7 @@ ssize_t sendto(int socket, const void *message, size_t length, int flags,
     struct sockaddr_in saddr;
     memcpy((char*)&saddr, dest_addr, dest_len);
 
+
     // espera terminar
     while(fd->flags&0x1){};
 

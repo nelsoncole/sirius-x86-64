@@ -362,9 +362,8 @@ unsigned long alloc_pages(int type, unsigned len, unsigned long *addr)
 {
 	if(!len) return 0;
 
-	while(alloc_spin_lock){}
-
-	alloc_spin_lock++;
+	/*while(alloc_spin_lock){}
+	alloc_spin_lock++;*/
 
 	pae_page_table_t *pte = alloc_pte;
 
@@ -385,7 +384,7 @@ unsigned long alloc_pages(int type, unsigned len, unsigned long *addr)
 
     *(unsigned long*)(addr) = (ALLOC_PAGE_MEMORY + (index * 0x1000));
 
-    alloc_spin_lock = 0;
+    //alloc_spin_lock = 0;
     return len;
 
 }
@@ -394,9 +393,8 @@ void free_pages(void *addr)
 {
 	if(!addr || 0)return;
 
-    while(alloc_spin_lock){}
-
-	alloc_spin_lock++;
+    /*while(alloc_spin_lock){}
+	alloc_spin_lock++;*/
 
 	pae_page_table_t *pte = alloc_pte;
     
@@ -426,7 +424,7 @@ void free_pages(void *addr)
         pte++;
     }
 
-    alloc_spin_lock = 0;
+   // alloc_spin_lock = 0;
 }
 
 

@@ -45,6 +45,7 @@ in_addr_t	inet_lnaof(struct in_addr in){
 struct in_addr	inet_makeaddr(in_addr_t net, in_addr_t lna){
 
     struct in_addr nul;
+    memset(&nul, 0, sizeof(struct in_addr));
     return nul;
 }
 

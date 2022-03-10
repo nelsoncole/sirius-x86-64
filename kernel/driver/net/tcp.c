@@ -18,6 +18,8 @@ int init_tcp(){
     alloc_pages(0, 8, (unsigned long*)&addr);
     queue_conn = (struct tcp_connect *)addr;
     memset(queue_conn,0, 8*0x1000);
+
+    return 0;
 }
 
 int tcp_send(unsigned int src_address, unsigned int dst_address,

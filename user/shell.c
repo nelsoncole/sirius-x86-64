@@ -137,7 +137,7 @@ static int cmd_run(int argc,char **argv)
         commun.type = COMMUN_TYPE_EXEC_CHILD;
         commun.pid = pid;
         unsigned long *addr = (unsigned long*)((unsigned long)&commun.message);
-        addr[0] = app_memory;
+        addr[0] = (unsigned long)((unsigned long*)app_memory);
         strcpy( (char*)&addr[1],pwd);
         char *arg = (char*)&addr[1];
         arg += strlen(pwd) + 1;
@@ -183,6 +183,7 @@ int set_argv(char *s)
 void shell() {
 
     app_memory = (char*)malloc(0x80000); // 512
+    
 	
 	int argc = 0;
 	char *argv = (char*) malloc(0x1000);
@@ -190,8 +191,8 @@ void shell() {
 	path = malloc(128);
 	_v_ = (unsigned long)malloc(COUNT_ARGV*8 + 256*COUNT_ARGV + 8);
 	
-	while(1) 		{
-	
+	while(1) {
+
 		memset((char*)argv_pointer, 0, sizeof(unsigned long)*COUNT_ARGV);
 		memset(argv,0,0x1000);
 		sprintf(name, "<%s> ~ $",getenv("PWD"));

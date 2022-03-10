@@ -97,9 +97,9 @@ int commun_switch(struct communication *commun, struct communication *ret)
             {	// error
 				thread = get_thread(pid);
 				pipe_write ( pipe, thread->pipe);
+                
 			}
 			sti();
-
             return 0;
     }
 
@@ -139,7 +139,7 @@ void kernel_thread_communication(){
 
         commun_switch(commun, commun2);
         ssize_t count = sendto(sd, commun2, sizeof(struct communication), 0, (struct sockaddr*)&serb, sizeof(struct sockaddr_in));
-
+        
     }
 
 }

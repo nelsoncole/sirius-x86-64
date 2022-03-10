@@ -242,7 +242,7 @@ static int app_execute(int index, WINDOW *w)
         commun.pid = 0;
         commun.apid = app_id;
         unsigned long *addr = (unsigned long*)((unsigned long)&commun.message);
-        addr[0] = app_memory;
+        addr[0] = (unsigned long)((unsigned long*)app_memory);
         //addr[1] = pwd;
         strcpy( (char*)&addr[1],pwd);
         communication(&commun, &commun2);

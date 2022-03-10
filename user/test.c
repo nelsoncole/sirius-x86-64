@@ -15,8 +15,10 @@ char bf[4096];
 int main(int argc, char **argv) {
 
     for(int i=0; i < argc; i++){
-        printf("%s\n",argv[i]);
+        //printf("%s\n",argv[i]);
     }
+
+    printf("Halla Madrid!\n");
 
     return 0;
 

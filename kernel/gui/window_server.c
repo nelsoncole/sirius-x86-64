@@ -86,7 +86,8 @@ void put_pixel_sirius(long x, long y, unsigned int scanline,unsigned int color, 
 	
 	if(x >= scanline || y >= w->ry) return;
 	
-	unsigned int *buf = (unsigned int*)((unsigned long)&w->start);
+    unsigned long addr = (unsigned long)((unsigned long*)&w->start);
+	unsigned int *buf = (unsigned int*)addr;
 
 	*(unsigned int*)((unsigned int*)buf + (scanline * y) + x) = color;
 	

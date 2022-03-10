@@ -244,7 +244,7 @@ void wcl(WINDOW *w) {
 
     short pipe_ptr[8] = {0,0,0,0,0,0,0,0};
 
-    __pipe_t *pipe = &pipe_ptr;
+    __pipe_t *pipe = (__pipe_t *) ((unsigned long *)&pipe_ptr);
 
 	pipe->id = PIPE_WINDOW_REGISTER;
     pipe->r1 = id &0xffff;

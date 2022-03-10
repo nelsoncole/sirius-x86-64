@@ -87,6 +87,6 @@ install:
 	
 push:
 	git add ./
-	git commit -m "removendo os bugs..."	
+	git commit -m "removendo o spinlock do alloc_page()"	
 	git push -u origin main
 	
