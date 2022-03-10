@@ -221,7 +221,6 @@ WINDOW *window(const char *title,int x, int y, int width, int height, int fg, in
 
 
     // rodapé
-    
     drawline( 3, w->height - WROD_SIZE - 3 , w->width-6 , WROD_SIZE, 0xC0C0C0, w);
 
 	return (w);
@@ -266,69 +265,3 @@ void __window_clear(WINDOW *w)
     w->terminal_clear = 1;
 }
 
-int __window_putchar( unsigned short int c)
-{
-
-	WINDOW *w = (WINDOW*) __window;
-	
-	//w->font.buf = (unsigned long)font8x16;
-
-	int limitx = (w->area_width-4)/w->font.x;
-	int limity = (w->area_height-4)/w->font.y;
-	
-	w->font.fg_color = w->text_fg;
-
-	if(w->cx >= limitx) {
-		w->cx =0;
-		w->cy++;
-	}
-		
-	if(w->cy >= limity){
-	
-		//scroll();
-		w->cy = w->cx =0;
-		__window_clear(w);
-		return c;
-		
-	}
-
-	if(c == '\b' && (w->cx > 0))
-	{
-		w->cx--;
-		drawchar(' ', 4 + w->area_x + w->font.x*w->cx, 4 + w->area_y + w->font.y*w->cy, 
-		w->font.fg_color, w->font.bg_color, &w->font, w);
-		//w->cx++;
-	} else if(c == '\t') {
-		w->cx += 8;
-		
-	} else if(c == '\n') {
-	
-		w->cx = 0;
-		w->cy++;
-		
-	} else if(c >= ' ') {
-	
-		drawchar( c, 4 + w->area_x + w->font.x*w->cx, 4 + w->area_y + w->font.y*w->cy, 
-		w->font.fg_color, w->font.bg_color, &w->font, w);
-		w->cx++;
-	}
-	
-	return c;
-}
-
-
-void color(int rgb){
-
-	WINDOW *w = (WINDOW*) __window;
-
-	w->text_fg = rgb;
-}
-
-
-void __window_puts(char* s)
-{
-	if(!s)return;
-	 
-	char *tmp_s = s; 
-	while(*tmp_s)__window_putchar(*tmp_s++);
- }

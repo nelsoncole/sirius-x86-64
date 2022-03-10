@@ -22,6 +22,9 @@ struct socket
 
     unsigned short  dest_port;
     unsigned int    dest_ip;
+    // receive
+    unsigned short  recv_dest_port;
+    unsigned int    recv_dest_ip;
 
     // For TCP
     unsigned char   protocol_flags;
@@ -195,14 +198,14 @@ ssize_t recvfrom(int socket, void *buffer, size_t length,
         return 0;
 
     // pooling
-    while(!(fd->flags&0x2));
+    while((fd->flags&0x2) == 0){};
 
     *address_len = sizeof(struct sockaddr_in);
 
     struct sockaddr_in saddr;
     saddr.sin_family = fd->domain;
-    saddr.sin_port = fd->dest_port;
-    saddr.sin_addr.s_addr = fd->dest_ip;
+    saddr.sin_port = fd->recv_dest_port;
+    saddr.sin_addr.s_addr = fd->recv_dest_ip;
     memcpy(address, (char*)&saddr, *address_len);
 
     if(fd->length1 < length){
@@ -210,7 +213,6 @@ ssize_t recvfrom(int socket, void *buffer, size_t length,
     }
 
     memcpy(buffer, (char*)fd->buf1 ,length);
-
 
     // clean    
     fd->flags &=~0x2;
@@ -289,7 +291,6 @@ ssize_t sendto(int socket, const void *message, size_t length, int flags,
     fd->flags |= 0x1;
     // polling
     while(fd->flags&0x1);
-
 
     return length;
 }

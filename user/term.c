@@ -6,6 +6,8 @@
 
 #include <pipe.h>
 
+#include <sys/communication.h>
+
 
 #define ID_MENU_FILE 	(0x10 + 0)
 #define ID_MENU_EXIT 	(ID_MENU_FILE + 4)
@@ -34,6 +36,11 @@ void main() {
     w->stderr = (unsigned long)stderr;
     w->terminal_buffer =(unsigned long)malloc(0x10000); // 64KiB
     memset((void*)w->terminal_buffer, 0, 0x10000);
+
+    w->t_x = w->area_x; 
+    w->t_y = w->area_y;
+    w->t_w = w->area_width-8;
+    w->t_h = w->area_height;
     w->terminal = 0x1234; 
 	
 	menubox(w, &menu_file, "File\0",0,0, 8*5, 24, ID_MENU_FILE);
@@ -65,9 +72,23 @@ void main() {
         fread (app_memory, 1, size, fp);
 	    fclose(fp);
 
-        __asm__ __volatile__("movq %%rax,%%r8;"
+        /*__asm__ __volatile__("movq %%rax,%%r8;"
 	    " int $0x72;"
-	    ::"d"(8),"D"(app_memory),"S"(0),"c"(1), "a"(pwd)); // fork
+	    ::"d"(8),"D"(app_memory),"S"(0),"c"(1), "a"(pwd)); // fork*/
+        unsigned long pid = 0;
+        // getpid()
+        __asm__ __volatile__("int $0x72":"=a"(pid):"d"(1),"c"(0));
+        struct communication commun, commun2;
+        memset((char*)&commun, 0, sizeof(struct communication));
+        commun.type = COMMUN_TYPE_EXEC_CHILD;
+        commun.pid = pid;
+        unsigned long *addr = (unsigned long*)((unsigned long)&commun.message);
+        addr[0] = app_memory;
+        strcpy( (char*)&addr[1],pwd);
+        char *arg = (char*)&addr[1];
+        arg += strlen(pwd) + 1;
+        strcpy( arg, path);
+        communication(&commun, &commun2);
 
     }else {
         printf("fopen error: \'%s\'\n", path);

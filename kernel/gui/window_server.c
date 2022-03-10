@@ -138,7 +138,7 @@ static int window_putchar_scroll(WINDOW *window){
     unsigned short *buffer = (unsigned short *)w->terminal_buffer;
 
     // clear
-    drawline(w->area_x , w->area_y, w->area_width, w->area_height, w->bg, w);
+    drawline(w->t_x , w->t_y, w->t_w, w->t_h, w->bg, w);
 
     // eliminar linha...
     unsigned short *c = buffer;
@@ -179,7 +179,7 @@ static int window_putchar_scroll(WINDOW *window){
                 if((color&0xf) < 16 && (color&0xf) != 0 )
                     fg = color_table[(color&0xf)];
 
-		        drawchar( ch, 4 + w->area_x + w->font.x*w->cx, 4 + w->area_y + w->font.y*w->cy, 
+		        drawchar( ch, 4 + w->t_x + w->font.x*w->cx, 4 + w->t_y + w->font.y*w->cy, 
 		        fg, bg, &w->font, w);
                 
 		        w->cx++;
@@ -190,7 +190,7 @@ static int window_putchar_scroll(WINDOW *window){
     }
 
     w->cx =0;
-    w->cy = ((w->area_height-4)/w->font.y) -1;
+    w->cy = ((w->t_h-4)/w->font.y) -1;
 
     return (int)(w->scrolly + 1);
 }
@@ -203,15 +203,15 @@ int window_putchar( unsigned short int c, unsigned char color, WINDOW *window)
 
     unsigned short *buf = (unsigned short *)w->terminal_buffer;
 	
-	int limitx = (w->area_width-4)/w->font.x;
-	int limity = (w->area_height-4)/w->font.y;
+	int limitx = (w->t_w-4)/w->font.x;
+	int limity = (w->t_h-4)/w->font.y;
 	
 	w->font.fg_color = w->text_fg;
 
     if((w->chcounter*2) >= 0x10000 || w->terminal_clear == 1){
         //clear
         w->terminal_clear = 0;
-        drawline(w->area_x , w->area_y, w->area_width, w->area_height, w->bg, w);
+        drawline(w->t_x , w->t_y, w->t_w, w->t_h, w->bg, w);
         w->cx =0;
         w->cy =0;
         w->scrolly = 0;
@@ -231,7 +231,7 @@ int window_putchar( unsigned short int c, unsigned char color, WINDOW *window)
 
         w->chcounter--;
         buf[w->chcounter] =' ' | color << 8;
-		drawchar( ' ', 4 + w->area_x + w->font.x*w->cx, 4 + w->area_y + w->font.y*w->cy, 
+		drawchar( ' ', 4 + w->t_x + w->font.x*w->cx, 4 + w->t_y + w->font.y*w->cy, 
 		fg, bg, &w->font, w);
 		//w->cx++;
         
@@ -252,7 +252,7 @@ int window_putchar( unsigned short int c, unsigned char color, WINDOW *window)
         buf[w->chcounter] = c | color << 8;
         w->chcounter++;
         for(int i=0; i < 8; i++) {
-		    drawchar(' ', 4 + w->area_x + w->font.x*w->cx, 4 + w->area_y + w->font.y*w->cy, fg, bg, &w->font, w);
+		    drawchar(' ', 4 + w->t_x + w->font.x*w->cx, 4 + w->t_y + w->font.y*w->cy, fg, bg, &w->font, w);
 		    w->cx++;
 
             if(w->cx >= limitx) {
@@ -275,7 +275,7 @@ int window_putchar( unsigned short int c, unsigned char color, WINDOW *window)
         if((color&0xf) < 16 && (color&0xf) != 0 )
             fg = color_table[(color&0xf)];
 
-		drawchar( c, 4 + w->area_x + w->font.x*w->cx, 4 + w->area_y + w->font.y*w->cy, 
+		drawchar( c, 4 + w->t_x + w->font.x*w->cx, 4 + w->t_y + w->font.y*w->cy, 
 		fg, bg, &w->font, w);
 		w->cx++;
 

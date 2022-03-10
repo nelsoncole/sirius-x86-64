@@ -15,8 +15,14 @@ char *fgets (char *str,int length,FILE *fp)
 	
 	while(1){
 	
-		c = getc(fp);
+		c = getc_r(fp);
 		if(c == EOF) break;
+
+        if(fp->flags == 2) { // stdin
+		
+			if(c == '\b' && of < 1) /*ignora*/;
+			else putc_r (c, stdout);
+		}
 		
 		if(c == '\n'){
             *s ++ = c;

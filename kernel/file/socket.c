@@ -4,6 +4,8 @@
 #include <socket.h>
 #include <ethernet.h>
 
+#include <stdio.h>
+
 
 
 #define SOCKET_BUF_SIZE 8192
@@ -202,7 +204,6 @@ void socket_execute_row(){
 
         if((sockt_receive_row[i].status & 0x1))
         {
-            
             if(!socket_server_receive(1, sockt_receive_row[i].protocol, sockt_receive_row[i].src_ip,
                 sockt_receive_row[i].dest_ip, sockt_receive_row[i].src_port, sockt_receive_row[i].dest_port,
                 sockt_receive_row[i].buffer, sockt_receive_row[i].length, sockt_receive_row[i].seq,
@@ -226,7 +227,7 @@ int socket_server_receive(int origem, int protocol, unsigned int src_ip, unsigne
             if(saddr->domain == AF_INET || saddr->domain == AF_LOCAL){
                 if(saddr->src_port == dest_port){
                 
-                    if(saddr->flags&2){
+                    if(saddr->flags & 0x2){
                         // TODO despachar o pacote para fila
                         if(!origem){
                             socket_save_row(protocol, src_ip, dest_ip, src_port, dest_port, buffer, length, seq, ack, flags);
@@ -236,8 +237,8 @@ int socket_server_receive(int origem, int protocol, unsigned int src_ip, unsigne
 
                     dest_buf = (char*)saddr->buf1;
                     saddr->length1 = length;
-                    saddr->dest_ip = src_ip;
-                    saddr->dest_port = src_port;
+                    saddr->recv_dest_ip = src_ip;
+                    saddr->recv_dest_port = src_port;
 
                     if(IP_PROTOCOL_TCP == protocol ){
                         saddr->protocol_flags = flags;
@@ -247,6 +248,8 @@ int socket_server_receive(int origem, int protocol, unsigned int src_ip, unsigne
                         memcpy(dest_buf, buffer , length);
                     }
                     saddr->flags |= 2;
+                 
+
                     break;
                 }
             }

@@ -185,7 +185,6 @@ int pv,int argc, char **argv, char *pwd)
     new_thread->stdin = fopen (0, "stdin");
 	new_thread->stdout = fopen (0, "stdout");
 	new_thread->stderr = fopen (0, "stderr");
-	
 	new_thread->pipe = fopen (0, "pipe");
 	
 	new_thread->mouse = (mouse_t*) malloc(sizeof(mouse_t));

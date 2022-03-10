@@ -99,8 +99,8 @@ void fault_exception(int  n)
     VERBOSE = 1;
     gui->font.fg_color = 0xFF0000;
 
-	while(screan_spin_lock);
-	screan_spin_lock++;
+	while(screan_spin_lock){};
+	screan_spin_lock ++;
 
 	unsigned long cr2, cr3, cr4;
 	puts(exception_mensagem[n]);

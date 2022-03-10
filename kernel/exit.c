@@ -40,6 +40,7 @@ void user_free(THREAD *thr )
 	free_pages(tmp);
 }
 
+
 void exit(int rc, THREAD *thr) {
 
 	// A thread deve ser do user-space
@@ -51,12 +52,10 @@ void exit(int rc, THREAD *thr) {
 	 tmp = tmp->tail;
 	}
 	
-	
 	// enviar memsagem dizendo que terminou.
 	short pipe[8] = {0,0,0,0,0,0,0,0};
 	pipe[0] = 0x1001;
 	pipe_write ( pipe, thr->pipe);
-	
 
 	// dealocar todas as memorias
 	tmp = thr;

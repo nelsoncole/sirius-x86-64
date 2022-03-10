@@ -14,7 +14,7 @@ struct communication{
     unsigned long type;
     unsigned long pid;
     unsigned long apid;
-    unsigned char message[512-24];
+    unsigned char message[1024-24];
 };
 
 int communication(struct communication *commun, struct communication *ret);

@@ -65,7 +65,7 @@ int stdgetc_r(FILE *fp)
 		fp->curp = (unsigned char*)(fp->buffer + fp->off2 - 1);
 		r = *(unsigned char*)(fp->curp) &0xff;
 
-        stdputc_r (r, stdout);		
+        //stdputc_r (r, stdout);		
 
 	}else if(fp->flags == 4)  { // stderr
 

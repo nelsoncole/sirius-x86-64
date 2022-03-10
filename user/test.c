@@ -14,6 +14,12 @@ extern char* get_ip_from_name(char *addr, const char *name , int query_type);
 char bf[4096];
 int main(int argc, char **argv) {
 
+    for(int i=0; i < argc; i++){
+        printf("%s\n",argv[i]);
+    }
+
+    return 0;
+
     if(argc < 2) {
         printf("No IP...\n");
         return 0;

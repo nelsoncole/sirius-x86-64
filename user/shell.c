@@ -12,9 +12,8 @@
 extern void term_color(int fg, int bg);
 
 void shell();
-int main()
-{
-	
+int main(int argc, char **argv)
+{	
 	shell();
 	return 0;
 }
@@ -79,14 +78,14 @@ COMMAND cmd_table[] = {
 #define DEL "\t "
 
 void wait_exit(){
-
+    int i = 11;
+	
 	__pipe_t pipe[1];
 	memset(pipe,0 , 16);
-	
 	for(;;){
-	
-	 pipe_read ( pipe, __pipe__);
-	 if(pipe->id == 0x1001)  break;
+	    pipe_read ( pipe, __pipe__);
+
+	    if(pipe->id == 0x1001)  break;
 	
 	}
 
@@ -99,8 +98,6 @@ static int cmd_run(int argc,char **argv)
 
 	if(argc < 1) return - 1; 
  
-
-	//strcpy(path,"hello.bin\0");
 	char *a = argv[0];
 	a +=2;
 	
@@ -128,9 +125,24 @@ static int cmd_run(int argc,char **argv)
         fread (app_memory, 1, size, fp);
 	    fclose(fp);
 
-        __asm__ __volatile__("movq %%rax,%%r8;"
+        /*__asm__ __volatile__("movq %%rax,%%r8;"
 	    " int $0x72;"
-	    ::"d"(8),"D"(app_memory),"S"(_v_),"c"(1), "a"(pwd)); // fork
+	    ::"d"(8),"D"(app_memory),"S"(_v_),"c"(1), "a"(pwd)); // fork*/
+        unsigned long pid = 0;
+        // getpid()
+        __asm__ __volatile__("int $0x72":"=a"(pid):"d"(1),"c"(0));
+     
+        struct communication commun, commun2;
+        memset((char*)&commun, 0, sizeof(struct communication));
+        commun.type = COMMUN_TYPE_EXEC_CHILD;
+        commun.pid = pid;
+        unsigned long *addr = (unsigned long*)((unsigned long)&commun.message);
+        addr[0] = app_memory;
+        strcpy( (char*)&addr[1],pwd);
+        char *arg = (char*)&addr[1];
+        arg += strlen(pwd) + 1;
+        strcpy( arg, path);
+        communication(&commun, &commun2);
 
         wait_exit();
 
@@ -322,11 +334,11 @@ int cmd_exit(int argc,char **argv)
     // getpid2()
     __asm__ __volatile__("int $0x72":"=a"(pid):"d"(1),"c"(1234));
 
-    struct communication commun, commun2;
+    struct communication commun;
     commun.type = COMMUN_TYPE_EXIT;
     commun.pid = pid;
-    communication(&commun, &commun2);
-    printf("%s", commun2.message);
+    communication(&commun, &commun);
+    printf("%s", commun.message);
 
 	return 0;
 }

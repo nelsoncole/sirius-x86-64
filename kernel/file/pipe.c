@@ -14,7 +14,7 @@ FILE *pipe_open_file(const char *filename, const char *mode)
 	
 	fp->bsize 	= (unsigned) BUFSIZ;
 	fp->buffer 	= (unsigned char*) malloc(BUFSIZ);
-	fp->fsize	= BUFSIZ;
+	fp->fsize	= 0;
 	fp->mode 	= 0x2;
 	fp->flags	= 0x1;
 	
@@ -31,22 +31,23 @@ int pipe_write ( void *buf, FILE *fp)
 
 	int i=0;
 	unsigned char *us = (unsigned char*) buf;
-
-	for( ; i < PIPE_SIZE; i ++) {
-	
-		if(fp->level >= fp->bsize || fp->off >= fp->bsize) {
+    if(fp->level >= fp->bsize || fp->off >= fp->bsize) {
 		
 			fp->off = 0;
 			fp->level = 0;
-		}
-	
-		fp->curp = (unsigned char*)(fp->buffer + fp->off);
-		*(unsigned char*)(fp->curp) = *us ++ &0xff;
-
-		// Update offset
-		fp->off += 1;
-		fp->fsize += 1;
 	}
+
+
+	for(i=0; i < PIPE_SIZE; i++) {
+	
+		fp->curp = (unsigned char*)(fp->buffer + fp->off+i);
+		*(unsigned char*)(fp->curp) = (*us++) &0xff;
+
+	}
+
+    // Update offset
+	fp->off += PIPE_SIZE;
+	fp->fsize += PIPE_SIZE;
 	
 	return (i);
 
@@ -60,26 +61,23 @@ int pipe_read ( void *buf, FILE *fp)
 	int i=0;
 	unsigned char *us = (unsigned char*) buf;
 	
-	fp->off2 += PIPE_SIZE;
-	
 	if(fp->off2 >= fp->bsize) {
 	
-		fp->off2 = PIPE_SIZE;
+		fp->off2 = 0;
 	}
 		
-	while(fp->off < fp->off2);// pause(); // wait
+	while(fp->off <= fp->off2 || ( (int)fp->off - (int)fp->off2 ) < 0) pause(); // wait
+		
+	for(i=0 ; i < PIPE_SIZE; i ++){
 	
-	fp->off2 -= PIPE_SIZE;
 		
-	for( ; i < PIPE_SIZE; i ++){
-			
-		fp->curp = (unsigned char*)(fp->buffer + fp->off2);
-		*us ++ = *(unsigned char*)(fp->curp) &0xff;
-		
-		fp->off2 += 1;
+		fp->curp = (unsigned char*)(fp->buffer + fp->off2+i);
+		*us++ = *(unsigned char*)(fp->curp) &0xff;
 		
 	}
+    
+    fp->off2 += PIPE_SIZE;
+
 	return (i);
 }
-
 

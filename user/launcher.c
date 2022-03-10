@@ -234,9 +234,18 @@ static int app_execute(int index, WINDOW *w)
 	    }
 
         // execute
-		__asm__ __volatile__( "movq %%rax,%%r8;"
+		/*__asm__ __volatile__( "movq %%rax,%%r8;"
 		" int $0x72;"
-		::"d"(8),"D"(app_memory),"S"( app_id ),"c"(2), "a"(pwd));
+		::"d"(8),"D"(app_memory),"S"( app_id ),"c"(2), "a"(pwd));*/
+        struct communication commun, commun2;
+        commun.type = COMMUN_TYPE_EXEC;
+        commun.pid = 0;
+        commun.apid = app_id;
+        unsigned long *addr = (unsigned long*)((unsigned long)&commun.message);
+        addr[0] = app_memory;
+        //addr[1] = pwd;
+        strcpy( (char*)&addr[1],pwd);
+        communication(&commun, &commun2);
 
         app_id ++;
     }

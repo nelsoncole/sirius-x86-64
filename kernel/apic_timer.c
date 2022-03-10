@@ -26,7 +26,7 @@ int apic_timer()
 
     // Prepare the PIT to sleep for 10ms (10000µs)
     // 1193180/100 Hz
-    pit_prepare_sleep(10000);
+    pit_prepare_sleep(100);
 
     // Rest APIC Timer (set counter to -1)
     local_apic_write_command( APIC_INITIAL_COUNT_TIMER, 0xFFFFFFFF);
@@ -45,6 +45,7 @@ int apic_timer()
     apic_timer_ticks++;
 
     printf("apic_timer_ticks %d\n", apic_timer_ticks);
+    apic_timer_ticks = 1995;
     
     // Finally re-enable timer in periodic mode
 	val = APIC_CONFIG_DATA_LVT(1/*periodic mode*/,1/*masked*/,null,null,0,null,0x20/*vetor*/);

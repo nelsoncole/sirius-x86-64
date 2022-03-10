@@ -2,6 +2,8 @@
 #include <socket.h>
 #include <inet.h>
 
+#include <stdio.h>
+
 ssize_t recvfrom(int socket, void *buffer, size_t length,
              int flags, struct sockaddr *address, socklen_t *address_len){
 
@@ -24,8 +26,8 @@ ssize_t recvfrom(int socket, void *buffer, size_t length,
 
     struct sockaddr_in saddr;
     saddr.sin_family = fd->domain;
-    saddr.sin_port = fd->dest_port;
-    saddr.sin_addr.s_addr = fd->dest_ip;
+    saddr.sin_port = fd->recv_dest_port;
+    saddr.sin_addr.s_addr = fd->recv_dest_ip;
     memcpy(address, (char*)&saddr, *address_len);
 
     if(fd->length1 < length){
@@ -33,9 +35,8 @@ ssize_t recvfrom(int socket, void *buffer, size_t length,
     }
 
     memcpy(buffer, (char*)fd->buf1 ,length);
-
-
     // clean    
     fd->flags &=~0x2;
+
     return length;
 }

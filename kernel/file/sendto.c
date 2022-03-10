@@ -2,6 +2,8 @@
 #include <socket.h>
 #include <inet.h>
 
+#include <stdio.h>
+
 ssize_t sendto(int socket, const void *message, size_t length, int flags,
              const struct sockaddr *dest_addr, socklen_t dest_len){
 
@@ -19,9 +21,8 @@ ssize_t sendto(int socket, const void *message, size_t length, int flags,
     struct sockaddr_in saddr;
     memcpy((char*)&saddr, dest_addr, dest_len);
 
-
     // espera terminar
-    while(fd->flags&1);
+    while(fd->flags&0x1){};
 
     fd->dest_port = saddr.sin_port;
     fd->dest_ip = saddr.sin_addr.s_addr;
@@ -35,7 +36,7 @@ ssize_t sendto(int socket, const void *message, size_t length, int flags,
     // send packet
     fd->flags |= 0x1;
     // polling
-   // while(fd->flags&0x1);
+    while(fd->flags&0x1);
 
     return length;
 }

@@ -95,16 +95,6 @@ loop:
 			memset(server_id, 0, sizeof(unsigned long)*5);
 			sti();
 				break;
-		case 2:
-            cli();
-			buf = (char*) server_id[1];
-			thread_id = server_id[2];
-			pwd = (char *) server_id[5];
-			exectve(0, 0, pwd, buf);
-			thread_id = 0;
-			memset(server_id, 0, sizeof(unsigned long)*5);
-			sti();
-				break;
 		default: 
             // processar socket
             //cli();

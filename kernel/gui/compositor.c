@@ -322,6 +322,7 @@ void compose()
     launcher = 0;
     for (;;){
         
+
         paint_desktop(zbuf);
         paint_cursor(zbuf,mouseaddr);
         
@@ -331,8 +332,13 @@ void compose()
         //while (!(inportb(0x3DA) & 0x08));
 		//#endif
 		
+  		while(screan_spin_lock){}
+		screan_spin_lock++;
+  		
   		//copymem(vram, zbuf, len);
   		sse_memcpy(vram, zbuf, len);
+  		
+  		screan_spin_lock = 0;
   		
   	}
   	

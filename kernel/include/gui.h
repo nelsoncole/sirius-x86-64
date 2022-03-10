@@ -67,6 +67,8 @@ typedef struct __WINDOW {
     unsigned int 	scrollx;
     unsigned int 	scrolly;
 	font_t		    font;
+    unsigned int 	t_y, t_x;
+    unsigned int 	t_h, t_w;
     unsigned int    terminal;
     unsigned int    terminal_clear;
     unsigned long   terminal_buffer;
@@ -76,7 +78,7 @@ typedef struct __WINDOW {
 	
 	unsigned int	style;
 	unsigned int	gid;
-	char		    rsv[4096 - 156];
+	char		    rsv[4096 - 172];
 	unsigned long 	start;
 }__attribute__ ((packed)) WINDOW;
 

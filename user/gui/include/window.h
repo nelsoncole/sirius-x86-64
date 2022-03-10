@@ -52,6 +52,8 @@ typedef struct __WINDOW {
     unsigned int 	scrollx;
     unsigned int 	scrolly;
 	font_t		    font;
+    unsigned int 	t_y, t_x;
+    unsigned int 	t_h, t_w;
 	unsigned int    terminal;
     unsigned int    terminal_clear;
     unsigned long   terminal_buffer;
@@ -61,7 +63,7 @@ typedef struct __WINDOW {
 
 	unsigned int	style;
 	unsigned int	gid;
-	char		    rsv[4096 - 156];
+	char		    rsv[4096 - 172];
 	unsigned long 	start;
 	
 }__attribute__ ((packed)) WINDOW;
@@ -122,8 +124,6 @@ WINDOW *window(const char *title,int x, int y, int width, int height,int fg, int
 void wcl(WINDOW *w);
 
 void __window_clear(WINDOW *w);
-int __window_putchar( unsigned short int c);
-void __window_puts(char* s);
 
 int BitMAP( void *Data, int X, int Y, int bg, WINDOW *w);
 int BitMAP2( void *Data, int X, int Y, int fg, int bg, WINDOW *w);

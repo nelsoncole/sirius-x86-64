@@ -24,6 +24,9 @@ struct socket
 
     unsigned short  dest_port;
     unsigned int    dest_ip;
+    // receive
+    unsigned short  recv_dest_port;
+    unsigned int    recv_dest_ip;
 
     // For TCP
     unsigned char   protocol_flags;

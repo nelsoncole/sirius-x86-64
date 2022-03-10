@@ -8,6 +8,7 @@
 #include "udp.h"
 
 #define VMNET_RX_BUF_NUM		256		// Rx buffer number
+#define VMNET_TX_BUF_NUM		(VMNET_RX_BUF_NUM)	// Tx buffer number
 
 struct RxDesc
 {
@@ -32,6 +33,7 @@ struct RxDesc *rx_desc[VMNET_RX_BUF_NUM];
 static ethernet_package_descriptor_t *vmnet_recieve_package();
 
 static int rx_cur;
+static int tx_cur;
 static void vmnet_map_buf(){
     unsigned long addr = 0;
     // 2048 + 8 KiB
@@ -52,6 +54,7 @@ static void vmnet_map_buf(){
     }
 
     rx_cur = 0;
+    tx_cur = 0;
 }
 
 
@@ -78,8 +81,11 @@ void handler_vmnet(){
     int count = (int) prd->count;
 
     for(int i=0; i < count; i++){
-        if(prd->buf == 0 || prd->buffersize == 0 || prd->flag)
+        if(prd->buf == 0 || prd->buffersize == 0 || prd->flag){
+            prd++;
+            
             continue;
+        }
         
         struct vm_inet_header *hdr =(struct vm_inet_header*)prd->buf;
         switch(hdr->protocol){
@@ -101,32 +107,14 @@ void handler_vmnet(){
                 break;
         }
 
+        prd++;
+
     }
 
 }
 
 
 int vmnet_send_package(ethernet_package_descriptor_t desc){
-
-    int tx_cur =  rx_cur;
-    int _break = 0;
-    for(int i=0; i < 2; i++){
-        for( ;tx_cur < VMNET_RX_BUF_NUM; tx_cur++){
-            if(rx_desc[tx_cur]->status & 0x8000){ 
-                _break = 1; 
-                break;
-            }
-        }
-
-        if(_break == 1)
-            break;
-        tx_cur  = 0;
-    }
-
-
-    if(tx_cur >= VMNET_RX_BUF_NUM )
-        return -1;
-
 
     unsigned long long dest = rx_desc[tx_cur]->buffer;
 
@@ -141,6 +129,7 @@ int vmnet_send_package(ethernet_package_descriptor_t desc){
     rx_desc[tx_cur]->length = pkt_len;
     rx_desc[tx_cur]->status = 0;
 
+    tx_cur = (tx_cur + 1) % VMNET_TX_BUF_NUM;
     // gerar interrupção
     asm("int $0xA0");
 
@@ -162,7 +151,7 @@ ethernet_package_descriptor_t *vmnet_recieve_package(){
         rx_desc[rx_cur]->status |= 0x8000;
 
         unsigned long long addr = rx_desc[rx_cur]->buffer;
-
+        
         unsigned short len = rx_desc[rx_cur]->length;
         rx_cur = (rx_cur + 1) % VMNET_RX_BUF_NUM;
 
@@ -216,6 +205,7 @@ unsigned short src_port, unsigned short dst_port, const void *data, size_t lengt
     if(data != 0 || length > 0 )
         memcpy((unsigned char*)udp + sizeof(udp_header_t), data, length);
     // 
+
     len = sizeof(udp_header_t) + length;
     vmipv4_send(buf, IP_PROTOCOL_UDP, src_ip, dst_ip, len);
 
