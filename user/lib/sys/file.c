@@ -25,7 +25,7 @@ int stdputc_r (int c, FILE *fp)
         int bg = term_bg_color;
         if(bg > 15 || bg < 0) bg = 0;
         if(fg > 15 || fg < 0) fg = 0;
-        if(fg == 15 && bg == 15) bg = fg = 0;
+        if(fg == 15 && bg == 15) bg = 0;
 
         unsigned char clor = ((bg << 4) &0xf0) | (fg &0xf);
         val |=  clor << 8;

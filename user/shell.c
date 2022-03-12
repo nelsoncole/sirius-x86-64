@@ -105,16 +105,14 @@ static int cmd_run(int argc,char **argv)
 	
 	
 	char *v = (char*) _v_;
-	memset(v, 0, COUNT_ARGV*8 + 256*COUNT_ARGV + 8);
-	*(unsigned long*)v = argc;
-	v += 8;
-	v += 8*COUNT_ARGV;
 	for(int i=0; i < argc; i ++){
-	
 		strcpy(v,argv[i]);
-		
-		v += 256;
+        v += strlen(argv[i]);
+        *v++ = ' ';
+     	
 	}
+    v--;
+    *v = '\0';
 	
     strcpy(path, a);
     FILE *fp = fopen(path,"r+b");
@@ -125,9 +123,6 @@ static int cmd_run(int argc,char **argv)
         fread (app_memory, 1, size, fp);
 	    fclose(fp);
 
-        /*__asm__ __volatile__("movq %%rax,%%r8;"
-	    " int $0x72;"
-	    ::"d"(8),"D"(app_memory),"S"(_v_),"c"(1), "a"(pwd)); // fork*/
         unsigned long pid = 0;
         // getpid()
         __asm__ __volatile__("int $0x72":"=a"(pid):"d"(1),"c"(0));
@@ -141,7 +136,7 @@ static int cmd_run(int argc,char **argv)
         strcpy( (char*)&addr[1],pwd);
         char *arg = (char*)&addr[1];
         arg += strlen(pwd) + 1;
-        strcpy( arg, path);
+        strcpy( arg, (const char*)_v_);
         communication(&commun, &commun2);
 
         wait_exit();

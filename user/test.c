@@ -9,19 +9,25 @@
 // PONG 36D9E40F
 // USER Nelson 0 \* : Nelson Cole
 // PRIVMSG #KernelDev : Olá Lucky
-
+extern void term_color(int fg, int bg);
 extern char* get_ip_from_name(char *addr, const char *name , int query_type);
 char bf[4096];
 int main(int argc, char **argv) {
-
-    for(int i=0; i < argc; i++){
-        //printf("%s\n",argv[i]);
+    term_color(14, 2);
+    printf(" Hello ");
+    term_color(-1, -1);
+    printf(" ");
+    term_color(4, 15);
+    printf(" World!\n");
+    printf("\n");
+    term_color(0, 15);
+    for(int i=0; i < 40; i++){
+        printf(" ");
+        int i = 1000000;
+        while(i-- > 0){}
     }
-
-    printf("Halla Madrid!\n");
-
+    printf("\n");
     return 0;
-
     if(argc < 2) {
         printf("No IP...\n");
         return 0;

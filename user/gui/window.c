@@ -229,10 +229,6 @@ WINDOW *window(const char *title,int x, int y, int width, int height, int fg, in
 
 void wcl(WINDOW *w) {
 
-    // enviar para compositor 
-    // TODO esta operação será feita no window server
-	// __asm__ __volatile__("int $0x72"::"d"(2),"D"(w));
-
     // enviar para window server
     unsigned long id = 0;
     __asm__ __volatile__("int $0x72":"=a"(id):"d"(14));

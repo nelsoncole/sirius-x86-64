@@ -180,6 +180,9 @@ static int window_putchar_scroll(WINDOW *window){
                 if((color&0xf) < 16 && (color&0xf) != 0 )
                     fg = color_table[(color&0xf)];
 
+                if(((color >> 4 )&0xf) < 16 && ((color >> 4 )&0xf) != 0 )
+                    bg = color_table[((color >> 4)&0xf)];
+
 		        drawchar( ch, 4 + w->t_x + w->font.x*w->cx, 4 + w->t_y + w->font.y*w->cy, 
 		        fg, bg, &w->font, w);
                 
@@ -249,7 +252,11 @@ int window_putchar( unsigned short int c, unsigned char color, WINDOW *window)
         unsigned int bg = w->font.bg_color;
 
         if((color&0xf) < 16 && (color&0xf) != 0 )
-            fg = color_table[(color&0xf)];
+            bg = color_table[(color&0xf)];
+
+        if(((color >> 4 )&0xf) < 16 && ((color >> 4 )&0xf) != 0 )
+            bg = color_table[((color >> 4)&0xf)];
+
         buf[w->chcounter] = c | color << 8;
         w->chcounter++;
         for(int i=0; i < 8; i++) {
@@ -275,6 +282,9 @@ int window_putchar( unsigned short int c, unsigned char color, WINDOW *window)
 
         if((color&0xf) < 16 && (color&0xf) != 0 )
             fg = color_table[(color&0xf)];
+
+        if(((color >> 4 )&0xf) < 16 && ((color >> 4 )&0xf) != 0 )
+            bg = color_table[((color >> 4)&0xf)];
 
 		drawchar( c, 4 + w->t_x + w->font.x*w->cx, 4 + w->t_y + w->font.y*w->cy, 
 		fg, bg, &w->font, w);

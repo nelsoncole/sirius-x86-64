@@ -4,5 +4,5 @@ void wait(unsigned int n){
 
 	unsigned int ns = n;
 	
-	while(ns--) outanyb(0x80);
+	while(ns--) outanyb(0xed);
 }

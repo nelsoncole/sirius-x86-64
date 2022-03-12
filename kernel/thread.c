@@ -290,6 +290,12 @@ int argc, char **argv, char *pwd, THREAD *thread)
 
         new_thread->rflag 	= 0x202;
    	}
+
+    if((pv&0x80) == 0x80) {
+    	
+    	new_thread->prv |= 0x80;
+    			
+    }
    
     new_thread->cr3    = cr3;
     	

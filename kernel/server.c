@@ -51,60 +51,14 @@ void foco_default()
 
 void server(unsigned long entry_pointer_info)
 {
-    char *buf;
-	char *pwd;
-	unsigned long pid;
-	
-	short pipe[8] = {0,0,0,0,0,0,0,0};
-	pipe[0] = 0x1001;
-	THREAD *thr;
-	
-	memset(server_id, 0, sizeof(unsigned long)*5);
-	
-loop:	
-	// wait
-	switch(*server_id) {
-		case 1:
-            cli();
-			buf = (char*) server_id[1];
-			pid = server_id[4];
-			pwd = (char *) server_id[5];
-			unsigned long v = server_id[2];
-			int argc = 0;
-			char **argv = 0;
-			if(v) { 
-				argc = *(int*)v;
-				v += 8;
-				argv = (char**) v;
-				v += 8*COUNT_ARGV;
-				for(int i=0; i < COUNT_ARGV; i ++)
-                {
-					argv[i] = (char*) v;
-					v += 256;
-				}
-	
-			}
-					
-			if(!exectve_child(argc, argv, pwd, buf, get_thread(pid)))
-            {
-				// error
-				thr = get_thread(pid);
-				pipe_write ( pipe, thr->pipe);
-			}
-	
-			memset(server_id, 0, sizeof(unsigned long)*5);
-			sti();
-				break;
-		default: 
-            // processar socket
-            //cli();
-            socket_server_transmit();
-            socket_execute_row();
-            //sti();
-			break;
-	}
-
-	goto loop;
+   
+    while(1){
+        // processar socket
+        //cli();
+        socket_server_transmit();
+        socket_execute_row();
+        //sti();
+    }	
 }
 
 
