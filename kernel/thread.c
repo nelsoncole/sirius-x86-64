@@ -149,7 +149,7 @@ int pv,int argc, char **argv, char *pwd)
    		//new_thread->es 	= 0x23;
    		//new_thread->fs 	= 0x23;
    		//new_thread->gs 	= 0x23;
-   		new_thread->ss 	= 0x23;
+   		new_thread->ss 		= 0x23;
     		
    		unsigned long addr;
 		alloc_pages(1, 1 + ((28*256)/0x1000), (unsigned long *)&addr);
@@ -161,13 +161,13 @@ int pv,int argc, char **argv, char *pwd)
         new_thread->rflag 	= 0x3202;
 
    	} else if(!(pv&1)) { // processo do kernelspace
-   		new_thread->cs 	= 0x8;
+   		new_thread->cs 		= 0x8;
    		//new_thread->ds 	= 0x10;
    		//new_thread->es 	= 0x10;
    		//new_thread->fs 	= 0x10;
    		//new_thread->gs 	= 0x10;
-   		new_thread->ss 	= 0x10;
-		new_thread->prv = 0;
+   		new_thread->ss 		= 0x10;
+		new_thread->prv 	= 0;
 
         new_thread->rflag 	= 0x202;
 

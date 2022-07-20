@@ -57,6 +57,10 @@ int setup_apic() {
 	
 	lapicbase = local_apic_virtual_addr;
 
+    /*
+    printf("%x %x",*(volatile unsigned int*)(lapicbase +0x20), *(volatile unsigned int*)(lapicbase +0x30));
+    while(1){}*/
+
 	//Legacy PIC mask all off
 
 	// Envia ICW1 reset
@@ -112,8 +116,7 @@ int setup_apic() {
 	// Spurious interrupt Vector Register, to enable the APIC and set
 	// spurious vector to 255
 	*(volatile unsigned int*)(lapicbase + APIC_S_INT_VECTOR) = 0x1ff;
-	
-	
+
 	// Global enable
 	enableapic(getapicbase());
 	

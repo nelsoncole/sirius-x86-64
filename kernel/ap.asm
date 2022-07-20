@@ -117,7 +117,7 @@ start32:
     or      eax, 0x20000 ; periodic mode
 	mov 	dword[0xFEE00000 + 0x320], eax
 
-    mov 	eax, 0x3
+    mov 	eax, 0xa ;0x3
 	mov 	dword[0xFEE00000 + 0x3e0], eax
 	
 	mov 	eax, dword[apic_ticks]
@@ -157,8 +157,8 @@ start64:
     mov 	ss, ax
    
     ; carregar o stack
-	;xor 	rbp, rbp
-    ;mov	    rsp, qword[stack]
+	xor 	rbp, rbp
+    mov	    rsp, qword[stack]
 	
 	
 	mov	rax, qword[COPY_GDTR]

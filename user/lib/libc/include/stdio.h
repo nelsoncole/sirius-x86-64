@@ -149,6 +149,11 @@ extern void perror(const char *s);
 extern int sscanf(const char *s,const char *fmt, ...);
 extern FILE *freopen(const char *filename, const char *mode, FILE *fp);
 
+extern int ferror (FILE *fp );
+extern int setvbuf(FILE * restrict stream, char * restrict buf, int mode, size_t size);
+extern void clearerr(FILE *stream);
+extern FILE *tmpfile(void);
+
 
 
 

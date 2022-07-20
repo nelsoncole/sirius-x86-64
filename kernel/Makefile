@@ -8,7 +8,7 @@ CC=gcc
 LD=ld
 
 
-GUI = gui.o compositor.o window_server.o font8x16.o
+GUI = gui.o compositor.o window_server.o font8x16.o terminal.o
 FILE = std.o cfs.o pipe.o socket.o elf.o bind.o inet.o recvfrom.o sendto.o
 DRIVER = pci.o  i965.o cursor.o acpi.o hpet.o lpc.o pit.o ps2.o mouse.o keyboard.o ahci.o ide.o \
 storage.o rtc.o hda.o speaker.o e1000.o ethernet.o arp.o udp.o ipv4.o dhcp.o tcp.o checksum.o rtl8169.o pcnet.o vmnet.o port.o \

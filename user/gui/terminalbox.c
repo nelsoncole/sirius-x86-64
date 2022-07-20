@@ -53,9 +53,9 @@ HANDLE_T *terminalbox(int x, int y, int width, int height, int fg, int bg, WINDO
 	drawrect(obj->x, obj->y, obj->width, obj->height, 0x808080, w);
 
     // scroll
-    drawrect((obj->x + obj->width - 2) - 0, obj->y + 1, 1, obj->height - 2, 0x808080, w);
     obj->scroll = 0;
-    drawline( (obj->x + obj->width - 1) - 1 ,obj->y + 2 + obj->scroll, 6, 40 , 0xe0e0e0, w);
+    drawline( (obj->x + obj->width) + 1, obj->y+1, 6, obj->height-2 , 0xe0e0e0, w);
+    //drawrect((obj->x + obj->width - 2) - 0, obj->y + 1, 1, obj->height - 2, 0x808080, w);
 
 	return obj;
 }

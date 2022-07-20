@@ -50,7 +50,8 @@ extern double ceil(double x);
 
 extern double exp(double x);
 extern double log10(double x);
-extern double log(double x);
+extern double log(double y);
+extern double log2(double x);
 extern double ldexp(double x, int exp);
 extern double frexp(double value, int *exp);
 extern double atan2(double y, double x);
@@ -64,5 +65,10 @@ extern int min(int x, int y);
 extern int max(int x, int y);
 
 extern double fabs(double x);
+
+
+extern double cosh(double x);
+extern double tanh(double x);
+extern double sinh(double x);
 
 #endif

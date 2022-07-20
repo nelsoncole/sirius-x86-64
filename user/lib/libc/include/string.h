@@ -44,6 +44,8 @@ extern void *memmove(void *dst, const void *src, size_t n);
 
 extern char *strerror(int errnum);
 extern int strcoll(const char *a, const char *b);
+
+extern void *memchr(const void *buf, int c, size_t n);
 // FIXME sem suport
 
 

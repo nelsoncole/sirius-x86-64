@@ -62,6 +62,7 @@ Removed property 0xc0000002 to merge main.o (not found) and gui.o (0x3)
 Removed property 0xc0000002 to merge main.o (not found) and compositor.o (0x3)
 Removed property 0xc0000002 to merge main.o (not found) and window_server.o (0x3)
 Removed property 0xc0000002 to merge main.o (not found) and font8x16.o (0x3)
+Removed property 0xc0000002 to merge main.o (not found) and terminal.o (0x3)
 Removed property 0xc0000002 to merge main.o (not found) and std.o (0x3)
 Removed property 0xc0000002 to merge main.o (not found) and cfs.o (0x3)
 Removed property 0xc0000002 to merge main.o (not found) and pipe.o (0x3)
@@ -407,6 +408,8 @@ Discarded input sections
                 0x0000000000000000       0x20 window_server.o
  .note.gnu.property
                 0x0000000000000000       0x20 font8x16.o
+ .note.gnu.property
+                0x0000000000000000       0x20 terminal.o
  .note.gnu.property
                 0x0000000000000000       0x20 std.o
  .note.gnu.property
@@ -959,92 +962,93 @@ Linker script and memory map
                 0x0000000000421e46                paint_desktop
                 0x0000000000422217                paint_cursor
                 0x00000000004223a8                compose
- .text          0x000000000042260f      0xeb9 window_server.o
+ .text          0x000000000042260f      0x2db window_server.o
                 0x000000000042260f                window_server
-                0x00000000004228e8                put_pixel_sirius
-                0x0000000000422989                drawchar
-                0x0000000000422ad7                drawline
-                0x0000000000422e41                window_putchar
- .text          0x00000000004234c8        0x0 font8x16.o
- .text          0x00000000004234c8      0x556 std.o
-                0x00000000004234c8                std_open_file
-                0x0000000000423677                std_file_close
-                0x00000000004236e6                std_putc
-                0x000000000042385e                std_getc
- .text          0x0000000000423a1e      0xaaa cfs.o
-                0x0000000000423a1e                filename_cmp
-                0x0000000000423b05                read_super_block
-                0x0000000000423b6e                read_directory_entry
-                0x0000000000423cf9                open_file_r
-                0x000000000042407a                open_file
-                0x00000000004242e1                file_close
-                0x00000000004243ea                file_read_block
- .text          0x00000000004244c8      0x2e7 pipe.o
-                0x00000000004244c8                pipe_open_file
-                0x00000000004245b4                pipe_write
-                0x00000000004246b8                pipe_read
- .text          0x00000000004247af      0xfc3 socket.o
-                0x00000000004247ee                init_socket
-                0x0000000000424a6e                socket_address
-                0x0000000000424ad0                socket
-                0x0000000000424c4f                socket_server_transmit
-                0x0000000000425312                socket_execute_row
-                0x00000000004255d2                socket_server_receive
- .text          0x0000000000425772      0x2b2 elf.o
-                0x0000000000425772                load_elf64_header
-                0x0000000000425945                load_elf64_segment
- .text          0x0000000000425a24      0x224 bind.o
-                0x0000000000425a63                bind
- .text          0x0000000000425c48       0x5d inet.o
-                0x0000000000425c48                inet_addr
- .text          0x0000000000425ca5      0x169 recvfrom.o
-                0x0000000000425ca5                recvfrom
- .text          0x0000000000425e0e      0x14e sendto.o
-                0x0000000000425e0e                sendto
- .text          0x0000000000425f5c      0x2b3 string.o
-                0x0000000000425f5c                memset
-                0x0000000000425fc1                memcpy
-                0x0000000000426038                strcpy
-                0x00000000004260b3                strlen
-                0x00000000004260ff                strcmp
-                0x0000000000426199                memcmp
- .text          0x000000000042620f      0x4e4 vsprintf.o
-                0x000000000042627b                vsprintf
- .text          0x00000000004266f3      0x818 stdio.o
-                0x00000000004266f3                putchar
-                0x0000000000426753                puts
-                0x00000000004267e3                printf
-                0x0000000000426910                fopen
-                0x0000000000426a31                fclose
-                0x0000000000426ad5                rewind
-                0x0000000000426b3e                fseek
-                0x0000000000426c1c                ftell
-                0x0000000000426c5d                fputc
-                0x0000000000426cdb                fgetc
-                0x0000000000426e4e                fread
- .text          0x0000000000426f0b      0x4fb stdlib.o
-                0x0000000000426f0b                malloc
-                0x0000000000426f7a                free
-                0x0000000000426fc6                i2hex
-                0x0000000000427234                utoa
-                0x00000000004272bf                itoa
- .text          0x0000000000427406      0x14a sse_memcpy.o
-                0x0000000000427406                sse_memcpy
- .text          0x0000000000427550      0x140 panic.o
-                0x0000000000427550                kernel_panic
- .text          0x0000000000427690      0xa9d msi.o
-                0x0000000000427690                msi_vector_install
-                0x0000000000427cea                default_mas
-                0x0000000000427d49                msi_function
-                0x0000000000427dff                apic_send_msi
-                0x00000000004280fa                apic_send_msix
- .text          0x000000000042812d      0x6f6 communication.o
-                0x00000000004281bf                commun_switch
-                0x00000000004285e5                kernel_thread_communication
- .text          0x0000000000428823      0x1e4 argv.o
-                0x00000000004288d8                format_argv
+ .text          0x00000000004228ea        0x0 font8x16.o
+ .text          0x00000000004228ea      0xbe0 terminal.o
+                0x00000000004228ea                put_pixel_sirius
+                0x000000000042298b                drawchar
+                0x0000000000422ad9                drawline
+                0x0000000000422e43                window_putchar
+ .text          0x00000000004234ca      0x556 std.o
+                0x00000000004234ca                std_open_file
+                0x0000000000423679                std_file_close
+                0x00000000004236e8                std_putc
+                0x0000000000423860                std_getc
+ .text          0x0000000000423a20      0xaaa cfs.o
+                0x0000000000423a20                filename_cmp
+                0x0000000000423b07                read_super_block
+                0x0000000000423b70                read_directory_entry
+                0x0000000000423cfb                open_file_r
+                0x000000000042407c                open_file
+                0x00000000004242e3                file_close
+                0x00000000004243ec                file_read_block
+ .text          0x00000000004244ca      0x2e7 pipe.o
+                0x00000000004244ca                pipe_open_file
+                0x00000000004245b6                pipe_write
+                0x00000000004246ba                pipe_read
+ .text          0x00000000004247b1      0xfc3 socket.o
+                0x00000000004247f0                init_socket
+                0x0000000000424a70                socket_address
+                0x0000000000424ad2                socket
+                0x0000000000424c51                socket_server_transmit
+                0x0000000000425314                socket_execute_row
+                0x00000000004255d4                socket_server_receive
+ .text          0x0000000000425774      0x2b2 elf.o
+                0x0000000000425774                load_elf64_header
+                0x0000000000425947                load_elf64_segment
+ .text          0x0000000000425a26      0x224 bind.o
+                0x0000000000425a65                bind
+ .text          0x0000000000425c4a       0x5d inet.o
+                0x0000000000425c4a                inet_addr
+ .text          0x0000000000425ca7      0x169 recvfrom.o
+                0x0000000000425ca7                recvfrom
+ .text          0x0000000000425e10      0x14e sendto.o
+                0x0000000000425e10                sendto
+ .text          0x0000000000425f5e      0x2b3 string.o
+                0x0000000000425f5e                memset
+                0x0000000000425fc3                memcpy
+                0x000000000042603a                strcpy
+                0x00000000004260b5                strlen
+                0x0000000000426101                strcmp
+                0x000000000042619b                memcmp
+ .text          0x0000000000426211      0x4e4 vsprintf.o
+                0x000000000042627d                vsprintf
+ .text          0x00000000004266f5      0x818 stdio.o
+                0x00000000004266f5                putchar
+                0x0000000000426755                puts
+                0x00000000004267e5                printf
+                0x0000000000426912                fopen
+                0x0000000000426a33                fclose
+                0x0000000000426ad7                rewind
+                0x0000000000426b40                fseek
+                0x0000000000426c1e                ftell
+                0x0000000000426c5f                fputc
+                0x0000000000426cdd                fgetc
+                0x0000000000426e50                fread
+ .text          0x0000000000426f0d      0x4fb stdlib.o
+                0x0000000000426f0d                malloc
+                0x0000000000426f7c                free
+                0x0000000000426fc8                i2hex
+                0x0000000000427236                utoa
+                0x00000000004272c1                itoa
+ .text          0x0000000000427408      0x14a sse_memcpy.o
+                0x0000000000427408                sse_memcpy
+ .text          0x0000000000427552      0x140 panic.o
+                0x0000000000427552                kernel_panic
+ .text          0x0000000000427692      0xa9d msi.o
+                0x0000000000427692                msi_vector_install
+                0x0000000000427cec                default_mas
+                0x0000000000427d4b                msi_function
+                0x0000000000427e01                apic_send_msi
+                0x00000000004280fc                apic_send_msix
+ .text          0x000000000042812f      0x6f6 communication.o
+                0x00000000004281c1                commun_switch
+                0x00000000004285e7                kernel_thread_communication
+ .text          0x0000000000428825      0x1e4 argv.o
+                0x00000000004288da                format_argv
                 0x0000000000429000                . = ALIGN (0x1000)
- *fill*         0x0000000000428a07      0x5f9 
+ *fill*         0x0000000000428a09      0x5f7 
 
 .iplt           0x0000000000429000        0x0
  .iplt          0x0000000000429000        0x0 setup.o
@@ -1123,10 +1127,11 @@ Linker script and memory map
  .data          0x000000000042978c        0x0 video.o
  .data          0x000000000042978c        0x0 gui.o
  .data          0x000000000042978c        0x0 compositor.o
+ .data          0x000000000042978c        0x0 window_server.o
  *fill*         0x000000000042978c       0x14 
- .data          0x00000000004297a0       0x40 window_server.o
- .data          0x00000000004297e0     0x1000 font8x16.o
-                0x00000000004297e0                font8x16
+ .data          0x00000000004297a0     0x1000 font8x16.o
+                0x00000000004297a0                font8x16
+ .data          0x000000000042a7a0       0x40 terminal.o
  .data          0x000000000042a7e0        0x0 std.o
  .data          0x000000000042a7e0        0x0 cfs.o
  .data          0x000000000042a7e0        0x0 pipe.o
@@ -1343,6 +1348,7 @@ Linker script and memory map
  .bss           0x00000000004614d8        0x0 compositor.o
  .bss           0x00000000004614d8        0x0 window_server.o
  .bss           0x00000000004614d8        0x0 font8x16.o
+ .bss           0x00000000004614d8        0x0 terminal.o
  .bss           0x00000000004614d8        0x0 std.o
  .bss           0x00000000004614d8        0x0 cfs.o
  .bss           0x00000000004614d8        0x0 pipe.o
@@ -1738,8 +1744,10 @@ Linker script and memory map
                                         0x140 (size before relaxing)
  .eh_frame      0x000000000046c738      0x110 compositor.o
                                         0x128 (size before relaxing)
- .eh_frame      0x000000000046c848       0xd8 window_server.o
-                                         0xf0 (size before relaxing)
+ .eh_frame      0x000000000046c848       0x20 window_server.o
+                                         0x38 (size before relaxing)
+ .eh_frame      0x000000000046c868       0xb8 terminal.o
+                                         0xd0 (size before relaxing)
  .eh_frame      0x000000000046c920       0x98 std.o
                                          0xb0 (size before relaxing)
  .eh_frame      0x000000000046c9b8      0x118 cfs.o
@@ -1845,6 +1853,7 @@ LOAD gui.o
 LOAD compositor.o
 LOAD window_server.o
 LOAD font8x16.o
+LOAD terminal.o
 LOAD std.o
 LOAD cfs.o
 LOAD pipe.o
@@ -1870,87 +1879,88 @@ OUTPUT(kernel.bin elf64-x86-64)
  .rela.iplt     0x000000000046e000        0x0 setup.o
  .rela.text     0x000000000046e000        0x0 setup.o
 
-.comment        0x0000000000000000       0x2a
- .comment       0x0000000000000000       0x2a main.o
-                                         0x2b (size before relaxing)
- .comment       0x000000000000002a       0x2b io.o
- .comment       0x000000000000002a       0x2b gdt.o
- .comment       0x000000000000002a       0x2b tss.o
- .comment       0x000000000000002a       0x2b idt.o
- .comment       0x000000000000002a       0x2b exception.o
- .comment       0x000000000000002a       0x2b data.o
- .comment       0x000000000000002a       0x2b server.o
- .comment       0x000000000000002a       0x2b smp.o
- .comment       0x000000000000002a       0x2b delay.o
- .comment       0x000000000000002a       0x2b paging.o
- .comment       0x000000000000002a       0x2b mm.o
- .comment       0x000000000000002a       0x2b cpuid.o
- .comment       0x000000000000002a       0x2b msr.o
- .comment       0x000000000000002a       0x2b lvt.o
- .comment       0x000000000000002a       0x2b irq.o
- .comment       0x000000000000002a       0x2b apic.o
- .comment       0x000000000000002a       0x2b apic_timer.o
- .comment       0x000000000000002a       0x2b ioapic.o
- .comment       0x000000000000002a       0x2b intr.o
- .comment       0x000000000000002a       0x2b sleep.o
- .comment       0x000000000000002a       0x2b thread.o
- .comment       0x000000000000002a       0x2b exectve.o
- .comment       0x000000000000002a       0x2b syscall.o
- .comment       0x000000000000002a       0x2b console.o
- .comment       0x000000000000002a       0x2b exit.o
- .comment       0x000000000000002a       0x2b sse.o
- .comment       0x000000000000002a       0x2b pci.o
- .comment       0x000000000000002a       0x2b i965.o
- .comment       0x000000000000002a       0x2b cursor.o
- .comment       0x000000000000002a       0x2b acpi.o
- .comment       0x000000000000002a       0x2b hpet.o
- .comment       0x000000000000002a       0x2b lpc.o
- .comment       0x000000000000002a       0x2b pit.o
- .comment       0x000000000000002a       0x2b ps2.o
- .comment       0x000000000000002a       0x2b mouse.o
- .comment       0x000000000000002a       0x2b keyboard.o
- .comment       0x000000000000002a       0x2b ahci.o
- .comment       0x000000000000002a       0x2b ide.o
- .comment       0x000000000000002a       0x2b storage.o
- .comment       0x000000000000002a       0x2b rtc.o
- .comment       0x000000000000002a       0x2b hda.o
- .comment       0x000000000000002a       0x2b speaker.o
- .comment       0x000000000000002a       0x2b e1000.o
- .comment       0x000000000000002a       0x2b ethernet.o
- .comment       0x000000000000002a       0x2b arp.o
- .comment       0x000000000000002a       0x2b udp.o
- .comment       0x000000000000002a       0x2b ipv4.o
- .comment       0x000000000000002a       0x2b dhcp.o
- .comment       0x000000000000002a       0x2b tcp.o
- .comment       0x000000000000002a       0x2b checksum.o
- .comment       0x000000000000002a       0x2b rtl8169.o
- .comment       0x000000000000002a       0x2b pcnet.o
- .comment       0x000000000000002a       0x2b vmnet.o
- .comment       0x000000000000002a       0x2b port.o
- .comment       0x000000000000002a       0x2b bga.o
- .comment       0x000000000000002a       0x2b video.o
- .comment       0x000000000000002a       0x2b gui.o
- .comment       0x000000000000002a       0x2b compositor.o
- .comment       0x000000000000002a       0x2b window_server.o
- .comment       0x000000000000002a       0x2b font8x16.o
- .comment       0x000000000000002a       0x2b std.o
- .comment       0x000000000000002a       0x2b cfs.o
- .comment       0x000000000000002a       0x2b pipe.o
- .comment       0x000000000000002a       0x2b socket.o
- .comment       0x000000000000002a       0x2b elf.o
- .comment       0x000000000000002a       0x2b bind.o
- .comment       0x000000000000002a       0x2b inet.o
- .comment       0x000000000000002a       0x2b recvfrom.o
- .comment       0x000000000000002a       0x2b sendto.o
- .comment       0x000000000000002a       0x2b string.o
- .comment       0x000000000000002a       0x2b vsprintf.o
- .comment       0x000000000000002a       0x2b stdio.o
- .comment       0x000000000000002a       0x2b stdlib.o
- .comment       0x000000000000002a       0x2b sse_memcpy.o
- .comment       0x000000000000002a       0x2b panic.o
- .comment       0x000000000000002a       0x2b msi.o
- .comment       0x000000000000002a       0x2b communication.o
- .comment       0x000000000000002a       0x2b argv.o
+.comment        0x0000000000000000       0x2b
+ .comment       0x0000000000000000       0x2b main.o
+                                         0x2c (size before relaxing)
+ .comment       0x000000000000002b       0x2c io.o
+ .comment       0x000000000000002b       0x2c gdt.o
+ .comment       0x000000000000002b       0x2c tss.o
+ .comment       0x000000000000002b       0x2c idt.o
+ .comment       0x000000000000002b       0x2c exception.o
+ .comment       0x000000000000002b       0x2c data.o
+ .comment       0x000000000000002b       0x2c server.o
+ .comment       0x000000000000002b       0x2c smp.o
+ .comment       0x000000000000002b       0x2c delay.o
+ .comment       0x000000000000002b       0x2c paging.o
+ .comment       0x000000000000002b       0x2c mm.o
+ .comment       0x000000000000002b       0x2c cpuid.o
+ .comment       0x000000000000002b       0x2c msr.o
+ .comment       0x000000000000002b       0x2c lvt.o
+ .comment       0x000000000000002b       0x2c irq.o
+ .comment       0x000000000000002b       0x2c apic.o
+ .comment       0x000000000000002b       0x2c apic_timer.o
+ .comment       0x000000000000002b       0x2c ioapic.o
+ .comment       0x000000000000002b       0x2c intr.o
+ .comment       0x000000000000002b       0x2c sleep.o
+ .comment       0x000000000000002b       0x2c thread.o
+ .comment       0x000000000000002b       0x2c exectve.o
+ .comment       0x000000000000002b       0x2c syscall.o
+ .comment       0x000000000000002b       0x2c console.o
+ .comment       0x000000000000002b       0x2c exit.o
+ .comment       0x000000000000002b       0x2c sse.o
+ .comment       0x000000000000002b       0x2c pci.o
+ .comment       0x000000000000002b       0x2c i965.o
+ .comment       0x000000000000002b       0x2c cursor.o
+ .comment       0x000000000000002b       0x2c acpi.o
+ .comment       0x000000000000002b       0x2c hpet.o
+ .comment       0x000000000000002b       0x2c lpc.o
+ .comment       0x000000000000002b       0x2c pit.o
+ .comment       0x000000000000002b       0x2c ps2.o
+ .comment       0x000000000000002b       0x2c mouse.o
+ .comment       0x000000000000002b       0x2c keyboard.o
+ .comment       0x000000000000002b       0x2c ahci.o
+ .comment       0x000000000000002b       0x2c ide.o
+ .comment       0x000000000000002b       0x2c storage.o
+ .comment       0x000000000000002b       0x2c rtc.o
+ .comment       0x000000000000002b       0x2c hda.o
+ .comment       0x000000000000002b       0x2c speaker.o
+ .comment       0x000000000000002b       0x2c e1000.o
+ .comment       0x000000000000002b       0x2c ethernet.o
+ .comment       0x000000000000002b       0x2c arp.o
+ .comment       0x000000000000002b       0x2c udp.o
+ .comment       0x000000000000002b       0x2c ipv4.o
+ .comment       0x000000000000002b       0x2c dhcp.o
+ .comment       0x000000000000002b       0x2c tcp.o
+ .comment       0x000000000000002b       0x2c checksum.o
+ .comment       0x000000000000002b       0x2c rtl8169.o
+ .comment       0x000000000000002b       0x2c pcnet.o
+ .comment       0x000000000000002b       0x2c vmnet.o
+ .comment       0x000000000000002b       0x2c port.o
+ .comment       0x000000000000002b       0x2c bga.o
+ .comment       0x000000000000002b       0x2c video.o
+ .comment       0x000000000000002b       0x2c gui.o
+ .comment       0x000000000000002b       0x2c compositor.o
+ .comment       0x000000000000002b       0x2c window_server.o
+ .comment       0x000000000000002b       0x2c font8x16.o
+ .comment       0x000000000000002b       0x2c terminal.o
+ .comment       0x000000000000002b       0x2c std.o
+ .comment       0x000000000000002b       0x2c cfs.o
+ .comment       0x000000000000002b       0x2c pipe.o
+ .comment       0x000000000000002b       0x2c socket.o
+ .comment       0x000000000000002b       0x2c elf.o
+ .comment       0x000000000000002b       0x2c bind.o
+ .comment       0x000000000000002b       0x2c inet.o
+ .comment       0x000000000000002b       0x2c recvfrom.o
+ .comment       0x000000000000002b       0x2c sendto.o
+ .comment       0x000000000000002b       0x2c string.o
+ .comment       0x000000000000002b       0x2c vsprintf.o
+ .comment       0x000000000000002b       0x2c stdio.o
+ .comment       0x000000000000002b       0x2c stdlib.o
+ .comment       0x000000000000002b       0x2c sse_memcpy.o
+ .comment       0x000000000000002b       0x2c panic.o
+ .comment       0x000000000000002b       0x2c msi.o
+ .comment       0x000000000000002b       0x2c communication.o
+ .comment       0x000000000000002b       0x2c argv.o
 
 .note.GNU-stack
                 0x0000000000000000        0x0
@@ -2076,6 +2086,8 @@ OUTPUT(kernel.bin elf64-x86-64)
                 0x0000000000000000        0x0 window_server.o
  .note.GNU-stack
                 0x0000000000000000        0x0 font8x16.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 terminal.o
  .note.GNU-stack
                 0x0000000000000000        0x0 std.o
  .note.GNU-stack

@@ -3,6 +3,15 @@
 #include <stdio.h>
 
 
+struct __realloc {
+    unsigned long ptr;
+    unsigned long pool;
+    unsigned long size;
+    struct __realloc *next;
+};
+
+
+struct __realloc *realloc_list;
 unsigned long __m_c;
 unsigned long __m_i;
 
@@ -29,6 +38,8 @@ void __free_block_r(unsigned long addr)
 
 }
 
+
+void *__malloc_r(unsigned s, int type);
 void __heap_r()
 {
 	__alloc_t *__m = (__alloc_t*) __m_i;
@@ -38,6 +49,10 @@ void __heap_r()
 	alloc_spin_lock = 0;
 	
 	memset(__m, 0, sizeof(__alloc_t)*ALLOC_COUNT);
+
+    // init realloc
+    realloc_list = (struct __realloc *) __malloc_r(0x1000, 0);
+    memset(realloc_list , 0, sizeof(struct __realloc));
 }
 
 void *__malloc_r(unsigned s, int type)
@@ -46,7 +61,7 @@ void *__malloc_r(unsigned s, int type)
 	
 	if(__m_c >= ALLOC_COUNT ) printf("Panic: __malloc, sem espaco na tabela de alocacao\n");
 	
-	while(alloc_spin_lock);
+	while(alloc_spin_lock){}
 	alloc_spin_lock++;
 	
 	int nb = s/0x1000;
@@ -126,8 +141,22 @@ void __free_r(void *p)
 {
 	if(!p)return;
 
-	while(alloc_spin_lock);
-	alloc_spin_lock++;
+    // verificar se e realloc
+    struct __realloc *tmp = realloc_list->next;
+    struct __realloc *tmp2 = realloc_list;
+    unsigned long bu = (unsigned long) p;
+    while(tmp){ 
+        if(tmp->ptr == bu){ break;}
+        tmp2 = tmp->next;
+        tmp = tmp->next;
+    }
+    if(tmp != 0){
+        tmp2->next = tmp->next;
+        __free_r(tmp);
+    }
+
+    while(alloc_spin_lock){}
+	alloc_spin_lock ++;
 	
 	__alloc_t *__m, *m;
 	unsigned long a = (unsigned long)p;
@@ -175,50 +204,67 @@ void __free_r(void *p)
 void *__realloc_r(void *ptr, unsigned s)
 {
 
-	//printf("panic: realloc %lx size = %d %d\n",ptr, s, __m_c);
-	
-	unsigned long r = 0;
-	int yes = 0;	
+    //printf("realloc: %lx %d\n", ptr, s);
+
+	unsigned long bu = 0;
+    struct __realloc *blk = 0;	
 	 	
-	if(!ptr) return (void*) __malloc_r(s, 1);
-	
-	
-	while(alloc_spin_lock);
-	alloc_spin_lock++;
-	
-	__alloc_t *m;
-	__alloc_t *__m = (__alloc_t*) __m_i;
-	
-	unsigned long a = (unsigned long)ptr;
+	if(!ptr){
 
-	 for(int i=0; i< ALLOC_COUNT;i ++){
-	 
-            	if(__m->addr != a){
-                        __m ++;
-                        continue;
-                }
-                
-               
-             	m = __m;
-             	
- 		yes = 1;
-                
-              	if((m->size + s ) > REALLOC_FIRST_SIZE) {
-              		printf("panic: realoc sem espaco, %lx size = %d %d\n",ptr, s, __m_c);
-              		for(;;);
-              	}
-              	else {
-              		r = m->addr;
-              		
-              		m->size += s;
-              	}
-                
-                
-   	} 
+        struct __realloc *tmp = realloc_list;
+        while(tmp->next){ 
+            tmp = tmp->next;
+        }
 
-	alloc_spin_lock = 0;
-	
-	if(yes == 0) return (void*) __malloc_r(s, 1);
+        blk = (struct __realloc *) __malloc_r(0x1000, 0);
+        memset(blk , 0, sizeof(struct __realloc));
 
-	return (void*)r;
+        int res = 0;
+        if(s%0x1000)res = 1;
+        unsigned long len = 0x1000*((s/0x1000)+res);
+
+        blk->ptr = (unsigned long)__malloc_r(len, 0);
+        blk->pool = len;
+        blk->size = s;        
+
+        tmp->next = blk;
+
+        bu = blk->ptr;
+
+    }else{
+        struct __realloc *tmp = realloc_list->next;
+        bu = (unsigned long) ptr;
+        while(tmp){ 
+            if(tmp->ptr == bu){ break;}
+            tmp = tmp->next;
+        }
+
+        blk = tmp;
+        if(blk){
+            if((blk->pool - blk->size) >= s){
+                blk->size += s;
+            }else {
+
+                blk->size += s;
+                int res = 0;
+                if(blk->size%0x1000)res = 1;
+                unsigned long len = 0x1000*((blk->size/0x1000)+res);
+                blk->size -= s;
+                bu = (unsigned long)__malloc_r(len, 0);
+                memcpy((void*)bu, (void*)blk->ptr ,blk->size);
+                void *tmp_ptr = (void*)blk->ptr;
+                blk->ptr = bu;
+                blk->pool = len;
+                blk->size += s; 
+
+                __free_r(tmp_ptr);
+            }
+        
+        }else{
+            printf("panic: realloc %lx size = %d\n",ptr, s);
+            while(1){}
+        }
+    }
+	printf("%lx\n", bu);
+	return (void*)bu;
 }

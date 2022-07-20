@@ -31,6 +31,7 @@ extern char *ctime(const time_t *timer);
 extern struct tm *gmtime(const time_t *timer);
 extern struct tm *localtime(const time_t *timer);
 extern size_t strftime(char *s, size_t maxsize,const char *format, const struct tm *timeptr);
-
+extern double difftime(time_t time1, time_t time0);
+extern time_t mktime(struct tm *timeptr);
 
 #endif

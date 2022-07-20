@@ -45,7 +45,8 @@ int apic_timer()
     apic_timer_ticks++;
 
     printf("apic_timer_ticks %d\n", apic_timer_ticks);
-    apic_timer_ticks = 1995;
+
+    apic_timer_ticks = 1000;
     
     // Finally re-enable timer in periodic mode
 	val = APIC_CONFIG_DATA_LVT(1/*periodic mode*/,1/*masked*/,null,null,0,null,0x20/*vetor*/);
@@ -53,7 +54,7 @@ int apic_timer()
         
     // Setting divide value register again not needed by the manuals
     // Although I have found buggy hardware that required it
-    local_apic_write_command( APIC_DIVIDE_TIMER, 0x3);
+    local_apic_write_command( APIC_DIVIDE_TIMER, 0xa/*0x3*/);
 
     // Now eax holds appropriate number of ticks, use it as APIC timer counter initializer
     local_apic_write_command( APIC_INITIAL_COUNT_TIMER, apic_timer_ticks);

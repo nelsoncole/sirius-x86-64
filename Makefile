@@ -75,8 +75,8 @@ test2:
 	-drive if=none,id=usbstick,file=disk.vhd -device usb-storage,bus=ehci.0,drive=usbstick
 	
 fs:
-	gcc -Wall -C fs.c -o fs
-	gcc -Wall -C copy.c -o copy
+	gcc -Wall fs.c -o fs
+	gcc -Wall copy.c -o copy
 	
 	
 vbox_install:
@@ -87,6 +87,6 @@ install:
 	
 push:
 	git add ./
-	git commit -m "removendo o spinlock do alloc_page()"	
+	git commit -m "Época de férias"	
 	git push -u origin main
 	

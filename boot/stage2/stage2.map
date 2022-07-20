@@ -822,36 +822,36 @@ OUTPUT(stage2.bin elf32-i386)
  .rel.iplt      0x000000000003b000        0x0 stage2.o
  .rel.text      0x000000000003b000        0x0 stage2.o
 
-.comment        0x0000000000000000       0x2a
- .comment       0x0000000000000000       0x2a main.o
-                                         0x2b (size before relaxing)
- .comment       0x000000000000002a       0x2b data.o
- .comment       0x000000000000002a       0x2b stdlib.o
- .comment       0x000000000000002a       0x2b string.o
- .comment       0x000000000000002a       0x2b gui.o
- .comment       0x000000000000002a       0x2b font8x16.o
- .comment       0x000000000000002a       0x2b stdio.o
- .comment       0x000000000000002a       0x2b vsprintf.o
- .comment       0x000000000000002a       0x2b gdt.o
- .comment       0x000000000000002a       0x2b idt.o
- .comment       0x000000000000002a       0x2b exception.o
- .comment       0x000000000000002a       0x2b irq.o
- .comment       0x000000000000002a       0x2b pci.o
- .comment       0x000000000000002a       0x2b ata.o
- .comment       0x000000000000002a       0x2b ahci.o
- .comment       0x000000000000002a       0x2b storage.o
- .comment       0x000000000000002a       0x2b fs.o
- .comment       0x000000000000002a       0x2b cpuid.o
- .comment       0x000000000000002a       0x2b msr.o
- .comment       0x000000000000002a       0x2b paging.o
- .comment       0x000000000000002a       0x2b bootblock.o
- .comment       0x000000000000002a       0x2b pic.o
- .comment       0x000000000000002a       0x2b ps2.o
- .comment       0x000000000000002a       0x2b mouse.o
- .comment       0x000000000000002a       0x2b keyboard.o
- .comment       0x000000000000002a       0x2b ehci.o
- .comment       0x000000000000002a       0x2b bulk.o
- .comment       0x000000000000002a       0x2b hub.o
+.comment        0x0000000000000000       0x2b
+ .comment       0x0000000000000000       0x2b main.o
+                                         0x2c (size before relaxing)
+ .comment       0x000000000000002b       0x2c data.o
+ .comment       0x000000000000002b       0x2c stdlib.o
+ .comment       0x000000000000002b       0x2c string.o
+ .comment       0x000000000000002b       0x2c gui.o
+ .comment       0x000000000000002b       0x2c font8x16.o
+ .comment       0x000000000000002b       0x2c stdio.o
+ .comment       0x000000000000002b       0x2c vsprintf.o
+ .comment       0x000000000000002b       0x2c gdt.o
+ .comment       0x000000000000002b       0x2c idt.o
+ .comment       0x000000000000002b       0x2c exception.o
+ .comment       0x000000000000002b       0x2c irq.o
+ .comment       0x000000000000002b       0x2c pci.o
+ .comment       0x000000000000002b       0x2c ata.o
+ .comment       0x000000000000002b       0x2c ahci.o
+ .comment       0x000000000000002b       0x2c storage.o
+ .comment       0x000000000000002b       0x2c fs.o
+ .comment       0x000000000000002b       0x2c cpuid.o
+ .comment       0x000000000000002b       0x2c msr.o
+ .comment       0x000000000000002b       0x2c paging.o
+ .comment       0x000000000000002b       0x2c bootblock.o
+ .comment       0x000000000000002b       0x2c pic.o
+ .comment       0x000000000000002b       0x2c ps2.o
+ .comment       0x000000000000002b       0x2c mouse.o
+ .comment       0x000000000000002b       0x2c keyboard.o
+ .comment       0x000000000000002b       0x2c ehci.o
+ .comment       0x000000000000002b       0x2c bulk.o
+ .comment       0x000000000000002b       0x2c hub.o
 
 .note.GNU-stack
                 0x0000000000000000        0x0

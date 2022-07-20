@@ -22,3 +22,16 @@ double atan2(double y, double x)
 {
 	return 0;
 }
+
+
+double cosh(double x){
+    return 0;
+}
+
+double tanh(double x){
+    return 0;
+}
+
+double sinh(double x){
+    return 0;
+}

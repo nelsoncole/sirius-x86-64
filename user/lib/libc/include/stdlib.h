@@ -1,11 +1,9 @@
 #ifndef __STDLIB_H
 #define __STDLIB_H
 
-#include "size_t.h"
+#include "stddef.h"
 
 #define NULL ((void *)0)
-
-typedef short unsigned int wchar_t;
 
 typedef struct {
   int quot;
@@ -49,6 +47,8 @@ extern	long long int strtoul ( const char *nptr, char **endptr, int base);
 
 extern void exit(int rc);
 extern char *getenv(const char *name);
+
+extern void abort(void);
 
 extern void qsort(void *base, size_t nmemb, size_t size,int (*compar)(const void *, const void *));
 
