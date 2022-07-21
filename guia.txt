@@ -9,3 +9,6 @@ Nelson:
 	
 10.07.2021:
 	Melhorar o putc
+
+21.07.2022:
+    Melhorias na GUI e no VHD
