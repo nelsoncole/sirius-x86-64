@@ -13,6 +13,7 @@ extern void term_color(int fg, int bg);
 extern char* get_ip_from_name(char *addr, const char *name , int query_type);
 char bf[4096];
 int main(int argc, char **argv) {
+
     term_color(14, 2);
     printf(" Hello ");
     term_color(-1, -1);

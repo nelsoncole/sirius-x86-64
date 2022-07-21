@@ -158,7 +158,7 @@ int pv,int argc, char **argv, char *pwd)
 		
 		new_thread->prv = 1;
     
-        new_thread->rflag 	= 0x3202;
+        new_thread->rflag 	= 0x202; //0x3202;
 
    	} else if(!(pv&1)) { // processo do kernelspace
    		new_thread->cs 		= 0x8;
@@ -277,7 +277,7 @@ int argc, char **argv, char *pwd, THREAD *thread)
 		 
 		new_thread->prv = 1;
 
-        new_thread->rflag 	= 0x3202;
+        new_thread->rflag 	= 0x202; //0x3202;
 
     } else if(!(pv&1)) { // processo do kernelspace
     	new_thread->cs 	    = 0x8;
@@ -370,7 +370,7 @@ THREAD *pthread_create( void (*main)(), unsigned long rsp, int pv, THREAD *threa
 		 
 		new_thread->prv = 1;
 
-        new_thread->rflag 	= 0x3202;
+        new_thread->rflag 	= 0x202; //0x3202;
 
     } else if(!(pv&1)) { // processo do kernelspace
     	new_thread->cs 	    = 0x8;

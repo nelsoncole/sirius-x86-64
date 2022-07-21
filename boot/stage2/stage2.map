@@ -41,8 +41,8 @@ key_buffer          0x2               keyboard.o
 dv_uid              0x4               data.o
 fs_directory        0x4000            fs.o
 qh                  0x4               ehci.o
-ATA_BAR1            0x4               main.o
-ATA_BAR4            0x4               main.o
+ATA_BAR1            0x4               ata.o
+ATA_BAR4            0x4               ata.o
 qh1                 0x4               ehci.o
 td3                 0x4               ehci.o
 gdtr1               0xa               gdt.o
@@ -56,8 +56,8 @@ ata_record_dev      0x4               ata.o
 ata                 0x800             storage.o
 ehci_pool           0x8000            ehci.o
 gdtr2               0xa               gdt.o
-ATA_BAR0            0x4               main.o
-ATA_BAR3            0x4               main.o
+ATA_BAR0            0x4               ata.o
+ATA_BAR3            0x4               ata.o
 qh3                 0x4               ehci.o
 HBA_BASE            0x4               ahci.o
 gdt1                0x18              gdt.o
@@ -73,8 +73,8 @@ mouse_y             0x4               mouse.o
 periodic_list       0x1000            ehci.o
 ehci                0xc               ehci.o
 hba_mem_space       0x4               ahci.o
-ATA_BAR2            0x4               main.o
-ATA_BAR5            0x4               main.o
+ATA_BAR2            0x4               ata.o
+ATA_BAR5            0x4               ata.o
 sata_idtfy          0x200             ahci.o
 cmd1                0x4               ehci.o
 
@@ -660,34 +660,34 @@ Linker script and memory map
  .bss           0x0000000000027020        0x0 bulk.o
  .bss           0x0000000000027020        0x0 hub.o
  *(COMMON)
- COMMON         0x0000000000027020       0x1c main.o
-                0x0000000000027020                ATA_BAR1
-                0x0000000000027024                ATA_BAR4
-                0x0000000000027028                CPUID_REQUEST
-                0x000000000002702c                ATA_BAR0
-                0x0000000000027030                ATA_BAR3
-                0x0000000000027034                ATA_BAR2
-                0x0000000000027038                ATA_BAR5
- COMMON         0x000000000002703c        0x5 data.o
-                0x000000000002703c                dv_uid
-                0x0000000000027040                dv_num
- *fill*         0x0000000000027041        0x3 
- COMMON         0x0000000000027044        0x4 gui.o
-                0x0000000000027044                gui
- COMMON         0x0000000000027048       0x48 gdt.o
-                0x0000000000027048                gdtr1
-                0x0000000000027054                gdt2
-                0x000000000002706c                gdtr2
-                0x0000000000027078                gdt1
- *fill*         0x0000000000027090       0x10 
- COMMON         0x00000000000270a0      0x80a idt.o
-                0x00000000000270a0                idt
-                0x00000000000278a0                idtr
- *fill*         0x00000000000278aa        0x2 
- COMMON         0x00000000000278ac        0x8 ata.o
-                0x00000000000278ac                ata_record_channel
-                0x00000000000278b0                ata_record_dev
- *fill*         0x00000000000278b4        0xc 
+ COMMON         0x0000000000027020        0x4 main.o
+                0x0000000000027020                CPUID_REQUEST
+ COMMON         0x0000000000027024        0x5 data.o
+                0x0000000000027024                dv_uid
+                0x0000000000027028                dv_num
+ *fill*         0x0000000000027029        0x3 
+ COMMON         0x000000000002702c        0x4 gui.o
+                0x000000000002702c                gui
+ COMMON         0x0000000000027030       0x48 gdt.o
+                0x0000000000027030                gdtr1
+                0x000000000002703c                gdt2
+                0x0000000000027054                gdtr2
+                0x0000000000027060                gdt1
+ *fill*         0x0000000000027078        0x8 
+ COMMON         0x0000000000027080      0x80a idt.o
+                0x0000000000027080                idt
+                0x0000000000027880                idtr
+ *fill*         0x000000000002788a        0x2 
+ COMMON         0x000000000002788c       0x20 ata.o
+                0x000000000002788c                ata_record_channel
+                0x0000000000027890                ATA_BAR1
+                0x0000000000027894                ATA_BAR4
+                0x0000000000027898                ata_record_dev
+                0x000000000002789c                ATA_BAR0
+                0x00000000000278a0                ATA_BAR3
+                0x00000000000278a4                ATA_BAR2
+                0x00000000000278a8                ATA_BAR5
+ *fill*         0x00000000000278ac       0x14 
  COMMON         0x00000000000278c0      0x220 ahci.o
                 0x00000000000278c0                dmaphys
                 0x00000000000278c4                HBA_BASE

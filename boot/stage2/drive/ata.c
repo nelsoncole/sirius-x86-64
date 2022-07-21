@@ -36,6 +36,13 @@
 
 #include <storage.h>
 
+// base address 
+uint32_t ATA_BAR0;    // Primary Command Block Base Address
+uint32_t ATA_BAR1;    // Primary Control Block Base Address
+uint32_t ATA_BAR2;    // Secondary Command Block Base Address
+uint32_t ATA_BAR3;    // Secondary Control Block Base Address
+uint32_t ATA_BAR4;    // Legacy Bus Master Base Address
+uint32_t ATA_BAR5;    // AHCI Base Address / SATA Index Data Pair Base Address
 
 PCI_COFIG_SPACE *ata_pci = NULL;
 unsigned int ata_record_dev,ata_record_channel;

@@ -128,8 +128,8 @@ eticks              0x8               pit.o
 mouse2              0x8               mouse.o
 fs_directory        0x8               cfs.o
 gdt                 0x100             gdt.o
-ATA_BAR1            0x4               main.o
-ATA_BAR4            0x4               main.o
+ATA_BAR1            0x4               storage.o
+ATA_BAR4            0x4               storage.o
 context_ds          0x8               thread.o
 hda_base            0x8               hda.o
 alloc_pde           0x8               mm.o
@@ -192,8 +192,8 @@ context_rbp         0x8               thread.o
 output_node         0x4               hda.o
 context_r8          0x8               thread.o
 w_remove_spinlock   0x4               window_server.o
-ATA_BAR0            0x4               main.o
-ATA_BAR3            0x4               main.o
+ATA_BAR0            0x4               storage.o
+ATA_BAR3            0x4               storage.o
 context2_rcx        0x8               thread.o
 HBA_BASE            0x8               ahci.o
 timer_ticks         0x8               pit.o
@@ -264,9 +264,9 @@ paint_foco          0x8               compositor.o
 ret                 0x8               syscall.o
 dhcp_ip             0x4               ethernet.o
 clock               0x8               rtc.o
-ATA_BAR2            0x4               main.o
+ATA_BAR2            0x4               storage.o
 rx_desc             0x800             vmnet.o
-ATA_BAR5            0x4               main.o
+ATA_BAR5            0x4               storage.o
 re_base_addr        0x8               rtl8169.o
 context2_rsi        0x8               thread.o
 SLP_TYPb            0x2               acpi.o
@@ -1370,176 +1370,176 @@ Linker script and memory map
                 0x00000000004614e0                memory
  .bss           0x00000000004614e8        0x0 argv.o
  *(COMMON)
- COMMON         0x00000000004614e8       0x40 main.o
+ COMMON         0x00000000004614e8       0x28 main.o
                 0x00000000004614e8                mult_task
-                0x00000000004614ec                ATA_BAR1
-                0x00000000004614f0                ATA_BAR4
-                0x00000000004614f8                user
-                0x0000000000461500                CPUID_REQUEST
-                0x0000000000461504                launcher
-                0x0000000000461508                ATA_BAR0
-                0x000000000046150c                ATA_BAR3
-                0x0000000000461510                no
-                0x0000000000461518                syspwd
-                0x0000000000461520                ATA_BAR2
-                0x0000000000461524                ATA_BAR5
- *fill*         0x0000000000461528       0x18 
- COMMON         0x0000000000461540      0x120 gdt.o
-                0x0000000000461540                gdtr
-                0x0000000000461560                gdt
- COMMON         0x0000000000461660       0x68 tss.o
-                0x0000000000461660                tss
- *fill*         0x00000000004616c8       0x18 
- COMMON         0x00000000004616e0     0x100a idt.o
-                0x00000000004616e0                idt
-                0x00000000004626e0                idtr
- *fill*         0x00000000004626ea        0x6 
- COMMON         0x00000000004626f0       0x25 data.o
-                0x00000000004626f0                interrupt_status
-                0x00000000004626f8                kernelmouse
-                0x0000000000462700                dv_uid
-                0x0000000000462708                pipe_launcher
-                0x0000000000462710                tmpnam
-                0x0000000000462714                dv_num
- *fill*         0x0000000000462715        0xb 
- COMMON         0x0000000000462720       0x50 server.o
-                0x0000000000462720                thread_id
-                0x0000000000462740                server_id
- *fill*         0x0000000000462770       0x10 
- COMMON         0x0000000000462780      0x112 smp.o
-                0x0000000000462780                core
- *fill*         0x0000000000462892        0x6 
- COMMON         0x0000000000462898       0x38 mm.o
-                0x0000000000462898                PAGE_BITMAP
-                0x00000000004628a0                alloc_pte
-                0x00000000004628a8                alloc_pde
-                0x00000000004628b0                RAM_BITMAP
-                0x00000000004628b8                alloc_spin_lock
-                0x00000000004628c0                device_pde
-                0x00000000004628c8                g_mm_mp_index
- COMMON         0x00000000004628d0       0x10 apic.o
-                0x00000000004628d0                localId
-                0x00000000004628d8                lapicbase
- COMMON         0x00000000004628e0        0x4 apic_timer.o
-                0x00000000004628e0                apic_timer_ticks
- *fill*         0x00000000004628e4       0x1c 
- COMMON         0x0000000000462900       0xc8 ioapic.o
-                0x0000000000462900                ioapic_redir_table
-                0x00000000004629c0                ioapic_base
- COMMON         0x00000000004629c8      0x1f0 thread.o
-                0x00000000004629c8                context2_r15
-                0x00000000004629d0                context2_rsp0
-                0x00000000004629d8                context2_r12
-                0x00000000004629e0                context2_gs
-                0x00000000004629e8                context_rcx
-                0x00000000004629f0                context2_ds
-                0x00000000004629f8                context_r12
-                0x0000000000462a00                context_rax
-                0x0000000000462a08                context_ds
-                0x0000000000462a10                context2_ss
-                0x0000000000462a18                current_thread
-                0x0000000000462a20                context2_cs
-                0x0000000000462a28                current_thread2
-                0x0000000000462a30                context2_pid
-                0x0000000000462a38                context_rsi
-                0x0000000000462a40                context2_r13
-                0x0000000000462a48                context2_rbp
-                0x0000000000462a50                context_r9
-                0x0000000000462a58                context_rdx
-                0x0000000000462a60                context_rflag
-                0x0000000000462a68                current_thread1
-                0x0000000000462a70                context_fxsave
-                0x0000000000462a78                context2_rdx
-                0x0000000000462a80                context_cs
-                0x0000000000462a88                context_rsp0
-                0x0000000000462a90                context2_es
-                0x0000000000462a98                thread_ready_queue
-                0x0000000000462aa0                context_cr3
-                0x0000000000462aa8                context_rsp
-                0x0000000000462ab0                context_fs
-                0x0000000000462ab8                context2_rax
-                0x0000000000462ac0                context_rbp
-                0x0000000000462ac8                context_r8
-                0x0000000000462ad0                context2_rcx
-                0x0000000000462ad8                context_r15
-                0x0000000000462ae0                context2_rflag
-                0x0000000000462ae8                context_ss
-                0x0000000000462af0                context2_r14
-                0x0000000000462af8                context2_fs
-                0x0000000000462b00                context2_rbx
-                0x0000000000462b08                context2_r11
-                0x0000000000462b10                context2_cr3
-                0x0000000000462b18                next_pid
-                0x0000000000462b20                context_gs
-                0x0000000000462b28                context_r11
-                0x0000000000462b30                context2_r9
-                0x0000000000462b38                first_thread2
-                0x0000000000462b40                context2_r10
-                0x0000000000462b48                context2_rip
-                0x0000000000462b50                context2_fxsave
-                0x0000000000462b58                context2_rsp
-                0x0000000000462b60                context_r13
-                0x0000000000462b68                context_r10
-                0x0000000000462b70                context_rip
-                0x0000000000462b78                context_pid
-                0x0000000000462b80                context_rbx
-                0x0000000000462b88                context_r14
-                0x0000000000462b90                context2_r8
-                0x0000000000462b98                context2_rsi
-                0x0000000000462ba0                context_rdi
-                0x0000000000462ba8                context2_rdi
-                0x0000000000462bb0                context_es
- COMMON         0x0000000000462bb8        0x8 syscall.o
-                0x0000000000462bb8                ret
- COMMON         0x0000000000462bc0       0x78 i965.o
-                0x0000000000462bc0                fb
-                0x0000000000462be0                mode
-                0x0000000000462c00                gtt
- COMMON         0x0000000000462c38       0x50 acpi.o
-                0x0000000000462c38                fadt
-                0x0000000000462c40                acpi_physical_init
-                0x0000000000462c48                SLP_TYPa
-                0x0000000000462c50                hpet
-                0x0000000000462c58                xsdt
-                0x0000000000462c60                rsdt
-                0x0000000000462c68                dsdt
-                0x0000000000462c70                SLP_TYPb
-                0x0000000000462c78                acpi_virtual_addr
-                0x0000000000462c80                rsdp
- COMMON         0x0000000000462c88       0x10 hpet.o
-                0x0000000000462c88                hpet_register
-                0x0000000000462c90                period
- COMMON         0x0000000000462c98       0x10 pit.o
-                0x0000000000462c98                eticks
-                0x0000000000462ca0                timer_ticks
- COMMON         0x0000000000462ca8       0x24 mouse.o
-                0x0000000000462ca8                mouse_x
-                0x0000000000462cac                count_mouse
-                0x0000000000462cb0                mouse2
-                0x0000000000462cb8                first_time
-                0x0000000000462cbc                buttons
-                0x0000000000462cc0                mouse
-                0x0000000000462cc8                mouse_y
- COMMON         0x0000000000462ccc        0x4 keyboard.o
-                0x0000000000462ccc                key_buffer
-                0x0000000000462cce                led_status
-                0x0000000000462ccf                keyboard_charset
- *fill*         0x0000000000462cd0       0x10 
- COMMON         0x0000000000462ce0      0x220 ahci.o
-                0x0000000000462ce0                dmavirt
-                0x0000000000462ce8                dmaphy
-                0x0000000000462cf0                HBA_BASE
-                0x0000000000462cf8                hba_mem_space
-                0x0000000000462d00                sata_idtfy
- COMMON         0x0000000000462f00        0x8 ide.o
-                0x0000000000462f00                ata_record_channel
-                0x0000000000462f04                ata_record_dev
- *fill*         0x0000000000462f08       0x18 
- COMMON         0x0000000000462f20      0x800 storage.o
+                0x00000000004614f0                user
+                0x00000000004614f8                CPUID_REQUEST
+                0x00000000004614fc                launcher
+                0x0000000000461500                no
+                0x0000000000461508                syspwd
+ *fill*         0x0000000000461510       0x10 
+ COMMON         0x0000000000461520      0x120 gdt.o
+                0x0000000000461520                gdtr
+                0x0000000000461540                gdt
+ COMMON         0x0000000000461640       0x68 tss.o
+                0x0000000000461640                tss
+ *fill*         0x00000000004616a8       0x18 
+ COMMON         0x00000000004616c0     0x100a idt.o
+                0x00000000004616c0                idt
+                0x00000000004626c0                idtr
+ *fill*         0x00000000004626ca        0x6 
+ COMMON         0x00000000004626d0       0x25 data.o
+                0x00000000004626d0                interrupt_status
+                0x00000000004626d8                kernelmouse
+                0x00000000004626e0                dv_uid
+                0x00000000004626e8                pipe_launcher
+                0x00000000004626f0                tmpnam
+                0x00000000004626f4                dv_num
+ *fill*         0x00000000004626f5        0xb 
+ COMMON         0x0000000000462700       0x50 server.o
+                0x0000000000462700                thread_id
+                0x0000000000462720                server_id
+ *fill*         0x0000000000462750       0x10 
+ COMMON         0x0000000000462760      0x112 smp.o
+                0x0000000000462760                core
+ *fill*         0x0000000000462872        0x6 
+ COMMON         0x0000000000462878       0x38 mm.o
+                0x0000000000462878                PAGE_BITMAP
+                0x0000000000462880                alloc_pte
+                0x0000000000462888                alloc_pde
+                0x0000000000462890                RAM_BITMAP
+                0x0000000000462898                alloc_spin_lock
+                0x00000000004628a0                device_pde
+                0x00000000004628a8                g_mm_mp_index
+ COMMON         0x00000000004628b0       0x10 apic.o
+                0x00000000004628b0                localId
+                0x00000000004628b8                lapicbase
+ COMMON         0x00000000004628c0        0x4 apic_timer.o
+                0x00000000004628c0                apic_timer_ticks
+ *fill*         0x00000000004628c4       0x1c 
+ COMMON         0x00000000004628e0       0xc8 ioapic.o
+                0x00000000004628e0                ioapic_redir_table
+                0x00000000004629a0                ioapic_base
+ COMMON         0x00000000004629a8      0x1f0 thread.o
+                0x00000000004629a8                context2_r15
+                0x00000000004629b0                context2_rsp0
+                0x00000000004629b8                context2_r12
+                0x00000000004629c0                context2_gs
+                0x00000000004629c8                context_rcx
+                0x00000000004629d0                context2_ds
+                0x00000000004629d8                context_r12
+                0x00000000004629e0                context_rax
+                0x00000000004629e8                context_ds
+                0x00000000004629f0                context2_ss
+                0x00000000004629f8                current_thread
+                0x0000000000462a00                context2_cs
+                0x0000000000462a08                current_thread2
+                0x0000000000462a10                context2_pid
+                0x0000000000462a18                context_rsi
+                0x0000000000462a20                context2_r13
+                0x0000000000462a28                context2_rbp
+                0x0000000000462a30                context_r9
+                0x0000000000462a38                context_rdx
+                0x0000000000462a40                context_rflag
+                0x0000000000462a48                current_thread1
+                0x0000000000462a50                context_fxsave
+                0x0000000000462a58                context2_rdx
+                0x0000000000462a60                context_cs
+                0x0000000000462a68                context_rsp0
+                0x0000000000462a70                context2_es
+                0x0000000000462a78                thread_ready_queue
+                0x0000000000462a80                context_cr3
+                0x0000000000462a88                context_rsp
+                0x0000000000462a90                context_fs
+                0x0000000000462a98                context2_rax
+                0x0000000000462aa0                context_rbp
+                0x0000000000462aa8                context_r8
+                0x0000000000462ab0                context2_rcx
+                0x0000000000462ab8                context_r15
+                0x0000000000462ac0                context2_rflag
+                0x0000000000462ac8                context_ss
+                0x0000000000462ad0                context2_r14
+                0x0000000000462ad8                context2_fs
+                0x0000000000462ae0                context2_rbx
+                0x0000000000462ae8                context2_r11
+                0x0000000000462af0                context2_cr3
+                0x0000000000462af8                next_pid
+                0x0000000000462b00                context_gs
+                0x0000000000462b08                context_r11
+                0x0000000000462b10                context2_r9
+                0x0000000000462b18                first_thread2
+                0x0000000000462b20                context2_r10
+                0x0000000000462b28                context2_rip
+                0x0000000000462b30                context2_fxsave
+                0x0000000000462b38                context2_rsp
+                0x0000000000462b40                context_r13
+                0x0000000000462b48                context_r10
+                0x0000000000462b50                context_rip
+                0x0000000000462b58                context_pid
+                0x0000000000462b60                context_rbx
+                0x0000000000462b68                context_r14
+                0x0000000000462b70                context2_r8
+                0x0000000000462b78                context2_rsi
+                0x0000000000462b80                context_rdi
+                0x0000000000462b88                context2_rdi
+                0x0000000000462b90                context_es
+ COMMON         0x0000000000462b98        0x8 syscall.o
+                0x0000000000462b98                ret
+ COMMON         0x0000000000462ba0       0x78 i965.o
+                0x0000000000462ba0                fb
+                0x0000000000462bc0                mode
+                0x0000000000462be0                gtt
+ COMMON         0x0000000000462c18       0x50 acpi.o
+                0x0000000000462c18                fadt
+                0x0000000000462c20                acpi_physical_init
+                0x0000000000462c28                SLP_TYPa
+                0x0000000000462c30                hpet
+                0x0000000000462c38                xsdt
+                0x0000000000462c40                rsdt
+                0x0000000000462c48                dsdt
+                0x0000000000462c50                SLP_TYPb
+                0x0000000000462c58                acpi_virtual_addr
+                0x0000000000462c60                rsdp
+ COMMON         0x0000000000462c68       0x10 hpet.o
+                0x0000000000462c68                hpet_register
+                0x0000000000462c70                period
+ COMMON         0x0000000000462c78       0x10 pit.o
+                0x0000000000462c78                eticks
+                0x0000000000462c80                timer_ticks
+ COMMON         0x0000000000462c88       0x24 mouse.o
+                0x0000000000462c88                mouse_x
+                0x0000000000462c8c                count_mouse
+                0x0000000000462c90                mouse2
+                0x0000000000462c98                first_time
+                0x0000000000462c9c                buttons
+                0x0000000000462ca0                mouse
+                0x0000000000462ca8                mouse_y
+ COMMON         0x0000000000462cac        0x4 keyboard.o
+                0x0000000000462cac                key_buffer
+                0x0000000000462cae                led_status
+                0x0000000000462caf                keyboard_charset
+ *fill*         0x0000000000462cb0       0x10 
+ COMMON         0x0000000000462cc0      0x220 ahci.o
+                0x0000000000462cc0                dmavirt
+                0x0000000000462cc8                dmaphy
+                0x0000000000462cd0                HBA_BASE
+                0x0000000000462cd8                hba_mem_space
+                0x0000000000462ce0                sata_idtfy
+ COMMON         0x0000000000462ee0        0x8 ide.o
+                0x0000000000462ee0                ata_record_channel
+                0x0000000000462ee4                ata_record_dev
+ *fill*         0x0000000000462ee8       0x18 
+ COMMON         0x0000000000462f00      0x830 storage.o
+                0x0000000000462f00                ATA_BAR1
+                0x0000000000462f04                ATA_BAR4
                 0x0000000000462f20                ata
- COMMON         0x0000000000463720        0x8 rtc.o
-                0x0000000000463720                clock
- *fill*         0x0000000000463728       0x18 
+                0x0000000000463720                ATA_BAR0
+                0x0000000000463724                ATA_BAR3
+                0x0000000000463728                ATA_BAR2
+                0x000000000046372c                ATA_BAR5
+ COMMON         0x0000000000463730        0x8 rtc.o
+                0x0000000000463730                clock
+ *fill*         0x0000000000463738        0x8 
  COMMON         0x0000000000463740       0xd4 hda.o
                 0x0000000000463740                corb_pointer
                 0x0000000000463744                HDBARL
