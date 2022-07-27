@@ -11,7 +11,7 @@
 
 #include <data.h>
 
-
+int threadz;
 extern int screan_spin_lock;
 
 extern unsigned long thread_id;
@@ -76,7 +76,7 @@ extern void SaveSSE(void *f);
 int first_thread2;
 
 unsigned long thread_setup() {
-
+    threadz = 0;
 	next_pid = 0;
     first_thread2 = 0;
 	unsigned long addr = 0;
@@ -588,7 +588,7 @@ void task_switch2()
     tmp->cr3 	= context2_cr3;
 
     for(int i=0;i<512;i++) tmp->fxsave[i] = context2_fxsave[i];
-
+    if(threadz != 0)goto label;
 __no:  
     // next
     tmp 	= tmp->next;
@@ -614,7 +614,7 @@ __no:
 
 	current_thread2 	= tmp;
     first_thread2       = 1;
-
+label:
     // Restaura o contexto da próxima
     // tarefa a ser executada...
 	context2_rax 	= tmp->rax;

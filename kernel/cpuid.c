@@ -1,5 +1,23 @@
 #include <cpuid.h>
 
+enum {
+	
+	// Basic CPUID Information
+	CPUID_GET_VENDOR_STRING,
+	CPUID_GET_FEATURES,
+	CPUID_GET_TLB,
+	CPUID_GET_SERIAL,
+	// Extended Function CPUID Information
+	CPUID_GET_EXTENDED = 0x80000000,
+	CPUID_GET_EXTENDED_FEATURES,
+	CPUID_GET_BRAND_STRING,
+	CPUID_GET_BRAND_STRING_MORE,
+	CPUID_GET_BRAND_STRING_END
+	
+	
+	
+}CPUID_REQUEST;
+
 int cpuid_vendor(char *string)
 {
 	unsigned int *str_p = (unsigned int*) string;

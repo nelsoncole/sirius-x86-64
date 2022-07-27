@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <pipe.h>
+#include <stdio.h>
 
 void drawline(int x1, int y1, int x2, int y2, int rgb, WINDOW *w)
 {
@@ -222,6 +223,10 @@ WINDOW *window(const char *title,int x, int y, int width, int height, int fg, in
 
     // rodapé
     drawline( 3, w->height - WROD_SIZE - 3 , w->width-6 , WROD_SIZE, 0xC0C0C0, w);
+
+    w->stdin = (unsigned long)stdin;
+    w->stdout = (unsigned long)stdout;
+    w->stderr = (unsigned long)stderr;
 
 	return (w);
 }

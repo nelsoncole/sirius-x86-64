@@ -155,7 +155,7 @@ void init_e1000(int bus,int slot,int function){
         e1000_write_command(0x5200 + (i * 4), 0);
     }
 
-    // Desabilitar Interrupção
+    // Habilitar Interrupção
     e1000_write_command(0xD0,0x1F6DC);
     e1000_read_command(0xC0);
 

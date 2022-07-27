@@ -71,7 +71,7 @@ NANOJPEG = $(HEADER) nanojpeg.o $(sys) $(GUI) $(LIBC)
 NASM = $(HEADER) $(NASM_OBJS) $(sys) $(GUI) $(LIBC)
 
 .PHONY: all term.bin shell.bin explore.bin editor.bin cat.bin test.bin telnet.bin chat.bin lua.bin nasm.bin nanojpeg.bin pci.bin png move
-all: launcher.bin term.bin shell.bin explore.bin editor.bin cat.bin test.bin telnet.bin chat.bin nanojpeg.bin pci.bin lua.bin move
+all: launcher.bin term.bin shell.bin explore.bin editor.bin cat.bin test.bin telnet.bin chat.bin pci.bin move # nanojpeg.bin lua.bin move #
 
 launcher.bin: $(LAUNCHER)
 	$(LD) $(LDFLAGS64) -o $@ $^

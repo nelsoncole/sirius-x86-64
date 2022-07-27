@@ -49,7 +49,7 @@ gdtr1               0xa               gdt.o
 gdt2                0x18              gdt.o
 ehci_driver         0x4               ehci.o
 dmaphys             0x4               ahci.o
-CPUID_REQUEST       0x4               main.o
+CPUID_REQUEST       0x4               cpuid.o
 first_time          0x4               mouse.o
 gui                 0x4               gui.o
 ata_record_dev      0x4               ata.o
@@ -660,20 +660,18 @@ Linker script and memory map
  .bss           0x0000000000027020        0x0 bulk.o
  .bss           0x0000000000027020        0x0 hub.o
  *(COMMON)
- COMMON         0x0000000000027020        0x4 main.o
-                0x0000000000027020                CPUID_REQUEST
- COMMON         0x0000000000027024        0x5 data.o
-                0x0000000000027024                dv_uid
-                0x0000000000027028                dv_num
- *fill*         0x0000000000027029        0x3 
- COMMON         0x000000000002702c        0x4 gui.o
-                0x000000000002702c                gui
- COMMON         0x0000000000027030       0x48 gdt.o
-                0x0000000000027030                gdtr1
-                0x000000000002703c                gdt2
-                0x0000000000027054                gdtr2
-                0x0000000000027060                gdt1
- *fill*         0x0000000000027078        0x8 
+ COMMON         0x0000000000027020        0x5 data.o
+                0x0000000000027020                dv_uid
+                0x0000000000027024                dv_num
+ *fill*         0x0000000000027025        0x3 
+ COMMON         0x0000000000027028        0x4 gui.o
+                0x0000000000027028                gui
+ COMMON         0x000000000002702c       0x48 gdt.o
+                0x000000000002702c                gdtr1
+                0x0000000000027038                gdt2
+                0x0000000000027050                gdtr2
+                0x000000000002705c                gdt1
+ *fill*         0x0000000000027074        0xc 
  COMMON         0x0000000000027080      0x80a idt.o
                 0x0000000000027080                idt
                 0x0000000000027880                idtr
@@ -697,16 +695,18 @@ Linker script and memory map
                 0x0000000000027ae0                ata
  COMMON         0x00000000000282e0     0x4000 fs.o
                 0x00000000000282e0                fs_directory
- COMMON         0x000000000002c2e0       0x18 mouse.o
-                0x000000000002c2e0                mouse_x
-                0x000000000002c2e4                count_mouse
-                0x000000000002c2e8                first_time
-                0x000000000002c2ec                buttons
-                0x000000000002c2f0                mouse
-                0x000000000002c2f4                mouse_y
- COMMON         0x000000000002c2f8        0x2 keyboard.o
-                0x000000000002c2f8                key_buffer
- *fill*         0x000000000002c2fa      0xd06 
+ COMMON         0x000000000002c2e0        0x4 cpuid.o
+                0x000000000002c2e0                CPUID_REQUEST
+ COMMON         0x000000000002c2e4       0x18 mouse.o
+                0x000000000002c2e4                mouse_x
+                0x000000000002c2e8                count_mouse
+                0x000000000002c2ec                first_time
+                0x000000000002c2f0                buttons
+                0x000000000002c2f4                mouse
+                0x000000000002c2f8                mouse_y
+ COMMON         0x000000000002c2fc        0x2 keyboard.o
+                0x000000000002c2fc                key_buffer
+ *fill*         0x000000000002c2fe      0xd02 
  COMMON         0x000000000002d000     0xb010 ehci.o
                 0x000000000002d000                td2
                 0x000000000002d004                qh

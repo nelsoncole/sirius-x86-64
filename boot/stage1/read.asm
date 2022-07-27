@@ -22,7 +22,7 @@ read:
 	ret
 
 .err:	
-	popa
+	popad
 	mov si,strerr_read
 	call print
 	ret
@@ -52,7 +52,7 @@ write:
 	ret
 
 .err:	
-	popa
+	popad
 	mov si,strerr_write
 	call print
 	ret

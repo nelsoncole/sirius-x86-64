@@ -78,9 +78,56 @@ typedef struct __WINDOW {
 	
 	unsigned int	style;
 	unsigned int	gid;
-	char		    rsv[4096 - 172];
+    unsigned int    foco;
+    unsigned long long component[256];
+	char		    rsv[4096 - 176 - 2048];
 	unsigned long 	start;
 }__attribute__ ((packed)) WINDOW;
+typedef struct {
+
+    unsigned int 	x, y;
+    unsigned int    size;
+	unsigned int 	width;
+    unsigned int 	flag;
+    unsigned int 	index;
+    unsigned long 	addr;
+
+}__attribute__ ((packed)) XSCROLL;
+
+typedef struct {
+    unsigned int    magic;
+
+    unsigned int    id;
+	unsigned int	type;
+    unsigned int	style;
+
+    unsigned int	visible;
+	
+    unsigned int 	x, y;
+	unsigned int 	width, height;
+	
+	unsigned int  	fg, bg;
+	
+	unsigned int 	cy, cx;
+
+    unsigned int 	clear;
+
+    unsigned int 	scroll;
+
+    XSCROLL         scrollx;
+    XSCROLL         scrolly;
+
+    unsigned int	offset;
+	unsigned int 	len;
+
+	font_t		    font;
+	
+	unsigned int	handle;
+
+    unsigned int	size;
+	unsigned long 	addr;
+}__attribute__ ((packed)) XCOMPONENT;
+
 
 
 typedef struct _PAINT

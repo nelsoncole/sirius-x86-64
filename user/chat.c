@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
 
     serb.sin_family        = AF_LOCAL; //AF_INET;
     serb.sin_addr.s_addr = inet_addr(/*(const char*)ip*/argv[1]);
-    serb.sin_port  = htons(3000);
+    serb.sin_port  = htons(20001);
 
     int socketid = socket(AF_LOCAL/*AF_INET*/, SOCK_DGRAM, 0);
     if(socketid < 0) {

@@ -57,7 +57,7 @@ cmd:
 .copy:	
 
 	push cx
-	mov cx, 16384 ;8192
+	mov cx, 0xFFFF; 16384 ;8192
 	
 	xor di,di
 	mov bx,0x600
