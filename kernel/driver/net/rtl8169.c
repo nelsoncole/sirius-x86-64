@@ -17,6 +17,8 @@
 
 #include <sleep.h>
 
+
+extern int apic_send_msi( struct dev *dev, void (*main)());
 static void re_pci(int bus, int slot, int function);
 void re_handle();
 static int re_send_package(ethernet_package_descriptor_t desc);
@@ -633,7 +635,7 @@ void re_handle(){
     re_write_command(0x3e, status);
 }
 
-extern int apic_send_msi( struct dev *dev, void (*main)());
+
 static void re_pci(int bus, int slot, int function){
 
     unsigned int command = 0;

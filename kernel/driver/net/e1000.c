@@ -21,6 +21,8 @@ int e1000_send_package(ethernet_package_descriptor_t desc);
 ethernet_package_descriptor_t *e1000_recieve_package();
 
 
+extern int irq_vetor_mapping(int intr, int line);
+
 unsigned int e1000_read_command(unsigned short addr){
     return *( (volatile unsigned int *)(base_addr + addr));
 }
@@ -88,11 +90,9 @@ void init_e1000(int bus,int slot,int function){
     base_addr = pci_read_config_dword(bus,slot,function,0x10) & 0xFFFFFFF0;
     printf("[E1000] Base physical address: %x \n",base_addr);
 	int intr = pci_read_config_dword(bus,slot,function,0x3C) & 0x000000FF;
-    if(intr == 9) {
-        // TODO improviso para VirtualBox
-        // IRQ19 
-        intr += 10;
-    }
+    int line = (pci_read_config_dword(bus,slot,function,0x3C) >> 8) & 0x000000FF;
+
+    irq_vetor_mapping(intr, line);
 
     printf("[E1000] INTR %d \n",intr);
     // Configurar IRQ Handler

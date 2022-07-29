@@ -16,6 +16,8 @@ static void pcnet_pci(int bus, int slot, int function);
 ethernet_package_descriptor_t *pcnet_recieve_package();
 int pcnet_send_package(ethernet_package_descriptor_t desc);
 
+extern int irq_vetor_mapping(int intr, int line);
+
 static unsigned short pcnetReadCSR(unsigned char reg)
 {
 	outportw(io_base + REG_RAP, reg);
@@ -121,11 +123,9 @@ void setup_pcnet( int bus, int slot, int function ){
 
 	int intr = pci_read_config_dword(bus,slot,function,0x3C) & 0x000000FF;
     int line = (pci_read_config_dword(bus,slot,function,0x3C) >> 8) & 0x000000FF;
-    if(intr == 9) {
-        // TODO improviso para VirtualBox
-        // IRQ19 
-        intr += 10;
-    }
+    
+
+    irq_vetor_mapping(intr, line);
 
     printf("[PCNET] INTR %d LINE %d \n",intr, line);
     // Configurar IRQ Handler

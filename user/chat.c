@@ -21,15 +21,15 @@ int main(int argc, char **argv) {
 
     struct sockaddr_in sera;
     struct sockaddr_in serb;
-    sera.sin_family        = AF_LOCAL;//AF_INET;
+    sera.sin_family        = AF_INET;
     sera.sin_addr.s_addr = htonl(INADDR_ANY);
     sera.sin_port  = htons(0);
 
-    serb.sin_family        = AF_LOCAL; //AF_INET;
+    serb.sin_family        = AF_INET;
     serb.sin_addr.s_addr = inet_addr(/*(const char*)ip*/argv[1]);
     serb.sin_port  = htons(20001);
 
-    int socketid = socket(AF_LOCAL/*AF_INET*/, SOCK_DGRAM, 0);
+    int socketid = socket(AF_INET, SOCK_DGRAM, 0);
     if(socketid < 0) {
         printf("Cannot create socket!\n");
         return 1;
@@ -39,15 +39,15 @@ int main(int argc, char **argv) {
         printf("Cannot bind socket!\n");
         return 1;
     }
-    char message[256];
+    char message[0x1000];
     while(1) {
         printf("> ");
-        fgets (message,256,stdin);
+        fgets (message,0x1000,stdin);
         ssize_t count = sendto(socketid, message, strlen(message), 0, (struct sockaddr*)&serb, sizeof(struct sockaddr_in));
         memset(message, 0, 256);
         printf("< ");
         socklen_t len = sizeof(serb);
-        count = recvfrom(socketid, message, 256, 0, (struct sockaddr*)&serb, &len);    
+        count = recvfrom(socketid, message, 0x1000, 0, (struct sockaddr*)&serb, &len);    
         printf("%s",message);
     }
     shutdown(socketid, 0);

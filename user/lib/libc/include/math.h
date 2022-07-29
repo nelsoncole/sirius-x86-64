@@ -71,4 +71,6 @@ extern double cosh(double x);
 extern double tanh(double x);
 extern double sinh(double x);
 
+extern double modf(double x, double *iptr);
+
 #endif

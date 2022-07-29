@@ -145,6 +145,7 @@ Removed property 0xc0000002 to merge crt0.o (not found) and min.o (0x3)
 Removed property 0xc0000002 to merge crt0.o (not found) and max.o (0x3)
 Removed property 0xc0000002 to merge crt0.o (not found) and fabs.o (0x3)
 Removed property 0xc0000002 to merge crt0.o (not found) and log2.o (0x3)
+Removed property 0xc0000002 to merge crt0.o (not found) and modf.o (0x3)
 Removed property 0xc0000002 to merge crt0.o (not found) and locale.o (0x3)
 Removed property 0xc0000002 to merge crt0.o (not found) and signal.o (0x3)
 
@@ -464,6 +465,8 @@ Discarded input sections
                 0x0000000000000000       0x20 fabs.o
  .note.gnu.property
                 0x0000000000000000       0x20 log2.o
+ .note.gnu.property
+                0x0000000000000000       0x20 modf.o
  .note.gnu.property
                 0x0000000000000000       0x20 locale.o
  .note.gnu.property
@@ -832,51 +835,54 @@ Linker script and memory map
                 0x000000800000f442                acos
  .text          0x000000800000f47b       0x39 asin.o
                 0x000000800000f47b                asin
- .text          0x000000800000f4b4      0x1b8 sin.o
-                0x000000800000f571                sin
- .text          0x000000800000f66c       0x39 tan.o
-                0x000000800000f66c                tan
- .text          0x000000800000f6a5      0x1b3 cos.o
-                0x000000800000f762                cos
- .text          0x000000800000f858       0x39 floor.o
-                0x000000800000f858                floor
- .text          0x000000800000f891       0x54 ceil.o
-                0x000000800000f891                ceil
- .text          0x000000800000f8e5       0x61 exp.o
-                0x000000800000f8e5                exp
- .text          0x000000800000f946      0x11a log.o
-                0x000000800000f946                log
- .text          0x000000800000fa60       0x48 fmax.o
-                0x000000800000fa60                fmax
- .text          0x000000800000faa8       0x48 fmin.o
-                0x000000800000faa8                fmin
- .text          0x000000800000faf0       0x47 fminf.o
-                0x000000800000faf0                fminf
- .text          0x000000800000fb37       0x36 min.o
-                0x000000800000fb37                min
- .text          0x000000800000fb6d       0x36 max.o
-                0x000000800000fb6d                max
- .text          0x000000800000fba3       0x5f fabs.o
-                0x000000800000fba3                fabs
- *fill*         0x000000800000fc02        0xe 
- .text          0x000000800000fc10        0x2 lbm.o
-                0x000000800000fc10                __sin
-                0x000000800000fc11                cosine
- .text          0x000000800000fc12       0x39 log2.o
-                0x000000800000fc12                log2
- .text          0x000000800000fc4b       0x32 locale.o
-                0x000000800000fc4b                setlocale
- .text          0x000000800000fc7d       0xbb signal.o
-                0x000000800000fc7d                signal
-                0x000000800000fcdb                sigaction
- *fill*         0x000000800000fd38        0x8 
- .text          0x000000800000fd40       0x2c setjmp.o
-                0x000000800000fd40                setjmp
- *fill*         0x000000800000fd6c        0x4 
- .text          0x000000800000fd70       0x2f longjmp.o
-                0x000000800000fd70                longjmp
+ .text          0x000000800000f4b4      0x312 sin.o
+                0x000000800000f4b4                __sinus
+                0x000000800000f77d                sin
+ .text          0x000000800000f7c6       0x7d tan.o
+                0x000000800000f7c6                tan
+ .text          0x000000800000f843       0x85 cos.o
+                0x000000800000f843                cos
+ .text          0x000000800000f8c8       0x39 floor.o
+                0x000000800000f8c8                floor
+ .text          0x000000800000f901       0x54 ceil.o
+                0x000000800000f901                ceil
+ .text          0x000000800000f955       0x61 exp.o
+                0x000000800000f955                exp
+ .text          0x000000800000f9b6      0x11a log.o
+                0x000000800000f9b6                log
+ .text          0x000000800000fad0       0x48 fmax.o
+                0x000000800000fad0                fmax
+ .text          0x000000800000fb18       0x48 fmin.o
+                0x000000800000fb18                fmin
+ .text          0x000000800000fb60       0x47 fminf.o
+                0x000000800000fb60                fminf
+ .text          0x000000800000fba7       0x36 min.o
+                0x000000800000fba7                min
+ .text          0x000000800000fbdd       0x36 max.o
+                0x000000800000fbdd                max
+ .text          0x000000800000fc13       0x5f fabs.o
+                0x000000800000fc13                fabs
+ *fill*         0x000000800000fc72        0xe 
+ .text          0x000000800000fc80        0x2 lbm.o
+                0x000000800000fc80                __sin
+                0x000000800000fc81                cosine
+ .text          0x000000800000fc82       0x39 log2.o
+                0x000000800000fc82                log2
+ .text          0x000000800000fcbb      0x14b modf.o
+                0x000000800000fcbb                modf
+ .text          0x000000800000fe06       0x32 locale.o
+                0x000000800000fe06                setlocale
+ .text          0x000000800000fe38       0xbb signal.o
+                0x000000800000fe38                signal
+                0x000000800000fe96                sigaction
+ *fill*         0x000000800000fef3        0xd 
+ .text          0x000000800000ff00       0x2c setjmp.o
+                0x000000800000ff00                setjmp
+ *fill*         0x000000800000ff2c        0x4 
+ .text          0x000000800000ff30       0x2f longjmp.o
+                0x000000800000ff30                longjmp
                 0x0000008000010000                . = ALIGN (0x1000)
- *fill*         0x000000800000fd9f      0x261 
+ *fill*         0x000000800000ff5f       0xa1 
 
 .iplt           0x0000008000010000        0x0
  .iplt          0x0000008000010000        0x0 setup.o
@@ -1039,6 +1045,7 @@ Linker script and memory map
  .data          0x0000008000011768        0x0 max.o
  .data          0x0000008000011768        0x0 fabs.o
  .data          0x0000008000011768        0x0 log2.o
+ .data          0x0000008000011768        0x0 modf.o
  .data          0x0000008000011768        0x0 locale.o
  .data          0x0000008000011768        0x0 signal.o
  *(.rodata)
@@ -1081,18 +1088,16 @@ Linker script and memory map
  .rodata        0x0000008000013758        0x8 atan.o
  .rodata        0x0000008000013760        0x8 acos.o
  .rodata        0x0000008000013768        0x8 asin.o
- .rodata        0x0000008000013770       0x18 sin.o
- .rodata        0x0000008000013788        0x8 tan.o
- .rodata        0x0000008000013790       0x18 cos.o
- .rodata        0x00000080000137a8        0x8 floor.o
- .rodata        0x00000080000137b0        0x8 exp.o
- .rodata        0x00000080000137b8       0x30 log.o
- *fill*         0x00000080000137e8        0x8 
- .rodata        0x00000080000137f0       0x20 fabs.o
- .rodata        0x0000008000013810        0x8 log2.o
- .rodata        0x0000008000013818       0x42 signal.o
+ .rodata        0x0000008000013770       0x90 sin.o
+ .rodata        0x0000008000013800       0x20 cos.o
+ .rodata        0x0000008000013820        0x8 floor.o
+ .rodata        0x0000008000013828        0x8 exp.o
+ .rodata        0x0000008000013830       0x30 log.o
+ .rodata        0x0000008000013860       0x20 fabs.o
+ .rodata        0x0000008000013880        0x8 log2.o
+ .rodata        0x0000008000013888       0x42 signal.o
                 0x0000008000014000                . = ALIGN (0x1000)
- *fill*         0x000000800001385a      0x7a6 
+ *fill*         0x00000080000138ca      0x736 
 
 .got            0x0000008000014000       0x78
  .got           0x0000008000014000       0x78 setup.o
@@ -1262,6 +1267,7 @@ Linker script and memory map
  .bss           0x000000800002572c        0x0 max.o
  .bss           0x000000800002572c        0x0 fabs.o
  .bss           0x000000800002572c        0x0 log2.o
+ .bss           0x000000800002572c        0x0 modf.o
  .bss           0x000000800002572c        0x0 locale.o
  .bss           0x000000800002572c        0x0 signal.o
  *(COMMON)
@@ -1551,40 +1557,42 @@ Linker script and memory map
                                          0x38 (size before relaxing)
  .eh_frame      0x0000008000028168       0x20 asin.o
                                          0x38 (size before relaxing)
- .eh_frame      0x0000008000028188       0x68 sin.o
-                                         0x80 (size before relaxing)
- .eh_frame      0x00000080000281f0       0x20 tan.o
-                                         0x38 (size before relaxing)
- .eh_frame      0x0000008000028210       0x68 cos.o
-                                         0x80 (size before relaxing)
- .eh_frame      0x0000008000028278       0x20 floor.o
-                                         0x38 (size before relaxing)
- .eh_frame      0x0000008000028298       0x20 ceil.o
-                                         0x38 (size before relaxing)
- .eh_frame      0x00000080000282b8       0x28 exp.o
+ .eh_frame      0x0000008000028188       0x50 sin.o
+                                         0x68 (size before relaxing)
+ .eh_frame      0x00000080000281d8       0x28 tan.o
                                          0x40 (size before relaxing)
- .eh_frame      0x00000080000282e0       0x20 log.o
+ .eh_frame      0x0000008000028200       0x28 cos.o
+                                         0x40 (size before relaxing)
+ .eh_frame      0x0000008000028228       0x20 floor.o
                                          0x38 (size before relaxing)
- .eh_frame      0x0000008000028300       0x20 fmax.o
+ .eh_frame      0x0000008000028248       0x20 ceil.o
                                          0x38 (size before relaxing)
- .eh_frame      0x0000008000028320       0x20 fmin.o
+ .eh_frame      0x0000008000028268       0x28 exp.o
+                                         0x40 (size before relaxing)
+ .eh_frame      0x0000008000028290       0x20 log.o
                                          0x38 (size before relaxing)
- .eh_frame      0x0000008000028340       0x20 fminf.o
+ .eh_frame      0x00000080000282b0       0x20 fmax.o
                                          0x38 (size before relaxing)
- .eh_frame      0x0000008000028360       0x20 min.o
+ .eh_frame      0x00000080000282d0       0x20 fmin.o
                                          0x38 (size before relaxing)
- .eh_frame      0x0000008000028380       0x20 max.o
+ .eh_frame      0x00000080000282f0       0x20 fminf.o
                                          0x38 (size before relaxing)
- .eh_frame      0x00000080000283a0       0x20 fabs.o
+ .eh_frame      0x0000008000028310       0x20 min.o
                                          0x38 (size before relaxing)
- .eh_frame      0x00000080000283c0       0x20 log2.o
+ .eh_frame      0x0000008000028330       0x20 max.o
                                          0x38 (size before relaxing)
- .eh_frame      0x00000080000283e0       0x20 locale.o
+ .eh_frame      0x0000008000028350       0x20 fabs.o
                                          0x38 (size before relaxing)
- .eh_frame      0x0000008000028400       0x38 signal.o
+ .eh_frame      0x0000008000028370       0x20 log2.o
+                                         0x38 (size before relaxing)
+ .eh_frame      0x0000008000028390       0x20 modf.o
+                                         0x38 (size before relaxing)
+ .eh_frame      0x00000080000283b0       0x20 locale.o
+                                         0x38 (size before relaxing)
+ .eh_frame      0x00000080000283d0       0x38 signal.o
                                          0x50 (size before relaxing)
                 0x0000008000029000                . = ALIGN (0x1000)
- *fill*         0x0000008000028438      0xbc8 
+ *fill*         0x0000008000028408      0xbf8 
                 0x0000008000029000                end = .
                 0x0000008000029000                _end = .
                 0x0000008000029000                __end = .
@@ -1734,6 +1742,7 @@ LOAD max.o
 LOAD fabs.o
 LOAD lbm.o
 LOAD log2.o
+LOAD modf.o
 LOAD locale.o
 LOAD signal.o
 LOAD setjmp.o
@@ -1891,6 +1900,7 @@ OUTPUT(pci.bin elf64-x86-64)
  .comment       0x000000000000002b       0x2c max.o
  .comment       0x000000000000002b       0x2c fabs.o
  .comment       0x000000000000002b       0x2c log2.o
+ .comment       0x000000000000002b       0x2c modf.o
  .comment       0x000000000000002b       0x2c locale.o
  .comment       0x000000000000002b       0x2c signal.o
 
@@ -2184,6 +2194,8 @@ OUTPUT(pci.bin elf64-x86-64)
                 0x0000000000000000        0x0 fabs.o
  .note.GNU-stack
                 0x0000000000000000        0x0 log2.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 modf.o
  .note.GNU-stack
                 0x0000000000000000        0x0 locale.o
  .note.GNU-stack

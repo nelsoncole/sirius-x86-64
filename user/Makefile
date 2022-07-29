@@ -26,7 +26,7 @@ string = memcmp.o memcpy.o memset.o strcasecmp.o strcat.o strchr.o strcmp.o strc
 	strlen.o strncasecmp.o strncmp.o strncpy.o strpbrk.o strrchr.o strsep.o strspn.o strtok.o strstr.o \
 	strdup.o memmove.o strcoll.o strerror.o memchr.o
 math = math.o pow.o sqrt.o atan.o acos.o asin.o sin.o tan.o cos.o floor.o ceil.o exp.o log.o fmax.o fmin.o fminf.o min.o max.o fabs.o lbm.o \
-    log2.o
+    log2.o modf.o
 locale = locale.o
 
 signal = signal.o

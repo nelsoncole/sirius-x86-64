@@ -4,5 +4,5 @@
 
 double tan(double x)
 {
-	return 0;
+	return sin(x)/cos(x);
 }

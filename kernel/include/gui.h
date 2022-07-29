@@ -86,7 +86,7 @@ typedef struct __WINDOW {
 typedef struct {
 
     unsigned int 	x, y;
-    unsigned int    size;
+    unsigned int    cur;
 	unsigned int 	width;
     unsigned int 	flag;
     unsigned int 	index;

@@ -153,11 +153,11 @@ static int window_putchar_scroll(WINDOW *window, int foco, int op){
         ty = limity;
     }
 
-    com->scrolly.size = ty = 16*ty;
-    drawline(x + com->width + 4, y+2, 8, com->height-4, com->bg, w);
-    drawline(x + com->width + 4, y+2+ty, 8, (com->height-4)-ty, 0xe0e0e0, w);
-
+    ty = 16*ty;
     com->scrolly.width = (com->height-4)-ty;
+    drawline(x + com->width + 4, y+2, 8, com->height-4, com->bg, w);
+    drawline(x + com->width + 4, y+2+ty, 8, com->scrolly.width, 0xe0e0e0, w);
+
 
     return (int)(com->scrolly.x + 1);
 }
@@ -372,24 +372,30 @@ void terminal_mouse_click(int x, int y, XCOMPONENT *com, WINDOW *w )
 	int x2 = 16;
 	int y2 = com->height;
 
-    if( /*x > x1 &&*/ y > y1 /*&& x < (x1+x2)*/ && y < (y1 + y2) )
+    if( /*x > x1 &&*/ y >= y1 /*&& x < (x1+x2)*/ && y < (y1 + y2) )
     {
-        if(zy == y) return;
+        if(zy == y || com->scrolly.x < 1) return;
         zy = y;
-        drawline(com->x + com->width + 4, com->y+2, 8, com->height-4, com->bg, w);
 
-        int limit = (com->height-4)/com->font.y;
-        limit = limit*0.9;
-        //limit = 16*limit;
+        int limit = com->height - com->scrolly.width;
+        int z = limit/com->scrolly.x;
 
-        com->scrolly.y = (y-com->y)/limit;
+        if((y-y1) > limit)return;
+
+        com->scrolly.cur = y;
+        com->scrolly.y = (com->scrolly.cur-y1)/z;
+
 
         if((y+com->scrolly.width) > ((com->height-4)+com->y))
             y -= (y+com->scrolly.width) - ((com->height-4)+com->y);
 
+        drawline(com->x + com->width + 4, com->y+2, 8, com->height-4, com->bg, w);
         drawline(com->x + com->width + 4, y+2, 8, com->scrolly.width, 0xe0e0e0, w);
 
-        window_putchar_scroll2(w, w->foco);   
+        if(com->scrolly.y <= com->scrolly.x)
+        {
+            window_putchar_scroll2(w, w->foco);
+        }   
     }
 
 }

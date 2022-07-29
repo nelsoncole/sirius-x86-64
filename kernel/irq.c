@@ -75,6 +75,16 @@ void irq_function(unsigned int n){
 	
 }
 
+int irq_vetor_mapping(int intr, int line){
+
+    if(intr == 9 /*&& chipset == ich9  && hardware == virtualbx*/) {
+        // TODO improviso para VirtualBox ich9
+        // IRQ19 
+        //intr += 10;
+    }
+
+    return intr;
+}
 
 void irq_install()
 {
