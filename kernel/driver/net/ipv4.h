@@ -17,6 +17,5 @@ typedef struct __ipv4_header{
 
 } __attribute__ ((packed)) ipv4_header_t;
 
-extern unsigned char *ipv4_cache;
 
 #endif

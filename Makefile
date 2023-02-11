@@ -19,45 +19,45 @@ user:
 	$(MAKE) -C user/
 	
 mout_vhd:
-	dd if=/dev/zero of=Sirius.vhd bs=512 count=65537 conv=noerror,sync
-	./fs -f Sirius.vhd
-	./fs -g bin/stage1.bin Sirius.vhd
-	./fs -p bin Sirius.vhd
-	./fs -p system Sirius.vhd
-	./fs -p user Sirius.vhd
-	./fs -g bin/stage2.bin Sirius.vhd
-	./fs -g bin/kernel.bin Sirius.vhd
-	./fs -g bin/ap.bin Sirius.vhd
-	./fs -g README.md Sirius.vhd
-	#./fs -g font/font.psf disk.vhd
-	./fs -g bin/term.bin Sirius.vhd
-	./fs -g bin/shell.bin Sirius.vhd
-	./fs -g bin/launcher.bin Sirius.vhd
-	./fs -g bin/explore.bin Sirius.vhd
-	./fs -g bin/editor.bin Sirius.vhd
-	./fs -g bmp/logo.bmp Sirius.vhd
-	./fs -g bmp/folder.bmp Sirius.vhd
-	./fs -g bmp/console.bmp Sirius.vhd
-	./fs -g bmp/trm.bmp Sirius.vhd
-	./fs -g bmp/edit.bmp Sirius.vhd
-	./fs -g bmp/file.bmp Sirius.vhd
-	./fs -g bmp/text.bmp Sirius.vhd
-	./fs -g bin/test.bin Sirius.vhd
-	./fs -g bin/telnet.bin Sirius.vhd
-	./fs -g bin/chat.bin Sirius.vhd
-	./fs -g bin/pci.bin Sirius.vhd
-	./fs -g bin/cat.bin Sirius.vhd
-	./fs -g bin/lua.bin Sirius.vhd
-	./fs -g bin/nanojpeg.bin Sirius.vhd
-	./fs -g bmp/w.ppm Sirius.vhd
-	#./fs -g bmp/b.ppm Sirius.vhd
-	./fs -g bmp/w.jpg Sirius.vhd
-	./fs -g bmp/ubuntu.ttf Sirius.vhd
-	./fs -g test.lua Sirius.vhd
-	#./fs -g beep/beep.wav Sirius.vhd
-	#./fs -g arquivo.txt Sirius.vhd
-	#./fs -g bin/a.bin Sirius.vhd
-	./footer footer.data Sirius.vhd
+	dd if=/dev/zero of=SIRIUS.VHD bs=512 count=65537 conv=noerror,sync
+	./fs -f SIRIUS.VHD
+	./fs -g bin/stage1.bin SIRIUS.VHD
+	./fs -p bin SIRIUS.VHD
+	./fs -p system SIRIUS.VHD
+	./fs -p user SIRIUS.VHD
+	./fs -g bin/stage2.bin SIRIUS.VHD
+	./fs -g bin/kernel.bin SIRIUS.VHD
+	./fs -g bin/ap.bin SIRIUS.VHD
+	./fs -g README.md SIRIUS.VHD
+	#./fs -g font/font.psf SIRIUS.VHD
+	./fs -g bin/term.bin SIRIUS.VHD
+	./fs -g bin/shell.bin SIRIUS.VHD
+	./fs -g bin/launcher.bin SIRIUS.VHD
+	./fs -g bin/explore.bin SIRIUS.VHD
+	./fs -g bin/editor.bin SIRIUS.VHD
+	./fs -g bmp/logo.bmp SIRIUS.VHD
+	./fs -g bmp/folder.bmp SIRIUS.VHD
+	./fs -g bmp/console.bmp SIRIUS.VHD
+	./fs -g bmp/trm.bmp SIRIUS.VHD
+	./fs -g bmp/edit.bmp SIRIUS.VHD
+	./fs -g bmp/file.bmp SIRIUS.VHD
+	./fs -g bmp/text.bmp SIRIUS.VHD
+	./fs -g bin/test.bin SIRIUS.VHD
+	./fs -g bin/telnet.bin SIRIUS.VHD
+	./fs -g bin/chat.bin SIRIUS.VHD
+	./fs -g bin/pci.bin SIRIUS.VHD
+	./fs -g bin/cat.bin SIRIUS.VHD
+	./fs -g bin/lua.bin SIRIUS.VHD
+	./fs -g bin/nanojpeg.bin SIRIUS.VHD
+	./fs -g bmp/w.ppm SIRIUS.VHD
+	#./fs -g bmp/b.ppm SIRIUS.VHD
+	./fs -g bmp/w.jpg SIRIUS.VHD
+	./fs -g bmp/ubuntu.ttf SIRIUS.VHD
+	./fs -g test.lua SIRIUS.VHD
+	#./fs -g beep/beep.wav SIRIUS.VHD
+	#./fs -g arquivo.txt SIRIUS.VHD
+	#./fs -g bin/a.bin SIRIUS.VHD
+	./footer footer.data SIRIUS.VHD
 	
 
 clean:
@@ -66,16 +66,16 @@ clean:
 	rm copy
 	rm footer.data
 	rm footer
-	rm Sirius.vhd
+	rm SIRIUS.VHD
 
 test:
 	qemu-system-x86_64 -m 512 \
-	-smp 2 -s -machine q35 -enable-kvm -cpu host -drive file=Sirius.vhd,format=raw,bus=0 \
+	-smp 2 -s -machine q35 -enable-kvm -cpu host -drive file=SIRIUS.VHD,format=raw,bus=0 \
 	-device ich9-intel-hda -device hda-duplex -net nic,model=pcnet -net user #-net nic,model=e1000 -net user
 test2:
 	qemu-system-x86_64 -smp 2 -m 512 \
 	-s -machine q35 -enable-kvm -cpu host -trace enable=usb* -device usb-ehci,id=ehci \
-	-drive if=none,id=usbstick,file=Sirius.vhd -device usb-storage,bus=ehci.0,drive=usbstick
+	-drive if=none,id=usbstick,file=SIRIUS.VHD -device usb-storage,bus=ehci.0,drive=usbstick
 	
 fs:
 	gcc -Wall fs.c -o fs
@@ -86,10 +86,10 @@ footer:
 	gcc -Wall footer.c -o footer 
 	
 vbox_install:
-	./copy Sirius.vhd "/home/nelson/VirtualBox VMs/sirius/"*.vhd
+	./copy SIRIUS.VHD "/home/nelson/VirtualBox VMs/sirius/"*.vhd
 	
 install:
-	sudo ./copy Sirius.vhd /dev/sdb
+	sudo ./copy SIRIUS.VHD /dev/sdb
 	
 push:
 	git add ./

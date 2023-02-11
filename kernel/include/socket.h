@@ -73,6 +73,8 @@ extern struct socket *current_saddr, *saddr_ready_queue;
 void socket_server_transmit();
 int socket_server_receive(int origem, int protocol, unsigned int src_ip, unsigned int dest_ip, unsigned short src_port, unsigned short dest_port,
     const void *buffer, unsigned length, unsigned int seq, unsigned int ack, unsigned char flags);
+int socket_server_receive_offline(int protocol, unsigned int src_ip, unsigned int dest_ip, unsigned short src_port, unsigned short dest_port,
+    const void *buffer, unsigned length, unsigned int seq, unsigned int ack, unsigned char flags);
 void socket_execute_row();
 void *socket_address(int socket);
 

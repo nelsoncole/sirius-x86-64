@@ -160,44 +160,6 @@ void arp_replay(unsigned char *ip, unsigned char *mac)
     free(arp);
 }
 
-void arp_replay2(unsigned char *src_ip, unsigned char *dest_ip, unsigned char *dest_mac)
-{
-    unsigned long addr = (unsigned long) malloc(sizeof(arp_header_t) + sizeof(ether_header_t));
-    ether_header_t *eh = (ether_header_t *)addr;
-    arp_header_t *arp = (arp_header_t*) (addr + sizeof(ether_header_t));
- 
-    // Ethernet header
-    fillMac(eh->dst, dest_mac);
-    fillMac(eh->src, default_ethernet_device.mac);
-    eh->type = htons(ET_ARP);
-
-    // arp header
-    arp->hardware_type = htons(0x0001);
-    arp->protocol_type = htons(ET_IPV4);
-    //Hardware address length (MAC)
-    arp->hardware_size = 6;
-    //Protocol address length (IP)    
-    arp->protocol_size = 4;
-    // Replay (2)
-    arp->operation = htons(ARP_OPC_REPLY);
-
-    // Sender MAC Address
-    fillMac(arp->source_mac, default_ethernet_device.mac);
-    // Sender IP Address
-    fillIP(arp->source_ip, src_ip);
-    // Target MAC Address
-    fillMac(arp->dest_mac, dest_mac);
-    // Target IP Address
-    fillIP(arp->dest_ip, dest_ip);
-
-    // send package
-    if( send_ethernet_package((void*)addr, sizeof( arp_header_t ) + sizeof(ether_header_t) ) ){
-        printf("[ETH] ARP replay error\n");
-    }
-
-    free(arp);
-}
-
 void arp_hexdump(arp_header_t *arp, ether_header_t *eh){
     printf("Ethernet\n");
     printf("\tDestination: %x:%x:%x:%x:%x:%x\n",eh->dst[0],eh->dst[1],eh->dst[2],eh->dst[3],eh->dst[4],eh->dst[5]);

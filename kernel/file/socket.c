@@ -169,13 +169,17 @@ void socket_server_transmit(){
     }
 }
 
+extern void die(char *menssage);
 static void socket_save_row(int protocol, unsigned int src_ip, unsigned int dest_ip, unsigned short src_port, unsigned short dest_port,
     const void *buffer, unsigned length, unsigned int seq, unsigned int ack, unsigned char flags){
 
     int old_cur = row_cur;
     row_cur = (row_cur + 1) % ROW_NUM; // next
 
-    if(0){} // dados perdidos
+    if(sockt_receive_row[old_cur].status){
+        // busy
+        die("limited socket_save_row()");
+    }
 
     sockt_receive_row[old_cur].protocol = protocol;
     sockt_receive_row[old_cur].src_port = src_port;
@@ -204,7 +208,7 @@ void socket_execute_row(){
 
         if((sockt_receive_row[i].status & 0x1))
         {
-            if(!socket_server_receive(1, sockt_receive_row[i].protocol, sockt_receive_row[i].src_ip,
+            if(!socket_server_receive_offline(sockt_receive_row[i].protocol, sockt_receive_row[i].src_ip,
                 sockt_receive_row[i].dest_ip, sockt_receive_row[i].src_port, sockt_receive_row[i].dest_port,
                 sockt_receive_row[i].buffer, sockt_receive_row[i].length, sockt_receive_row[i].seq,
                 sockt_receive_row[i].ack, sockt_receive_row[i].flags) ){
@@ -232,7 +236,8 @@ int socket_server_receive(int origem, int protocol, unsigned int src_ip, unsigne
                         if(!origem){
                             socket_save_row(protocol, src_ip, dest_ip, src_port, dest_port, buffer, length, seq, ack, flags);
                         }
-                        return 1;
+                        
+                        goto next;
                     }
 
                     dest_buf = (char*)saddr->buf1;
@@ -254,9 +259,47 @@ int socket_server_receive(int origem, int protocol, unsigned int src_ip, unsigne
                 }
             }
         }
-
+        next:
         saddr = saddr->next;
     }
 
     return 0;
+}
+
+int socket_server_receive_offline(int protocol, unsigned int src_ip, unsigned int dest_ip, unsigned short src_port, unsigned short dest_port,
+    const void *buffer, unsigned length, unsigned int seq, unsigned int ack, unsigned char flags){
+
+    char *dest_buf;
+
+    struct socket *saddr = saddr_ready_queue;
+    while(saddr){
+        if(saddr->flags&0x80){
+            if(saddr->domain == AF_INET || saddr->domain == AF_LOCAL){
+                if(saddr->src_port == dest_port){
+                
+                    if(!(saddr->flags & 0x2)){ 
+                        dest_buf = (char*)saddr->buf1;
+                        saddr->length1 = length;
+                        saddr->recv_dest_ip = src_ip;
+                        saddr->recv_dest_port = src_port;
+
+                        if(IP_PROTOCOL_TCP == protocol ){
+                            saddr->protocol_flags = flags;
+                        }
+                    
+                        if(length) {
+                            memcpy(dest_buf, buffer , length);
+                        }
+                        saddr->flags |= 2;
+                
+                        return 0;
+                    }    
+                }
+            }
+        }
+
+        saddr = saddr->next;
+    }
+
+    return 1;
 }

@@ -104,7 +104,7 @@ void main() {
     int image_width = z->rx - (z->rx/4);
     int image_height = (const int)(image_width / aspect_ratio);
 	
-    image_width = 600; image_height = 500;
+    image_width = 700; image_height = 400;
 
     app_memory = (char*)malloc(0x80000); // 512
 	WINDOW *w = window("@~Terminal",0, 0, image_width, image_height, 0x1f1f2f, 0x80101020, 0xFFFFFF, 0x10);

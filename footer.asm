@@ -28,8 +28,8 @@
 .CheckSum:
     dd 0xC2E7FFFF   ;# VHD igual ou acima de 32Mb
 .UniqueID:
-    db 'S',  'i',  'r',  'i'
-    db 'u',  's',  0x20, 0x20
+    db 'S',  'I',  'R',  'I'
+    db 'U',  'S',  0x20, 0x20
     db 0x88, 0x88, 0x88, 0x88
     db 0x88, 0x88, 0x88, 0x88
 .SaveState:

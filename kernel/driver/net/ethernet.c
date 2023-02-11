@@ -255,11 +255,9 @@ void fillIP(unsigned char* to,unsigned char* from){
 
 void initialise_ethernet(){
 
-    ipv4_cache = (unsigned char *)malloc(0x10000); // 64KiB
     dhcp_header_t *dhcp = (dhcp_header_t *)malloc(sizeof(dhcp_header_t)); 
     package_recieved_ack = 1;
     ipv4_count  = 0;
-    memset(ipv4_cache, 0, 0x10000);
 
     printf("[ETH] Ethernet module reached!\n");
     ethernet_device_t ed = get_default_ethernet_device();
@@ -270,7 +268,6 @@ void initialise_ethernet(){
         if( udp_receive(dhcp, sizeof(dhcp_header_t), 68) ){
             if(htonl(dhcp->magic_cookie) != 0x63825363) {
                 printf("No DHCP\n");
-                free(ipv4_cache);
                 goto end;
             }
             printf("%s\n", string_dhcp_message[dhcp->options[2]]);
@@ -278,7 +275,6 @@ void initialise_ethernet(){
         }else {
         
             printf("timeout\n");
-            free(ipv4_cache);
             goto end;
         }
 
@@ -292,13 +288,11 @@ void initialise_ethernet(){
         if( udp_receive(dhcp, sizeof(dhcp_header_t), 68) ){
             if(htonl(dhcp->magic_cookie) != 0x63825363) {
                 printf("No DHCP\n");
-                free(ipv4_cache);
                 goto end;
             }
 
             if(dhcp->options[2] != DHCP_ACK){
                 printf("%s\n", string_dhcp_message[dhcp->options[2]]);
-                free(ipv4_cache);
                 goto end;
             }
 
@@ -311,7 +305,6 @@ void initialise_ethernet(){
         ethernet_set_link_status(1);
     }else {
             printf("Internet device not found!\n");
-            free(ipv4_cache);
             goto end;
     }
 

@@ -134,3 +134,26 @@ void fault_exception(int  n)
 	for( ; ; );
 	screan_spin_lock = 0;
 }
+
+void die(char *menssage)
+{
+    VERBOSE = 1;
+    gui->font.fg_color = 0xFF0000;
+
+	while(screan_spin_lock){};
+	screan_spin_lock ++;
+
+    int id = 0;
+	__asm__ __volatile__ ("mov $1, %%eax; cpuid; shrl $24, %%ebx;"
+	: "=b"(id) );
+	
+    printf("Local APIC ID: %x ",id);
+    THREAD	*tmp = current_thread1;
+    if(id > 0){
+        tmp = current_thread2;
+    }
+	printf("PID:%d\nError: ",tmp->pid);
+	puts(menssage);
+	for( ; ; );
+}
+

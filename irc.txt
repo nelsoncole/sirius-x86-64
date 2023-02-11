@@ -1,0 +1,5 @@
+telnet irc.mindforge.org 6667
+USER nelson * * : Nelson Cole
+NICK nelson
+JOIN #KernelDev
+PRIVMSG #KernelDev :Mensagem

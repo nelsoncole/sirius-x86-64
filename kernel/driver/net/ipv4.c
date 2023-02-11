@@ -6,8 +6,6 @@
 #include "ether.h"
 #include "checksum.h"
 
-
-unsigned char *ipv4_cache;
 unsigned int ipv4_count = 0;
 int ipv4_send(void *buf, unsigned char protocol, unsigned int src_address, unsigned int dst_address, unsigned length)
 {
@@ -56,8 +54,6 @@ int ipv4_send(void *buf, unsigned char protocol, unsigned int src_address, unsig
     // Hardware
     if(send_ethernet_package( (void*)addr,length + sizeof(ipv4_header_t) + sizeof(ether_header_t)) ) 
         return 1;
-
-    memcpy(ipv4_cache, (void*)addr , length + sizeof(ipv4_header_t) + sizeof(ether_header_t));
 
     return 0;
 }
