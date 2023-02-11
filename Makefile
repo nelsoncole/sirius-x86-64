@@ -93,6 +93,6 @@ install:
 	
 push:
 	git add ./
-	git commit -m "Época de férias"	
+	git commit -m "Revisão básica"	
 	git push -u origin main
 	
