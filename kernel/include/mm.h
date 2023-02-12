@@ -25,4 +25,12 @@ void free_pages(void *addr);
 unsigned long get_phy_addr (unsigned long v);
 
 
+#define POOL_COUNT 512 
+typedef struct {
+    unsigned long ptr;
+    unsigned int size;
+    unsigned int flag;
+}__attribute__((packed)) POOL_SYSCALL;
+
+
 #endif

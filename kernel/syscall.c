@@ -16,7 +16,7 @@
 #include <socket.h>
 
 
-#define SYSCALL_TABLE 19
+#define SYSCALL_TABLE 35
 
 unsigned long ret;
 
@@ -72,6 +72,70 @@ void syscall_free_pages(unsigned long rdi, unsigned long rsi, unsigned long rdx,
 
 	free_pages((void*)rdi);
 }
+
+void *__malloc_syscall(THREAD *thread, unsigned size) {
+
+	unsigned long addr;
+	
+	int len = size/0x1000;
+	if(size%0x1000) len++;
+	
+	alloc_pages(1, len, &addr);
+
+    POOL_SYSCALL *m = (POOL_SYSCALL*) thread->pool;
+
+    for(int i=0; i < POOL_COUNT; i++){
+        if(m->ptr == 0){
+            m->ptr = addr;
+            m->size = size;
+            m->flag = 0;
+            break;
+        }
+
+        m++;
+    }
+	
+	return (void*)(addr);
+
+}
+
+
+void __free_syscall(THREAD *thread, void *ptr) {
+
+    if(!ptr)return;
+
+	free_pages(ptr);
+    POOL_SYSCALL *m = (POOL_SYSCALL*) thread->pool;
+
+    for(int i=0; i < POOL_COUNT; i++){
+        if(m->ptr == (unsigned long)ptr){
+            m->ptr = 0;
+            m->size = 0;
+            m->flag = 0;
+            break;
+        }
+
+        m++;
+    }
+}
+
+void malloc_syscall(unsigned long rdi) {
+
+    THREAD *thread = current_thread;
+    ret = __malloc_syscall(thread, rdi);
+
+}
+
+
+void free_syscall(unsigned long rdi) {
+    THREAD *thread = current_thread;
+    __free_syscall(thread, (void *)rdi);
+}
+
+void realloc_syscall(unsigned long rdi, unsigned long rsi) {
+    THREAD *thread = current_thread;
+}
+
 
 
 void syscall_readsector(unsigned long rdi, unsigned long rsi, unsigned long rdx, unsigned long rcx)
@@ -218,6 +282,23 @@ void *fnvetors_syscall[SYSCALL_TABLE] = {
     &syscall_get_socket_ready_queue, // 16
     &syscall_pthread_create, // 17
     &syscall_pthread_join, // 18
+    &default_syscall, 	    // 19
+    &default_syscall, 	    // 20
+    &default_syscall, 	    // 21
+    &default_syscall, 	    // 22
+    &default_syscall, 	    // 23
+    &default_syscall, 	    // 24
+    &default_syscall, 	    // 25
+    &default_syscall, 	    // 26
+    &default_syscall, 	    // 27
+    &default_syscall, 	    // 28
+    &default_syscall, 	    // 29
+    &default_syscall, 	    // 30
+    &default_syscall, 	    // 31
+    &malloc_syscall, 	    // 32
+    &free_syscall, 	        // 33
+    &realloc_syscall        // 34
+
 };
 
 

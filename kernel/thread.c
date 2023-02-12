@@ -82,7 +82,7 @@ unsigned long thread_setup() {
 	unsigned long addr = 0;
 	context_fxsave = (char*) (unsigned long)&SavedFloats;
     context2_fxsave = (char*) (unsigned long)&SavedFloats3;
-    alloc_pages(0, 2, &addr);
+    alloc_pages(0, 2, (unsigned long *)&addr);
 	thread_ready_queue = (THREAD*)addr;
     current_thread2 = current_thread 	= thread_ready_queue;
     	
@@ -118,6 +118,11 @@ unsigned long thread_setup() {
 
    
     current_thread->next 	= 0;
+
+    alloc_pages(0, 2, (unsigned long *)&addr); // 8KiB
+    current_thread->pool = addr;
+    memset((char*)current_thread->pool,0,0x2000);
+    
     	
     current_thread1 = current_thread;
     current_thread2	= current_thread; 
@@ -151,11 +156,6 @@ int pv,int argc, char **argv, char *pwd)
    		//new_thread->gs 	= 0x23;
    		new_thread->ss 		= 0x23;
     		
-   		unsigned long addr;
-		alloc_pages(1, 1 + ((28*256)/0x1000), (unsigned long *)&addr);
-		memset((char*)addr, 0, ((28*256)/0x1000) + 0x1000);
-		new_thread->alloc_addr = addr;
-		
 		new_thread->prv = 1;
     
         new_thread->rflag 	= 0x202; //0x3202;
@@ -218,8 +218,8 @@ int pv,int argc, char **argv, char *pwd)
 	new_thread->rsi	= (unsigned long)new_thread->stderr;
 	new_thread->rdi	= (unsigned long)new_thread->window;
 	new_thread->rbx	= rbx;
-	new_thread->r8 = 0; // reserved
-	new_thread->r9		= new_thread->alloc_addr;
+	new_thread->r8  = 0; // reserved
+	new_thread->r9  = 0;
 	new_thread->r10	= (unsigned long)new_thread->pipe;
 	
 	new_thread->rax	= (unsigned long)new_thread->mouse;
@@ -231,6 +231,11 @@ int pv,int argc, char **argv, char *pwd)
     new_thread->head    = NULL;
     new_thread->next 	= NULL;
     new_thread->tail 	= NULL;
+
+
+    alloc_pages(0, 2, (unsigned long *)&v); // 8KiB
+    new_thread->pool = v;
+    memset((char*)new_thread->pool,0,0x2000);
     
 
     // Adicionar novo elemento, no final da lista
@@ -269,11 +274,6 @@ int argc, char **argv, char *pwd, THREAD *thread)
     	//new_thread->fs 	= 0x23;
     	//new_thread->gs 	= 0x23;
     	new_thread->ss 	    = 0x23;
-
-		unsigned long addr;
-		alloc_pages(1, 1 + ((28*256)/0x1000), (unsigned long *)&addr);
-		memset((char*)addr, 0, ((28*256)/0x1000) + 0x1000);
-		new_thread->alloc_addr = addr;
 		 
 		new_thread->prv = 1;
 
@@ -315,8 +315,8 @@ int argc, char **argv, char *pwd, THREAD *thread)
 	new_thread->rsi	= (unsigned long)new_thread->stderr;
 	new_thread->rdi	= (unsigned long)new_thread->window;
 	new_thread->rbx	= rbx;
-	new_thread->r8 = 0; // reserved
-	new_thread->r9		= new_thread->alloc_addr;
+	new_thread->r8  = 0; // reserved
+	new_thread->r9  = 0;
 	new_thread->r10	= (unsigned long)new_thread->pipe;
 
 	new_thread->rax	= (unsigned long)new_thread->mouse;
@@ -328,6 +328,11 @@ int argc, char **argv, char *pwd, THREAD *thread)
     new_thread->head    = thread;
     new_thread->next 	= NULL;
     new_thread->tail 	= NULL;
+
+
+    alloc_pages(0, 2, (unsigned long *)&v); // 8KiB
+    new_thread->pool = v;
+    memset((char*)new_thread->pool,0,0x2000);
     
 
     // Adicionar novo elemento, no final da lista
@@ -365,8 +370,6 @@ THREAD *pthread_create( void (*main)(), unsigned long rsp, int pv, THREAD *threa
     	//new_thread->fs 	= 0x23;
     	//new_thread->gs 	= 0x23;
     	new_thread->ss 	    = 0x23;
-
-		new_thread->alloc_addr = thread->alloc_addr;
 		 
 		new_thread->prv = 1;
 
@@ -385,6 +388,7 @@ THREAD *pthread_create( void (*main)(), unsigned long rsp, int pv, THREAD *threa
    	}
    
     new_thread->cr3    = thread->cr3;
+    new_thread->pool = thread->pool ;
     	 	
     new_thread->stdin  = t->stdin;
 	new_thread->stdout = t->stdout;
@@ -401,8 +405,8 @@ THREAD *pthread_create( void (*main)(), unsigned long rsp, int pv, THREAD *threa
 	new_thread->rsi	= (unsigned long)new_thread->stderr;
 	new_thread->rdi	= (unsigned long)new_thread->window;
 	new_thread->rbx	= 0;//rbx;
-	new_thread->r8 = 0; // reserved
-	new_thread->r9		= new_thread->alloc_addr;
+	new_thread->r8  = 0; // reserved
+	new_thread->r9	= 0;
 	new_thread->r10	= (unsigned long)new_thread->pipe;
 
 	new_thread->rax	= (unsigned long)new_thread->mouse;
@@ -413,6 +417,7 @@ THREAD *pthread_create( void (*main)(), unsigned long rsp, int pv, THREAD *threa
 
     new_thread->next 	= NULL;
     new_thread->tail 	= NULL;
+   
     
 
     // Adicionar novo elemento, no final da lista

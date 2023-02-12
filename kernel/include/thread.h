@@ -17,6 +17,8 @@ typedef struct _THREAD {
 	// Outros registradores 
 	unsigned long rflag, cr3;
 
+	char fxsave[512]__attribute__((aligned(16)));
+
 	// Registradores null
 	unsigned long rsp0, pdpte;
 	
@@ -34,10 +36,8 @@ typedef struct _THREAD {
 	
 	// outros
 	unsigned long pml4e_addr, pdpte_addr, pde_addr, pte_addr, frame_size;
-	unsigned long alloc_addr;
-	
-	
-	char fxsave[512]__attribute__((aligned(16)));
+
+	unsigned long pool;
 	
 
     struct _THREAD *head;	

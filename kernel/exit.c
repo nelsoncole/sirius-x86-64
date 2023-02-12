@@ -14,30 +14,17 @@ extern void window_remove(unsigned long addr);
 extern void foco_default();
 extern int pipe_write ( void *buf, FILE *fp);
 
-typedef struct __alloc
-{
-	unsigned long addr;
-	unsigned long sub;
-	unsigned int size;
-	unsigned int pool;
-	unsigned int flag;
-	
-}__attribute__ ((packed)) __alloc_t;
-
 void user_free(THREAD *thr )
 {
-	
-	__alloc_t *m = (__alloc_t *) thr->alloc_addr;
-	__alloc_t *tmp = m;
-	for(int i=0; i < 256; i ++){
-    	 if(m->flag == 1 && m->addr != 0)
-                free_pages((void*) m->addr);
+	POOL_SYSCALL *m = (POOL_SYSCALL *)thr->pool;
 
-    	 m++;
-    	 
+	for(int i=0; i <POOL_COUNT; i++){
+		if(m->ptr != 0)free_pages((void*)m->ptr);
+		m++;
 	}
-	
-	free_pages(tmp);
+
+	m = (POOL_SYSCALL *)thr->pool;
+	free_pages(m);
 }
 
 

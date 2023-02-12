@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <alloc.h>
+#include <window.h>
+#include <data.h>
+
 #define COUNT_ARGV 32
 
 extern int main(int argc, char **argv);
@@ -10,12 +14,6 @@ unsigned long __window;
 FILE *stdin;
 FILE *stdout;
 FILE *stderr;
-
-extern void __heap_r();
-
-#include <alloc.h>
-#include <window.h>
-#include <data.h>
 
 
 FILE *__pipe__;
@@ -39,7 +37,6 @@ extern int term_bg_color;
 void ctr0(unsigned long rdi, unsigned long rsi, unsigned long rdx, unsigned long rcx,
 unsigned long r8, unsigned long r9) {
 	
-	__m_i  = r9;
 	__window = rdi;
 	user 	= (user_t*) r8;
 	mouse 	= (mouse_t*) user->mouse;
@@ -51,9 +48,6 @@ unsigned long r8, unsigned long r9) {
 	stderr	= (FILE *) rsi;
 	
 	__pipe__= (FILE *) (unsigned long) pipe_r;
-	
-	// init heap
-	__heap_r();
 	
 	// objectos
 	obj_list = 0;

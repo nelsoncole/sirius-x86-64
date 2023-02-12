@@ -3,9 +3,9 @@
 
 #undef        malloc
 
-extern void *__malloc_r(unsigned size, int type);
+extern void *__malloc_r(unsigned size);
 
 void *malloc(size_t size) {
 
-	return __malloc_r(size, 0);
+	return __malloc_r(size);
 }
