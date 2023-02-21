@@ -228,10 +228,11 @@ int pv,int argc, char **argv, char *pwd)
 	new_thread->r12 = (unsigned long)argv;
 	new_thread->r13 = (unsigned long)pwd;
 
-    new_thread->head    = NULL;
+    new_thread->head    = new_thread;
     new_thread->next 	= NULL;
     new_thread->tail 	= NULL;
 
+    new_thread->wait_pid = new_thread->pid;
 
     alloc_pages(0, 2, (unsigned long *)&v); // 8KiB
     new_thread->pool = v;
@@ -329,6 +330,8 @@ int argc, char **argv, char *pwd, THREAD *thread)
     new_thread->next 	= NULL;
     new_thread->tail 	= NULL;
 
+    thread->wait_pid = new_thread->pid;
+
 
     alloc_pages(0, 2, (unsigned long *)&v); // 8KiB
     new_thread->pool = v;
@@ -388,7 +391,6 @@ THREAD *pthread_create( void (*main)(), unsigned long rsp, int pv, THREAD *threa
    	}
    
     new_thread->cr3    = thread->cr3;
-    new_thread->pool = thread->pool ;
     	 	
     new_thread->stdin  = t->stdin;
 	new_thread->stdout = t->stdout;
@@ -415,10 +417,15 @@ THREAD *pthread_create( void (*main)(), unsigned long rsp, int pv, THREAD *threa
 	new_thread->r12 = (unsigned long)0; //argv;
 	new_thread->r13 = (unsigned long)0; // pwd
 
+    new_thread->head    = thread;
     new_thread->next 	= NULL;
     new_thread->tail 	= NULL;
    
+    thread->wait_pid = new_thread->pid;
     
+    alloc_pages(0, 2, (unsigned long *)&v); // 8KiB
+    new_thread->pool = v;
+    memset((char*)new_thread->pool,0,0x2000);
 
     // Adicionar novo elemento, no final da lista
     // tmp aponta para inicio da lista
@@ -485,7 +492,8 @@ void task_switch()
 	// Obter a próxima tarefa a ser executada.
 	current_thread 	= current_thread->next;
 	 while(current_thread){
-        if((current_thread->prv & 0x80) || current_thread->status == THREAD_ZUMBI) {
+        if((current_thread->prv & 0x80) || (current_thread->status&THREAD_ZUMBI) ||\
+        (current_thread->status&THREAD_WAIT)) {
 		    current_thread = current_thread->next;
         }else break;
     }
@@ -601,7 +609,8 @@ __no:
     int x = 0;
     for(i=0; i < 2; i++){
         while(tmp) {
-		    if((tmp->prv&0x80) && (tmp->status != THREAD_ZUMBI)) {
+		    if((tmp->prv&0x80) && ((tmp->status&THREAD_ZUMBI) != THREAD_ZUMBI)\
+            && ((tmp->status&THREAD_WAIT) != THREAD_WAIT)) {
                 x = 1;
 			    break;
             }

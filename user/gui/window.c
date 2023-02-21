@@ -41,6 +41,19 @@ void drawrect(int x, int y, int width, int height, int rgb, WINDOW *w)
 
 }
 
+void drawtriagle(int x, int y, int width, int fill, int rgb, WINDOW *w)
+{
+
+	int a =0;
+	for(int t = width; t > 0; t-- ){
+		for(int i=0; i < (t-a); i++){
+			put_pixel(x+a, y+i+a, w->width, rgb, &w->start);
+		}
+
+		a++;
+	}
+
+}
 
 void drawchar( unsigned short int c, int cx, int cy, unsigned int fg, unsigned int bg, struct _font *font, WINDOW *w)
 {
@@ -124,6 +137,49 @@ void drawstring_trans( const char *str, int cx, int cy, unsigned int fg, unsigne
 	}
 
 }
+
+
+WINDOW *init_window(int x, int y, int width, int height, int fg, int bg, int style, WINDOW *window){
+	// Limpar de acordo ao limit de buffer
+	WINDOW *w = (WINDOW*) window;
+
+	if(width == -1 || width > w->rx) w->width = w->rx;
+    else w->width = width;
+
+    if(height == -1 || height > w->ry) w->height = w->ry;
+    else w->height = height;
+
+	w->pos_x = x;
+	w->pos_y = y;
+	
+	w->style = style;
+	
+	w->area_width = w->width;
+	w->area_height = w->height;
+	w->area_x = 0;
+	w->area_y = 0;
+
+	w->fg = fg;
+	w->bg = bg;
+
+	drawline(0, 0, w->width, w->height, w->bg, w);
+	drawrect(0, 0, w->width, w->height, w->fg, w);
+
+	return w;
+}
+
+WINDOW *create_new_window(WINDOW *window, int x, int y){
+	WINDOW *w = (WINDOW*) malloc(x*4*y);
+	memset(w,0,0x1000);
+	w->rx = x;
+	w->ry = y;
+	w->bpp = window->bpp;
+	w->scanline = window->scanline;
+
+	return w;
+}
+
+
 
 /*
  * 0x10 MENU
@@ -252,7 +308,9 @@ void wcl(WINDOW *w) {
     pipe->r2 = id >> 16 &0xffff;
     pipe->r3 = id >> 32 &0xffff; //id >> 48 &0xffff; */
     pipe->r4 = addr;
-	pipe_write ( pipe, pipe_launcher ); 
+	pipe_write ( pipe, pipe_launcher );
+
+	w->visibility = 1; 
 }
 
 void update_window(WINDOW *w)

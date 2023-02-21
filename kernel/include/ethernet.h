@@ -40,7 +40,7 @@
 #define TCP_URG     (1 << 5)
 
 
-extern unsigned char our_ip[SIZE_OF_IP];
+extern unsigned char your_ip[SIZE_OF_IP];
 extern unsigned char router_ip[SIZE_OF_IP];
 extern unsigned char dns_ip[SIZE_OF_IP];
 extern unsigned char dhcp_ip[SIZE_OF_IP];

@@ -93,7 +93,6 @@ tx_descs            0x40              e1000.o
 mult_task           0x1               main.o
 interrupt_status    0x4               data.o
 gdtr                0xa               gdt.o
-our_ip              0x4               ethernet.o
 stdout              0x8               std.o
 corb_pointer        0x4               hda.o
 ata_record_channel  0x4               ide.o
@@ -241,6 +240,7 @@ context2_r10        0x8               thread.o
 period              0x8               hpet.o
 context2_rip        0x8               thread.o
 context2_fxsave     0x8               thread.o
+your_ip             0x4               ethernet.o
 context2_rsp        0x8               thread.o
 default_ethernet_device
                     0x21              ethernet.o
@@ -614,7 +614,7 @@ Linker script and memory map
                 0x0000000000404a8e                enable_pae
                 0x0000000000404aba                page_enable
                 0x0000000000404ae8                page_install
- .text          0x0000000000404b89     0x167e mm.o
+ .text          0x0000000000404b89     0x16be mm.o
                 0x0000000000404b89                initialize_mm_mp
                 0x0000000000404d28                mm_mp
                 0x0000000000405183                ram_setup
@@ -625,439 +625,441 @@ Linker script and memory map
                 0x0000000000405a80                get_free_page
                 0x0000000000405b72                get_busy_page_size
                 0x0000000000405c69                alloc_pages
-                0x0000000000405e4c                free_pages
-                0x0000000000406035                get_phy_addr
- .text          0x0000000000406207      0x1f9 cpuid.o
-                0x0000000000406207                cpuid_vendor
-                0x0000000000406275                cpuid_processor_brand
-                0x000000000040634c                cpuid
-                0x0000000000406397                cpuid_string
- .text          0x0000000000406400       0xb9 msr.o
-                0x0000000000406400                getmsr
-                0x000000000040644b                setmsr
- .text          0x00000000004064b9      0x6be lvt.o
-                0x00000000004064b9                lvt_function
-                0x00000000004066c5                lvt_function2
-                0x00000000004068d1                lvt_install
- .text          0x0000000000406b77      0x623 irq.o
-                0x0000000000406b77                default_irq
-                0x0000000000406bd3                irq_function
-                0x0000000000406caa                irq_vetor_mapping
-                0x0000000000406cd9                irq_install
- .text          0x000000000040719a      0x579 apic.o
-                0x000000000040719a                local_apic_read_command
-                0x00000000004071dd                local_apic_write_command
-                0x000000000040722a                getapicbase
-                0x000000000040727d                enableapic
-                0x00000000004072e8                apic_eoi_register
-                0x0000000000407325                setup_apic
-                0x00000000004075bc                local_apic_get_id
-                0x00000000004075f9                local_apic_send_init
-                0x0000000000407683                local_apic_send_startup
- .text          0x0000000000407713      0x309 apic_timer.o
-                0x0000000000407713                apic_initial_count_timer
-                0x0000000000407761                apic_timer
-                0x0000000000407944                apic_timer_umasked
-                0x00000000004079b0                apic_timer_masked
- .text          0x0000000000407a1c      0x5d6 ioapic.o
-                0x0000000000407a1c                read_ioapic_register
-                0x0000000000407a6c                write_ioapic_register
-                0x0000000000407ac6                ioapic_masked
-                0x0000000000407b63                ioapic_umasked
-                0x0000000000407c00                set_ioapic_redir_table
-                0x0000000000407e8c                ioapic_cofiguration
-                0x0000000000407f26                setup_ioapic
- .text          0x0000000000407ff2       0xc6 intr.o
-                0x0000000000407ff2                intr_install
-                0x0000000000408053                intr_function
- .text          0x00000000004080b8       0x6b sleep.o
-                0x00000000004080b8                sleep
- .text          0x0000000000408123     0x20d9 thread.o
-                0x0000000000408123                thread_setup
-                0x0000000000408558                create_thread
-                0x0000000000408ab8                create_thread_child
-                0x0000000000408eb0                pthread_create
-                0x0000000000409237                pthread_join
-                0x0000000000409283                task_switch
-                0x0000000000409a9e                task_switch2
-                0x000000000040a0f2                getpid
-                0x000000000040a129                getpid2
-                0x000000000040a18c                get_thread
- .text          0x000000000040a1fc     0x12ac exectve.o
-                0x000000000040a1fc                exectve
-                0x000000000040ab44                exectve_child
- .text          0x000000000040b4a8      0xdd7 syscall.o
-                0x000000000040b4a8                default_syscall
-                0x000000000040b513                syscall_getpid
-                0x000000000040b5aa                syscall_window
-                0x000000000040b602                syscall_kbd_foco
-                0x000000000040b6dd                syscall_alloc_pages
-                0x000000000040b75e                syscall_free_pages
-                0x000000000040b7b6                __malloc_syscall
-                0x000000000040b881                __free_syscall
-                0x000000000040b937                malloc_syscall
-                0x000000000040b9ad                free_syscall
-                0x000000000040ba0b                realloc_syscall
-                0x000000000040ba4f                syscall_readsector
-                0x000000000040bacb                syscall_writesector
-                0x000000000040bb47                syscall_geral
-                0x000000000040bc8e                syscall_tmpnam
-                0x000000000040bd5c                syscall_io
-                0x000000000040be96                syscall_register_pipe_launcher
-                0x000000000040bee2                syscall_get_pipe_launcher
-                0x000000000040bf27                syscall_get_paint_list
-                0x000000000040bf6c                syscall_get_thread_id
-                0x000000000040bfb5                syscall_create_socket
-                0x000000000040c03a                syscall_get_socket_ready_queue
-                0x000000000040c07f                syscall_pthread_create
-                0x000000000040c107                syscall_pthread_join
-                0x000000000040c16d                syscall_function_handler
-                0x000000000040c218                syscall_install
- *fill*         0x000000000040c27f        0x1 
- .text          0x000000000040c280       0x86 asyscall.o
-                0x000000000040c2f7                int114
- .text          0x000000000040c306      0xaa9 console.o
-                0x000000000040c306                console
-                0x000000000040c5ae                cmd_version
-                0x000000000040c611                cmd_time
-                0x000000000040c674                cmd_shutdown
-                0x000000000040c6ce                cmd_rename
-                0x000000000040c731                cmd_reboot
-                0x000000000040c78b                cmd_new
-                0x000000000040c7ee                cmd_mov
-                0x000000000040c851                cmd_info
-                0x000000000040c92f                cmd_help
-                0x000000000040caa0                cmd_exit
-                0x000000000040cb03                cmd_echo
-                0x000000000040cb66                cmd_dir
-                0x000000000040cbc9                cmd_del
-                0x000000000040cc2c                cmd_date
-                0x000000000040cc8f                cmd_copy
-                0x000000000040ccf2                cmd_clear
-                0x000000000040cd4c                cmd_cd
- .text          0x000000000040cdaf      0x596 exit.o
-                0x000000000040cdaf                user_free
-                0x000000000040ce5e                exit
- .text          0x000000000040d345      0x1c7 sse.o
-                0x000000000040d345                fpu_cw
-                0x000000000040d375                sse_cr
-                0x000000000040d3a9                sse_cw
-                0x000000000040d3d7                fpu_save
-                0x000000000040d406                fpu_restore
-                0x000000000040d435                setup_sse
- .text          0x000000000040d50c      0xcfb pci.o
-                0x000000000040d50c                read_pci_config_addr
-                0x000000000040d586                write_pci_config_addr
-                0x000000000040d600                pci_read_config_dword
-                0x000000000040d67a                pci_write_config_dword
-                0x000000000040d6f4                pci_read_config_word
-                0x000000000040d794                pci_write_config_word
-                0x000000000040d85d                pci_read_config_byte
-                0x000000000040d8fd                pci_write_config_byte
-                0x000000000040d9c5                pci_get_info
-                0x000000000040dc73                pci_scan_bcc
-                0x000000000040dd56                pci_scan_class
-                0x000000000040de47                pci_scan_class_subclass
-                0x000000000040df4f                pci_scan_bcc_scc
-                0x000000000040e04d                pci_scan_bcc_scc_prog
-                0x000000000040e15c                pci_scan_vendor
-                0x000000000040e18d                pci_check_vendor
-                0x000000000040e1c7                pci_size
- .text          0x000000000040e207     0x1014 i965.o
-                0x000000000040e207                i965_pci_init
-                0x000000000040e3b6                setup_i965
-                0x000000000040e8dd                timings
-                0x000000000040eb7b                disable_dac
-                0x000000000040ebf8                enable_dac
-                0x000000000040ec75                disable_plane
-                0x000000000040ecf4                enable_plane
-                0x000000000040ed73                disable_pipe
-                0x000000000040edf2                enable_pipe
-                0x000000000040ee71                disable_dpll
-                0x000000000040ee9c                enable_dpll
-                0x000000000040eedb                disable_legacy_vga_emul
-                0x000000000040efa3                gmbus_reset
-                0x000000000040efce                gmbus_stoptransaction
-                0x000000000040f00d                gmbus_wait
-                0x000000000040f053                gmbus_read
-                0x000000000040f1ea                gmbus_write
- .text          0x000000000040f21b      0x26f cursor.o
-                0x000000000040f21b                DrawMouse
-                0x000000000040f305                setup_cursor
-                0x000000000040f411                update_graphic_cursor
- .text          0x000000000040f48a      0xa96 acpi.o
-                0x000000000040f813                acpi_probe
-                0x000000000040f8e9                acpi_enable
-                0x000000000040fb3f                setup_acpi
-                0x000000000040fddf                poweroff
-                0x000000000040fe65                reboot
- .text          0x000000000040ff20      0x21c hpet.o
-                0x0000000000410068                setup_hpet
-                0x00000000004100ca                hpet_sleep
- .text          0x000000000041013c       0xf9 lpc.o
-                0x0000000000410170                setup_lpc
- .text          0x0000000000410235      0x2df pit.o
-                0x00000000004102c9                pit_set_frequencia
-                0x0000000000410327                pit_enable
-                0x00000000004103be                timer_wait
-                0x0000000000410413                pit_prepare_sleep
-                0x00000000004104a1                pit_perform_sleep
- .text          0x0000000000410514      0x1b3 ps2.o
-                0x0000000000410514                kbdc_wait
-                0x00000000004105b3                kbdc_set_cmd
-                0x0000000000410645                kbdc_wait_ack
- .text          0x00000000004106c7      0x911 mouse.o
-                0x00000000004106c7                mouse_write
-                0x0000000000410740                mouse_read
-                0x0000000000410794                MOUSE_BAT_TEST
-                0x0000000000410809                mouse_handler
-                0x0000000000410bad                mouse_install
- .text          0x0000000000410fd8      0x93f keyboard.o
-                0x0000000000410fd8                keyboard_read
-                0x000000000041102c                keyboard_write
-                0x0000000000411081                KEYBOARD_BAT_TEST
-                0x00000000004110f6                keyboard_handler
-                0x000000000041174c                kbd_wait_irq_ack
-                0x000000000041180c                keyboard_install
- .text          0x0000000000411917     0x19af ahci.o
-                0x0000000000411917                ahci_initialize
-                0x0000000000412f9e                sata_read_sector
-                0x0000000000413132                sata_write_sector
- .text          0x00000000004132c6     0x161a ide.o
-                0x00000000004132c6                ata_wait
-                0x00000000004133a8                ata_status_read
-                0x0000000000413403                ata_wait_not_busy
-                0x000000000041347a                ata_wait_busy
-                0x00000000004134f1                ata_wait_no_drq
-                0x0000000000413566                ata_wait_drq
-                0x00000000004135db                ata_cmd_write
-                0x0000000000413661                ata_soft_reset
-                0x0000000000413713                ata_pio_read
-                0x0000000000413778                ata_pio_write
-                0x00000000004137dd                ata_bus_install
-                0x0000000000413bb4                ata_identify_device
-                0x0000000000414483                ata_read_sector
-                0x000000000041467f                ata_write_sector
- .text          0x00000000004148e0      0xe04 storage.o
-                0x0000000000414f28                ata_initialize
-                0x00000000004154b8                read_sector
-                0x00000000004155ce                write_sector
- .text          0x00000000004156e4      0x680 rtc.o
-                0x00000000004156e4                disable_NMI
-                0x000000000041572b                enable_NMI
-                0x00000000004157b7                rtc_setup
-                0x00000000004158f2                rtc_handler
-                0x0000000000415ad2                swait_init
-                0x0000000000415c5a                swait
- .text          0x0000000000415d64     0x20ee hda.o
-                0x0000000000415d64                hda_wait
-                0x0000000000415db3                hda_outb
-                0x0000000000415e04                hda_outw
-                0x0000000000415e57                hda_outl
-                0x0000000000415ea5                hda_inb
-                0x0000000000415eed                hda_inw
-                0x0000000000415f35                hda_inl
-                0x0000000000415f7c                corb_write_command
-                0x0000000000416123                hda_reset
-                0x00000000004161ef                setup_hda
-                0x0000000000417471                hda_response
-                0x00000000004174b1                hda_send_verb
-                0x0000000000417803                hda_ic_verbe
-                0x0000000000417945                hda_set_output_node
-                0x0000000000417bda                hda_play_sound
-                0x0000000000417db7                hda_volume
- .text          0x0000000000417e52      0x129 speaker.o
-                0x0000000000417e52                turn_speaker_on
-                0x0000000000417e91                turn_speaker_off
-                0x0000000000417ed2                set_speaker_frequence
-                0x0000000000417f22                play_speaker
- .text          0x0000000000417f7b     0x1305 e1000.o
-                0x0000000000417f7b                e1000_read_command
-                0x0000000000417fbe                e1000_write_command
-                0x000000000041800b                e1000_is_eeprom
-                0x0000000000418080                e1000_enable_int
-                0x0000000000418117                e1000_link_up
-                0x00000000004181a2                irq_e1000
-                0x000000000041837f                init_e1000
-                0x0000000000418d6e                e1000_send_package
-                0x0000000000418f36                e1000_recieve_package
- .text          0x0000000000419280     0x1428 ethernet.o
-                0x0000000000419312                get_default_ethernet_device
-                0x0000000000419378                ethernet_set_link_status
-                0x00000000004193b7                ethernet_set_interrupt_status
-                0x00000000004193f6                register_ethernet_device
-                0x0000000000419498                get_ethernet_package
-                0x000000000041950d                send_ethernet_package
-                0x00000000004195b5                handler_ethernet_package_received
-                0x0000000000419d75                int_ethernet_device
-                0x0000000000419f9d                fillMac
-                0x0000000000419fff                fillIP
-                0x000000000041a061                initialise_ethernet
- .text          0x000000000041a6a8     0x10ca arp.o
-                0x000000000041a6e7                init_arp
-                0x000000000041a7b3                arp_save_address
-                0x000000000041ad87                get_hardwere_ethernet
-                0x000000000041ae54                arp_request
-                0x000000000041b09e                arp_replay
-                0x000000000041b2db                arp_hexdump
- .text          0x000000000041b772      0x3c7 udp.o
-                0x000000000041b7b1                udp_send
-                0x000000000041b914                udp_receive
- .text          0x000000000041bb39      0x2d5 ipv4.o
-                0x000000000041bb78                ipv4_send
- .text          0x000000000041be0e      0x745 dhcp.o
-                0x000000000041bea0                dhcp_send
-                0x000000000041c2b8                dhcp_parse_options
- .text          0x000000000041c553      0xa89 tcp.o
-                0x000000000041c5e5                init_tcp
-                0x000000000041c687                tcp_send
-                0x000000000041c9e7                tcp_connect
-                0x000000000041cb4b                tcp_ack
-                0x000000000041cde3                tcp_send_payload
-                0x000000000041cf2b                tcp_finish
- .text          0x000000000041cfdc      0x134 checksum.o
-                0x000000000041d01b                net_checksum
- .text          0x000000000041d110     0x1ef6 rtl8169.o
-                0x000000000041d110                re_read_command
-                0x000000000041d153                re_write_command
-                0x000000000041d1a0                re_read_command_word
-                0x000000000041d1e4                re_write_command_word
-                0x000000000041d236                re_read_command_byte
-                0x000000000041d27a                re_write_command_byte
-                0x000000000041d2cc                re_probe
-                0x000000000041e44f                setup_realtek
-                0x000000000041ed48                re_handle
- .text          0x000000000041f006     0x102b pcnet.o
-                0x000000000041f11e                pcnetWriteBCR
-                0x000000000041f5b7                setup_pcnet
-                0x000000000041fc5f                pcnet_send_package
-                0x000000000041fdd1                pcnet_recieve_package
- .text          0x0000000000420031      0x9a7 vmnet.o
-                0x00000000004201ef                setup_vmnet
-                0x0000000000420278                handler_vmnet
-                0x00000000004204a9                vmnet_send_package
-                0x0000000000420790                vmipv4_send
-                0x0000000000420877                vmnet_udp_send
- .text          0x00000000004209d8      0x291 port.o
-                0x00000000004209d8                ethernet_port_setup
-                0x0000000000420a8b                get_port
-                0x0000000000420b4d                set_port
-                0x0000000000420bea                clean_port
- .text          0x0000000000420c69      0x336 bga.o
-                0x0000000000420c69                bga_write_register
-                0x0000000000420cb2                bga_read_register
-                0x0000000000420cfa                bga_is_available
-                0x0000000000420d3b                bga_set_video_mode
-                0x0000000000420e29                bga_set_bank
-                0x0000000000420e71                setup_bga
- .text          0x0000000000420f9f      0x1f9 video.o
-                0x0000000000420f9f                initialize_graphic_adapter
- .text          0x0000000000421198      0x880 gui.o
-                0x0000000000421198                initialize_gui
-                0x00000000004212f1                update_gui
-                0x0000000000421449                put_pixel
-                0x00000000004214bc                put_pixel_buff
-                0x000000000042155b                refresh_rate
-                0x0000000000421600                clears_creen
-                0x00000000004216b8                draw_char_transparent
-                0x00000000004217c2                glyph
- .text          0x0000000000421a18      0xd56 compositor.o
-                0x0000000000421b09                window_add
-                0x0000000000421cc8                window_remove
-                0x0000000000421e6e                window_foco
-                0x0000000000421fa5                paint_desktop
-                0x0000000000422376                paint_cursor
-                0x0000000000422507                compose
- .text          0x000000000042276e      0x50a window_server.o
-                0x000000000042276e                window_server
-                0x0000000000422a3a                window_server_handle
- .text          0x0000000000422c78        0x0 font8x16.o
- .text          0x0000000000422c78     0x1364 terminal.o
-                0x0000000000422c78                put_pixel_sirius
-                0x0000000000422d19                drawchar
-                0x0000000000422e67                drawline
-                0x0000000000423611                window_putchar
-                0x0000000000423d95                terminal_mouse_click
- .text          0x0000000000423fdc      0x556 std.o
-                0x0000000000423fdc                std_open_file
-                0x000000000042418b                std_file_close
-                0x00000000004241fa                std_putc
-                0x0000000000424372                std_getc
- .text          0x0000000000424532      0xaaa cfs.o
-                0x0000000000424532                filename_cmp
-                0x0000000000424619                read_super_block
-                0x0000000000424682                read_directory_entry
-                0x000000000042480d                open_file_r
-                0x0000000000424b8e                open_file
-                0x0000000000424df5                file_close
-                0x0000000000424efe                file_read_block
- .text          0x0000000000424fdc      0x2e7 pipe.o
-                0x0000000000424fdc                pipe_open_file
-                0x00000000004250c8                pipe_write
-                0x00000000004251cc                pipe_read
- .text          0x00000000004252c3     0x1154 socket.o
-                0x0000000000425302                init_socket
-                0x0000000000425582                socket_address
-                0x00000000004255e4                socket
-                0x0000000000425763                socket_server_transmit
-                0x0000000000425e74                socket_execute_row
-                0x0000000000426129                socket_server_receive
-                0x00000000004262c4                socket_server_receive_offline
- .text          0x0000000000426417      0x2b2 elf.o
-                0x0000000000426417                load_elf64_header
-                0x00000000004265ea                load_elf64_segment
- .text          0x00000000004266c9      0x224 bind.o
-                0x0000000000426708                bind
- .text          0x00000000004268ed       0x5d inet.o
-                0x00000000004268ed                inet_addr
- .text          0x000000000042694a      0x169 recvfrom.o
-                0x000000000042694a                recvfrom
- .text          0x0000000000426ab3      0x14e sendto.o
-                0x0000000000426ab3                sendto
- .text          0x0000000000426c01      0x2b3 string.o
-                0x0000000000426c01                memset
-                0x0000000000426c66                memcpy
-                0x0000000000426cdd                strcpy
-                0x0000000000426d58                strlen
-                0x0000000000426da4                strcmp
-                0x0000000000426e3e                memcmp
- .text          0x0000000000426eb4      0x4e4 vsprintf.o
-                0x0000000000426f20                vsprintf
- .text          0x0000000000427398      0x818 stdio.o
-                0x0000000000427398                putchar
-                0x00000000004273f8                puts
-                0x0000000000427488                printf
-                0x00000000004275b5                fopen
-                0x00000000004276d6                fclose
-                0x000000000042777a                rewind
-                0x00000000004277e3                fseek
-                0x00000000004278c1                ftell
-                0x0000000000427902                fputc
-                0x0000000000427980                fgetc
-                0x0000000000427af3                fread
- .text          0x0000000000427bb0      0x4fb stdlib.o
-                0x0000000000427bb0                malloc
-                0x0000000000427c1f                free
-                0x0000000000427c6b                i2hex
-                0x0000000000427ed9                utoa
-                0x0000000000427f64                itoa
- .text          0x00000000004280ab      0x14a sse_memcpy.o
-                0x00000000004280ab                sse_memcpy
- .text          0x00000000004281f5      0x140 panic.o
-                0x00000000004281f5                kernel_panic
- .text          0x0000000000428335      0xa9d msi.o
-                0x0000000000428335                msi_vector_install
-                0x000000000042898f                default_mas
-                0x00000000004289ee                msi_function
-                0x0000000000428aa4                apic_send_msi
-                0x0000000000428d9f                apic_send_msix
- .text          0x0000000000428dd2      0x6f6 communication.o
-                0x0000000000428e64                commun_switch
-                0x000000000042928a                kernel_thread_communication
- .text          0x00000000004294c8      0x1e4 argv.o
-                0x000000000042957d                format_argv
+                0x0000000000405e8c                free_pages
+                0x0000000000406075                get_phy_addr
+ .text          0x0000000000406247      0x1f9 cpuid.o
+                0x0000000000406247                cpuid_vendor
+                0x00000000004062b5                cpuid_processor_brand
+                0x000000000040638c                cpuid
+                0x00000000004063d7                cpuid_string
+ .text          0x0000000000406440       0xb9 msr.o
+                0x0000000000406440                getmsr
+                0x000000000040648b                setmsr
+ .text          0x00000000004064f9      0x6be lvt.o
+                0x00000000004064f9                lvt_function
+                0x0000000000406705                lvt_function2
+                0x0000000000406911                lvt_install
+ .text          0x0000000000406bb7      0x623 irq.o
+                0x0000000000406bb7                default_irq
+                0x0000000000406c13                irq_function
+                0x0000000000406cea                irq_vetor_mapping
+                0x0000000000406d19                irq_install
+ .text          0x00000000004071da      0x579 apic.o
+                0x00000000004071da                local_apic_read_command
+                0x000000000040721d                local_apic_write_command
+                0x000000000040726a                getapicbase
+                0x00000000004072bd                enableapic
+                0x0000000000407328                apic_eoi_register
+                0x0000000000407365                setup_apic
+                0x00000000004075fc                local_apic_get_id
+                0x0000000000407639                local_apic_send_init
+                0x00000000004076c3                local_apic_send_startup
+ .text          0x0000000000407753      0x309 apic_timer.o
+                0x0000000000407753                apic_initial_count_timer
+                0x00000000004077a1                apic_timer
+                0x0000000000407984                apic_timer_umasked
+                0x00000000004079f0                apic_timer_masked
+ .text          0x0000000000407a5c      0x5d6 ioapic.o
+                0x0000000000407a5c                read_ioapic_register
+                0x0000000000407aac                write_ioapic_register
+                0x0000000000407b06                ioapic_masked
+                0x0000000000407ba3                ioapic_umasked
+                0x0000000000407c40                set_ioapic_redir_table
+                0x0000000000407ecc                ioapic_cofiguration
+                0x0000000000407f66                setup_ioapic
+ .text          0x0000000000408032       0xc6 intr.o
+                0x0000000000408032                intr_install
+                0x0000000000408093                intr_function
+ .text          0x00000000004080f8       0x6b sleep.o
+                0x00000000004080f8                sleep
+ .text          0x0000000000408163     0x21a8 thread.o
+                0x0000000000408163                thread_setup
+                0x0000000000408598                create_thread
+                0x0000000000408b0e                create_thread_child
+                0x0000000000408f1c                pthread_create
+                0x000000000040930e                pthread_join
+                0x000000000040935a                task_switch
+                0x0000000000409b98                task_switch2
+                0x000000000040a201                getpid
+                0x000000000040a238                getpid2
+                0x000000000040a29b                get_thread
+ .text          0x000000000040a30b     0x12ac exectve.o
+                0x000000000040a30b                exectve
+                0x000000000040ac53                exectve_child
+ .text          0x000000000040b5b7      0xed3 syscall.o
+                0x000000000040b5b7                default_syscall
+                0x000000000040b622                syscall_getpid
+                0x000000000040b6b9                syscall_window
+                0x000000000040b711                syscall_kbd_foco
+                0x000000000040b7ec                syscall_alloc_pages
+                0x000000000040b86d                syscall_free_pages
+                0x000000000040b8c5                __malloc_syscall
+                0x000000000040b990                __free_syscall
+                0x000000000040ba46                malloc_syscall
+                0x000000000040bab9                free_syscall
+                0x000000000040bb17                realloc_syscall
+                0x000000000040bb5b                syscall_readsector
+                0x000000000040bbd7                syscall_writesector
+                0x000000000040bc53                syscall_geral
+                0x000000000040bd9a                syscall_tmpnam
+                0x000000000040be68                syscall_io
+                0x000000000040bfa2                syscall_register_pipe_launcher
+                0x000000000040bfee                syscall_get_pipe_launcher
+                0x000000000040c033                syscall_get_paint_list
+                0x000000000040c078                syscall_get_thread_id
+                0x000000000040c0c1                syscall_create_socket
+                0x000000000040c146                syscall_get_socket_ready_queue
+                0x000000000040c18b                syscall_pthread_create
+                0x000000000040c213                syscall_pthread_join
+                0x000000000040c279                syscall_wait_state
+                0x000000000040c2f5                syscall_wait
+                0x000000000040c378                syscall_function_handler
+                0x000000000040c423                syscall_install
+ *fill*         0x000000000040c48a        0x6 
+ .text          0x000000000040c490       0x86 asyscall.o
+                0x000000000040c507                int114
+ .text          0x000000000040c516      0xaa9 console.o
+                0x000000000040c516                console
+                0x000000000040c7be                cmd_version
+                0x000000000040c821                cmd_time
+                0x000000000040c884                cmd_shutdown
+                0x000000000040c8de                cmd_rename
+                0x000000000040c941                cmd_reboot
+                0x000000000040c99b                cmd_new
+                0x000000000040c9fe                cmd_mov
+                0x000000000040ca61                cmd_info
+                0x000000000040cb3f                cmd_help
+                0x000000000040ccb0                cmd_exit
+                0x000000000040cd13                cmd_echo
+                0x000000000040cd76                cmd_dir
+                0x000000000040cdd9                cmd_del
+                0x000000000040ce3c                cmd_date
+                0x000000000040ce9f                cmd_copy
+                0x000000000040cf02                cmd_clear
+                0x000000000040cf5c                cmd_cd
+ .text          0x000000000040cfbf      0x5e2 exit.o
+                0x000000000040cfbf                user_free
+                0x000000000040d071                exit
+ .text          0x000000000040d5a1      0x1c7 sse.o
+                0x000000000040d5a1                fpu_cw
+                0x000000000040d5d1                sse_cr
+                0x000000000040d605                sse_cw
+                0x000000000040d633                fpu_save
+                0x000000000040d662                fpu_restore
+                0x000000000040d691                setup_sse
+ .text          0x000000000040d768      0xcfb pci.o
+                0x000000000040d768                read_pci_config_addr
+                0x000000000040d7e2                write_pci_config_addr
+                0x000000000040d85c                pci_read_config_dword
+                0x000000000040d8d6                pci_write_config_dword
+                0x000000000040d950                pci_read_config_word
+                0x000000000040d9f0                pci_write_config_word
+                0x000000000040dab9                pci_read_config_byte
+                0x000000000040db59                pci_write_config_byte
+                0x000000000040dc21                pci_get_info
+                0x000000000040decf                pci_scan_bcc
+                0x000000000040dfb2                pci_scan_class
+                0x000000000040e0a3                pci_scan_class_subclass
+                0x000000000040e1ab                pci_scan_bcc_scc
+                0x000000000040e2a9                pci_scan_bcc_scc_prog
+                0x000000000040e3b8                pci_scan_vendor
+                0x000000000040e3e9                pci_check_vendor
+                0x000000000040e423                pci_size
+ .text          0x000000000040e463     0x1014 i965.o
+                0x000000000040e463                i965_pci_init
+                0x000000000040e612                setup_i965
+                0x000000000040eb39                timings
+                0x000000000040edd7                disable_dac
+                0x000000000040ee54                enable_dac
+                0x000000000040eed1                disable_plane
+                0x000000000040ef50                enable_plane
+                0x000000000040efcf                disable_pipe
+                0x000000000040f04e                enable_pipe
+                0x000000000040f0cd                disable_dpll
+                0x000000000040f0f8                enable_dpll
+                0x000000000040f137                disable_legacy_vga_emul
+                0x000000000040f1ff                gmbus_reset
+                0x000000000040f22a                gmbus_stoptransaction
+                0x000000000040f269                gmbus_wait
+                0x000000000040f2af                gmbus_read
+                0x000000000040f446                gmbus_write
+ .text          0x000000000040f477      0x26f cursor.o
+                0x000000000040f477                DrawMouse
+                0x000000000040f561                setup_cursor
+                0x000000000040f66d                update_graphic_cursor
+ .text          0x000000000040f6e6      0xa96 acpi.o
+                0x000000000040fa6f                acpi_probe
+                0x000000000040fb45                acpi_enable
+                0x000000000040fd9b                setup_acpi
+                0x000000000041003b                poweroff
+                0x00000000004100c1                reboot
+ .text          0x000000000041017c      0x21c hpet.o
+                0x00000000004102c4                setup_hpet
+                0x0000000000410326                hpet_sleep
+ .text          0x0000000000410398       0xf9 lpc.o
+                0x00000000004103cc                setup_lpc
+ .text          0x0000000000410491      0x2df pit.o
+                0x0000000000410525                pit_set_frequencia
+                0x0000000000410583                pit_enable
+                0x000000000041061a                timer_wait
+                0x000000000041066f                pit_prepare_sleep
+                0x00000000004106fd                pit_perform_sleep
+ .text          0x0000000000410770      0x1b3 ps2.o
+                0x0000000000410770                kbdc_wait
+                0x000000000041080f                kbdc_set_cmd
+                0x00000000004108a1                kbdc_wait_ack
+ .text          0x0000000000410923      0x911 mouse.o
+                0x0000000000410923                mouse_write
+                0x000000000041099c                mouse_read
+                0x00000000004109f0                MOUSE_BAT_TEST
+                0x0000000000410a65                mouse_handler
+                0x0000000000410e09                mouse_install
+ .text          0x0000000000411234      0x93f keyboard.o
+                0x0000000000411234                keyboard_read
+                0x0000000000411288                keyboard_write
+                0x00000000004112dd                KEYBOARD_BAT_TEST
+                0x0000000000411352                keyboard_handler
+                0x00000000004119a8                kbd_wait_irq_ack
+                0x0000000000411a68                keyboard_install
+ .text          0x0000000000411b73     0x19af ahci.o
+                0x0000000000411b73                ahci_initialize
+                0x00000000004131fa                sata_read_sector
+                0x000000000041338e                sata_write_sector
+ .text          0x0000000000413522     0x161a ide.o
+                0x0000000000413522                ata_wait
+                0x0000000000413604                ata_status_read
+                0x000000000041365f                ata_wait_not_busy
+                0x00000000004136d6                ata_wait_busy
+                0x000000000041374d                ata_wait_no_drq
+                0x00000000004137c2                ata_wait_drq
+                0x0000000000413837                ata_cmd_write
+                0x00000000004138bd                ata_soft_reset
+                0x000000000041396f                ata_pio_read
+                0x00000000004139d4                ata_pio_write
+                0x0000000000413a39                ata_bus_install
+                0x0000000000413e10                ata_identify_device
+                0x00000000004146df                ata_read_sector
+                0x00000000004148db                ata_write_sector
+ .text          0x0000000000414b3c      0xe04 storage.o
+                0x0000000000415184                ata_initialize
+                0x0000000000415714                read_sector
+                0x000000000041582a                write_sector
+ .text          0x0000000000415940      0x680 rtc.o
+                0x0000000000415940                disable_NMI
+                0x0000000000415987                enable_NMI
+                0x0000000000415a13                rtc_setup
+                0x0000000000415b4e                rtc_handler
+                0x0000000000415d2e                swait_init
+                0x0000000000415eb6                swait
+ .text          0x0000000000415fc0     0x20ee hda.o
+                0x0000000000415fc0                hda_wait
+                0x000000000041600f                hda_outb
+                0x0000000000416060                hda_outw
+                0x00000000004160b3                hda_outl
+                0x0000000000416101                hda_inb
+                0x0000000000416149                hda_inw
+                0x0000000000416191                hda_inl
+                0x00000000004161d8                corb_write_command
+                0x000000000041637f                hda_reset
+                0x000000000041644b                setup_hda
+                0x00000000004176cd                hda_response
+                0x000000000041770d                hda_send_verb
+                0x0000000000417a5f                hda_ic_verbe
+                0x0000000000417ba1                hda_set_output_node
+                0x0000000000417e36                hda_play_sound
+                0x0000000000418013                hda_volume
+ .text          0x00000000004180ae      0x129 speaker.o
+                0x00000000004180ae                turn_speaker_on
+                0x00000000004180ed                turn_speaker_off
+                0x000000000041812e                set_speaker_frequence
+                0x000000000041817e                play_speaker
+ .text          0x00000000004181d7     0x1305 e1000.o
+                0x00000000004181d7                e1000_read_command
+                0x000000000041821a                e1000_write_command
+                0x0000000000418267                e1000_is_eeprom
+                0x00000000004182dc                e1000_enable_int
+                0x0000000000418373                e1000_link_up
+                0x00000000004183fe                irq_e1000
+                0x00000000004185db                init_e1000
+                0x0000000000418fca                e1000_send_package
+                0x0000000000419192                e1000_recieve_package
+ .text          0x00000000004194dc     0x1428 ethernet.o
+                0x000000000041956e                get_default_ethernet_device
+                0x00000000004195d4                ethernet_set_link_status
+                0x0000000000419613                ethernet_set_interrupt_status
+                0x0000000000419652                register_ethernet_device
+                0x00000000004196f4                get_ethernet_package
+                0x0000000000419769                send_ethernet_package
+                0x0000000000419811                handler_ethernet_package_received
+                0x0000000000419fd1                int_ethernet_device
+                0x000000000041a1f9                fillMac
+                0x000000000041a25b                fillIP
+                0x000000000041a2bd                initialise_ethernet
+ .text          0x000000000041a904     0x10ca arp.o
+                0x000000000041a943                init_arp
+                0x000000000041aa0f                arp_save_address
+                0x000000000041afe3                get_hardwere_ethernet
+                0x000000000041b0b0                arp_request
+                0x000000000041b2fa                arp_replay
+                0x000000000041b537                arp_hexdump
+ .text          0x000000000041b9ce      0x3c7 udp.o
+                0x000000000041ba0d                udp_send
+                0x000000000041bb70                udp_receive
+ .text          0x000000000041bd95      0x2d5 ipv4.o
+                0x000000000041bdd4                ipv4_send
+ .text          0x000000000041c06a      0x745 dhcp.o
+                0x000000000041c0fc                dhcp_send
+                0x000000000041c514                dhcp_parse_options
+ .text          0x000000000041c7af      0xa89 tcp.o
+                0x000000000041c841                init_tcp
+                0x000000000041c8e3                tcp_send
+                0x000000000041cc43                tcp_connect
+                0x000000000041cda7                tcp_ack
+                0x000000000041d03f                tcp_send_payload
+                0x000000000041d187                tcp_finish
+ .text          0x000000000041d238      0x134 checksum.o
+                0x000000000041d277                net_checksum
+ .text          0x000000000041d36c     0x1ef6 rtl8169.o
+                0x000000000041d36c                re_read_command
+                0x000000000041d3af                re_write_command
+                0x000000000041d3fc                re_read_command_word
+                0x000000000041d440                re_write_command_word
+                0x000000000041d492                re_read_command_byte
+                0x000000000041d4d6                re_write_command_byte
+                0x000000000041d528                re_probe
+                0x000000000041e6ab                setup_realtek
+                0x000000000041efa4                re_handle
+ .text          0x000000000041f262     0x102b pcnet.o
+                0x000000000041f37a                pcnetWriteBCR
+                0x000000000041f813                setup_pcnet
+                0x000000000041febb                pcnet_send_package
+                0x000000000042002d                pcnet_recieve_package
+ .text          0x000000000042028d      0x9a7 vmnet.o
+                0x000000000042044b                setup_vmnet
+                0x00000000004204d4                handler_vmnet
+                0x0000000000420705                vmnet_send_package
+                0x00000000004209ec                vmipv4_send
+                0x0000000000420ad3                vmnet_udp_send
+ .text          0x0000000000420c34      0x291 port.o
+                0x0000000000420c34                ethernet_port_setup
+                0x0000000000420ce7                get_port
+                0x0000000000420da9                set_port
+                0x0000000000420e46                clean_port
+ .text          0x0000000000420ec5      0x336 bga.o
+                0x0000000000420ec5                bga_write_register
+                0x0000000000420f0e                bga_read_register
+                0x0000000000420f56                bga_is_available
+                0x0000000000420f97                bga_set_video_mode
+                0x0000000000421085                bga_set_bank
+                0x00000000004210cd                setup_bga
+ .text          0x00000000004211fb      0x1f9 video.o
+                0x00000000004211fb                initialize_graphic_adapter
+ .text          0x00000000004213f4      0x880 gui.o
+                0x00000000004213f4                initialize_gui
+                0x000000000042154d                update_gui
+                0x00000000004216a5                put_pixel
+                0x0000000000421718                put_pixel_buff
+                0x00000000004217b7                refresh_rate
+                0x000000000042185c                clears_creen
+                0x0000000000421914                draw_char_transparent
+                0x0000000000421a1e                glyph
+ .text          0x0000000000421c74      0xd6e compositor.o
+                0x0000000000421d65                window_add
+                0x0000000000421f24                window_remove
+                0x00000000004220ca                window_foco
+                0x0000000000422201                paint_desktop
+                0x00000000004225ea                paint_cursor
+                0x000000000042277b                compose
+ .text          0x00000000004229e2      0x50b window_server.o
+                0x00000000004229e2                window_server
+                0x0000000000422cae                window_server_handle
+ .text          0x0000000000422eed        0x0 font8x16.o
+ .text          0x0000000000422eed     0x1367 terminal.o
+                0x0000000000422eed                put_pixel_sirius
+                0x0000000000422f8e                drawchar
+                0x00000000004230dc                drawline
+                0x0000000000423888                window_putchar
+                0x000000000042400d                terminal_mouse_click
+ .text          0x0000000000424254      0x556 std.o
+                0x0000000000424254                std_open_file
+                0x0000000000424403                std_file_close
+                0x0000000000424472                std_putc
+                0x00000000004245ea                std_getc
+ .text          0x00000000004247aa      0xaaa cfs.o
+                0x00000000004247aa                filename_cmp
+                0x0000000000424891                read_super_block
+                0x00000000004248fa                read_directory_entry
+                0x0000000000424a85                open_file_r
+                0x0000000000424e06                open_file
+                0x000000000042506d                file_close
+                0x0000000000425176                file_read_block
+ .text          0x0000000000425254      0x2e7 pipe.o
+                0x0000000000425254                pipe_open_file
+                0x0000000000425340                pipe_write
+                0x0000000000425444                pipe_read
+ .text          0x000000000042553b     0x1179 socket.o
+                0x000000000042557a                init_socket
+                0x00000000004257fa                socket_address
+                0x000000000042585c                socket
+                0x00000000004259db                socket_server_transmit
+                0x0000000000426111                socket_execute_row
+                0x00000000004263c6                socket_server_receive
+                0x0000000000426561                socket_server_receive_offline
+ .text          0x00000000004266b4      0x2b2 elf.o
+                0x00000000004266b4                load_elf64_header
+                0x0000000000426887                load_elf64_segment
+ .text          0x0000000000426966      0x224 bind.o
+                0x00000000004269a5                bind
+ .text          0x0000000000426b8a       0x5d inet.o
+                0x0000000000426b8a                inet_addr
+ .text          0x0000000000426be7      0x169 recvfrom.o
+                0x0000000000426be7                recvfrom
+ .text          0x0000000000426d50      0x14e sendto.o
+                0x0000000000426d50                sendto
+ .text          0x0000000000426e9e      0x2b3 string.o
+                0x0000000000426e9e                memset
+                0x0000000000426f03                memcpy
+                0x0000000000426f7a                strcpy
+                0x0000000000426ff5                strlen
+                0x0000000000427041                strcmp
+                0x00000000004270db                memcmp
+ .text          0x0000000000427151      0x4e4 vsprintf.o
+                0x00000000004271bd                vsprintf
+ .text          0x0000000000427635      0x818 stdio.o
+                0x0000000000427635                putchar
+                0x0000000000427695                puts
+                0x0000000000427725                printf
+                0x0000000000427852                fopen
+                0x0000000000427973                fclose
+                0x0000000000427a17                rewind
+                0x0000000000427a80                fseek
+                0x0000000000427b5e                ftell
+                0x0000000000427b9f                fputc
+                0x0000000000427c1d                fgetc
+                0x0000000000427d90                fread
+ .text          0x0000000000427e4d      0x4fb stdlib.o
+                0x0000000000427e4d                malloc
+                0x0000000000427ebc                free
+                0x0000000000427f08                i2hex
+                0x0000000000428176                utoa
+                0x0000000000428201                itoa
+ .text          0x0000000000428348      0x14a sse_memcpy.o
+                0x0000000000428348                sse_memcpy
+ .text          0x0000000000428492      0x140 panic.o
+                0x0000000000428492                kernel_panic
+ .text          0x00000000004285d2      0xa9d msi.o
+                0x00000000004285d2                msi_vector_install
+                0x0000000000428c2c                default_mas
+                0x0000000000428c8b                msi_function
+                0x0000000000428d41                apic_send_msi
+                0x000000000042903c                apic_send_msix
+ .text          0x000000000042906f      0x6f2 communication.o
+                0x0000000000429101                commun_switch
+                0x0000000000429526                kernel_thread_communication
+ .text          0x0000000000429761      0x1e4 argv.o
+                0x0000000000429816                format_argv
                 0x000000000042a000                . = ALIGN (0x1000)
- *fill*         0x00000000004296ac      0x954 
+ *fill*         0x0000000000429945      0x6bb 
 
 .iplt           0x000000000042a000        0x0
  .iplt          0x000000000042a000        0x0 setup.o
@@ -1219,368 +1221,367 @@ Linker script and memory map
  *fill*         0x000000000043f941        0x7 
  .rodata        0x000000000043f948        0x8 terminal.o
  .rodata        0x000000000043f950       0x14 std.o
- .rodata        0x000000000043f964       0x1a socket.o
- *fill*         0x000000000043f97e        0x2 
- .rodata        0x000000000043f980       0xad elf.o
- *fill*         0x000000000043fa2d        0x3 
- .rodata        0x000000000043fa30      0x110 vsprintf.o
- .rodata        0x000000000043fb40        0x9 stdio.o
- .rodata        0x000000000043fb49        0xf panic.o
- .rodata        0x000000000043fb58       0x2b msi.o
- *fill*         0x000000000043fb83        0x5 
- .rodata        0x000000000043fb88       0xb8 communication.o
+ .rodata        0x000000000043f964       0x24 socket.o
+ .rodata        0x000000000043f988       0xad elf.o
+ *fill*         0x000000000043fa35        0x3 
+ .rodata        0x000000000043fa38      0x110 vsprintf.o
+ .rodata        0x000000000043fb48        0x9 stdio.o
+ .rodata        0x000000000043fb51        0xf panic.o
+ .rodata        0x000000000043fb60       0x2b msi.o
+ *fill*         0x000000000043fb8b        0x5 
+ .rodata        0x000000000043fb90       0xae communication.o
                 0x0000000000440000                . = ALIGN (0x1000)
- *fill*         0x000000000043fc40      0x3c0 
+ *fill*         0x000000000043fc3e      0x3c2 
 
-.got            0x0000000000440000      0x550
- .got           0x0000000000440000      0x550 setup.o
+.got            0x0000000000440000      0x548
+ .got           0x0000000000440000      0x548 setup.o
 
-.got.plt        0x0000000000440550       0x18
- .got.plt       0x0000000000440550       0x18 setup.o
-                0x0000000000440550                _GLOBAL_OFFSET_TABLE_
+.got.plt        0x0000000000440548       0x18
+ .got.plt       0x0000000000440548       0x18 setup.o
+                0x0000000000440548                _GLOBAL_OFFSET_TABLE_
 
-.igot.plt       0x0000000000440568        0x0
- .igot.plt      0x0000000000440568        0x0 setup.o
+.igot.plt       0x0000000000440560        0x0
+ .igot.plt      0x0000000000440560        0x0 setup.o
 
 .data.rel.local
-                0x0000000000440580     0x1e40
+                0x0000000000440560     0x1e40
  .data.rel.local
-                0x0000000000440580      0x100 exception.o
-                0x0000000000440580                exception_mensagem
+                0x0000000000440560      0x100 exception.o
+                0x0000000000440560                exception_mensagem
  .data.rel.local
-                0x0000000000440680       0xc0 irq.o
-                0x0000000000440680                fnvetors_handler
+                0x0000000000440660       0xc0 irq.o
+                0x0000000000440660                fnvetors_handler
  .data.rel.local
-                0x0000000000440740      0x118 syscall.o
-                0x0000000000440740                fnvetors_syscall
- *fill*         0x0000000000440858        0x8 
+                0x0000000000440720      0x118 syscall.o
+                0x0000000000440720                fnvetors_syscall
+ *fill*         0x0000000000440838        0x8 
  .data.rel.local
-                0x0000000000440860      0x1b0 console.o
-                0x0000000000440860                cmd_table
- *fill*         0x0000000000440a10       0x10 
+                0x0000000000440840      0x1b0 console.o
+                0x0000000000440840                cmd_table
+ *fill*         0x00000000004409f0       0x10 
  .data.rel.local
-                0x0000000000440a20     0x1400 pci.o
-                0x0000000000440a20                pci_classes
-                0x0000000000441220                pci_class_names
+                0x0000000000440a00     0x1400 pci.o
+                0x0000000000440a00                pci_classes
+                0x0000000000441200                pci_class_names
  .data.rel.local
-                0x0000000000441e20       0x20 mouse.o
-                0x0000000000441e20                id_mouse_strings
+                0x0000000000441e00       0x20 mouse.o
+                0x0000000000441e00                id_mouse_strings
  .data.rel.local
-                0x0000000000441e40       0x38 ahci.o
-                0x0000000000441e40                ahci_type
- *fill*         0x0000000000441e78        0x8 
+                0x0000000000441e20       0x38 ahci.o
+                0x0000000000441e20                ahci_type
+ *fill*         0x0000000000441e58        0x8 
  .data.rel.local
-                0x0000000000441e80       0x48 dhcp.o
-                0x0000000000441e80                string_dhcp_message
- *fill*         0x0000000000441ec8       0x18 
+                0x0000000000441e60       0x48 dhcp.o
+                0x0000000000441e60                string_dhcp_message
+ *fill*         0x0000000000441ea8       0x18 
  .data.rel.local
-                0x0000000000441ee0      0x3d0 rtl8169.o
- *fill*         0x00000000004422b0       0x10 
+                0x0000000000441ec0      0x3d0 rtl8169.o
+ *fill*         0x0000000000442290       0x10 
  .data.rel.local
-                0x00000000004422c0      0x100 msi.o
+                0x00000000004422a0      0x100 msi.o
 
-.bss            0x00000000004423c0    0x27c40
-                0x00000000004423c0                bss = .
-                0x00000000004423c0                _bss = .
-                0x00000000004423c0                __bss = .
+.bss            0x00000000004423a0    0x27c60
+                0x00000000004423a0                bss = .
+                0x00000000004423a0                _bss = .
+                0x00000000004423a0                __bss = .
  *(.bss)
- .bss           0x00000000004423c0    0x20000 setup.o
- .bss           0x00000000004623c0        0x0 main.o
- .bss           0x00000000004623c0        0x0 io.o
- .bss           0x00000000004623c0        0x0 gdt.o
- .bss           0x00000000004623c0        0x0 tss.o
- .bss           0x00000000004623c0        0x0 idt.o
- .bss           0x00000000004623c0        0x0 exception.o
- .bss           0x00000000004623c0        0x0 data.o
- .bss           0x00000000004623c0        0x0 server.o
- .bss           0x00000000004623c0        0x0 smp.o
- .bss           0x00000000004623c0        0x0 delay.o
- .bss           0x00000000004623c0       0x20 paging.o
-                0x00000000004623c0                pml4e
-                0x00000000004623c8                pdpte
-                0x00000000004623d0                pae_pde
-                0x00000000004623d8                pae_pte
- .bss           0x00000000004623e0        0x0 mm.o
- .bss           0x00000000004623e0        0x0 cpuid.o
- .bss           0x00000000004623e0        0x0 msr.o
- .bss           0x00000000004623e0        0x0 lvt.o
- .bss           0x00000000004623e0        0x0 irq.o
- .bss           0x00000000004623e0        0x0 apic.o
- .bss           0x00000000004623e0        0x0 apic_timer.o
- .bss           0x00000000004623e0        0x0 ioapic.o
- .bss           0x00000000004623e0        0x0 intr.o
- .bss           0x00000000004623e0        0x0 sleep.o
- .bss           0x00000000004623e0        0x0 thread.o
- .bss           0x00000000004623e0        0x0 exectve.o
- .bss           0x00000000004623e0        0x0 syscall.o
- .bss           0x00000000004623e0        0x8 console.o
-                0x00000000004623e0                call_loader
- .bss           0x00000000004623e8        0x0 exit.o
- .bss           0x00000000004623e8        0x0 sse.o
- .bss           0x00000000004623e8        0x0 pci.o
- .bss           0x00000000004623e8        0x0 i965.o
- .bss           0x00000000004623e8        0x0 cursor.o
- .bss           0x00000000004623e8        0x0 acpi.o
- *fill*         0x00000000004623e8       0x18 
- .bss           0x0000000000462400      0x100 hpet.o
- .bss           0x0000000000462500        0x0 lpc.o
- .bss           0x0000000000462500        0x0 pit.o
- .bss           0x0000000000462500        0x0 ps2.o
- .bss           0x0000000000462500        0x4 mouse.o
-                0x0000000000462500                mouse_position
- *fill*         0x0000000000462504        0x4 
- .bss           0x0000000000462508       0x18 keyboard.o
-                0x0000000000462508                kbd_irq_ack
- .bss           0x0000000000462520        0x0 ahci.o
- .bss           0x0000000000462520        0x0 ide.o
- .bss           0x0000000000462520        0x8 storage.o
-                0x0000000000462520                ata_pci
- .bss           0x0000000000462528        0x1 rtc.o
- .bss           0x0000000000462529        0x0 hda.o
- .bss           0x0000000000462529        0x0 speaker.o
- *fill*         0x0000000000462529        0x7 
- .bss           0x0000000000462530       0x10 e1000.o
- .bss           0x0000000000462540        0x8 ethernet.o
-                0x0000000000462540                package_recieved_ack
- .bss           0x0000000000462548        0x0 arp.o
- .bss           0x0000000000462548        0x0 udp.o
- .bss           0x0000000000462548        0x4 ipv4.o
-                0x0000000000462548                ipv4_count
- .bss           0x000000000046254c        0x0 dhcp.o
- .bss           0x000000000046254c        0x0 tcp.o
- .bss           0x000000000046254c        0x0 checksum.o
- .bss           0x000000000046254c        0x0 rtl8169.o
- .bss           0x000000000046254c        0x4 pcnet.o
- .bss           0x0000000000462550        0x8 vmnet.o
- .bss           0x0000000000462558        0x0 port.o
- .bss           0x0000000000462558        0x0 bga.o
- .bss           0x0000000000462558        0x0 video.o
- .bss           0x0000000000462558        0x0 gui.o
- .bss           0x0000000000462558        0x0 compositor.o
- .bss           0x0000000000462558        0x0 window_server.o
- .bss           0x0000000000462558        0x0 font8x16.o
- .bss           0x0000000000462558        0x4 terminal.o
- .bss           0x000000000046255c        0x0 std.o
- .bss           0x000000000046255c        0x0 cfs.o
- .bss           0x000000000046255c        0x0 pipe.o
- .bss           0x000000000046255c        0x2 socket.o
- .bss           0x000000000046255e        0x0 elf.o
- .bss           0x000000000046255e        0x0 bind.o
- .bss           0x000000000046255e        0x0 inet.o
- .bss           0x000000000046255e        0x0 recvfrom.o
- .bss           0x000000000046255e        0x0 sendto.o
- .bss           0x000000000046255e        0x0 string.o
- .bss           0x000000000046255e        0x0 vsprintf.o
- .bss           0x000000000046255e        0x0 stdio.o
- .bss           0x000000000046255e        0x0 stdlib.o
- .bss           0x000000000046255e        0x0 sse_memcpy.o
- .bss           0x000000000046255e        0x0 panic.o
- .bss           0x000000000046255e        0x0 msi.o
- *fill*         0x000000000046255e        0x2 
- .bss           0x0000000000462560        0x8 communication.o
-                0x0000000000462560                memory
- .bss           0x0000000000462568        0x0 argv.o
+ .bss           0x00000000004423a0    0x20000 setup.o
+ .bss           0x00000000004623a0        0x0 main.o
+ .bss           0x00000000004623a0        0x0 io.o
+ .bss           0x00000000004623a0        0x0 gdt.o
+ .bss           0x00000000004623a0        0x0 tss.o
+ .bss           0x00000000004623a0        0x0 idt.o
+ .bss           0x00000000004623a0        0x0 exception.o
+ .bss           0x00000000004623a0        0x0 data.o
+ .bss           0x00000000004623a0        0x0 server.o
+ .bss           0x00000000004623a0        0x0 smp.o
+ .bss           0x00000000004623a0        0x0 delay.o
+ .bss           0x00000000004623a0       0x20 paging.o
+                0x00000000004623a0                pml4e
+                0x00000000004623a8                pdpte
+                0x00000000004623b0                pae_pde
+                0x00000000004623b8                pae_pte
+ .bss           0x00000000004623c0        0x0 mm.o
+ .bss           0x00000000004623c0        0x0 cpuid.o
+ .bss           0x00000000004623c0        0x0 msr.o
+ .bss           0x00000000004623c0        0x0 lvt.o
+ .bss           0x00000000004623c0        0x0 irq.o
+ .bss           0x00000000004623c0        0x0 apic.o
+ .bss           0x00000000004623c0        0x0 apic_timer.o
+ .bss           0x00000000004623c0        0x0 ioapic.o
+ .bss           0x00000000004623c0        0x0 intr.o
+ .bss           0x00000000004623c0        0x0 sleep.o
+ .bss           0x00000000004623c0        0x0 thread.o
+ .bss           0x00000000004623c0        0x0 exectve.o
+ .bss           0x00000000004623c0        0x0 syscall.o
+ .bss           0x00000000004623c0        0x8 console.o
+                0x00000000004623c0                call_loader
+ .bss           0x00000000004623c8        0x0 exit.o
+ .bss           0x00000000004623c8        0x0 sse.o
+ .bss           0x00000000004623c8        0x0 pci.o
+ .bss           0x00000000004623c8        0x0 i965.o
+ .bss           0x00000000004623c8        0x0 cursor.o
+ .bss           0x00000000004623c8        0x0 acpi.o
+ *fill*         0x00000000004623c8       0x18 
+ .bss           0x00000000004623e0      0x100 hpet.o
+ .bss           0x00000000004624e0        0x0 lpc.o
+ .bss           0x00000000004624e0        0x0 pit.o
+ .bss           0x00000000004624e0        0x0 ps2.o
+ .bss           0x00000000004624e0        0x4 mouse.o
+                0x00000000004624e0                mouse_position
+ *fill*         0x00000000004624e4        0x4 
+ .bss           0x00000000004624e8       0x18 keyboard.o
+                0x00000000004624e8                kbd_irq_ack
+ .bss           0x0000000000462500        0x0 ahci.o
+ .bss           0x0000000000462500        0x0 ide.o
+ .bss           0x0000000000462500        0x8 storage.o
+                0x0000000000462500                ata_pci
+ .bss           0x0000000000462508        0x1 rtc.o
+ .bss           0x0000000000462509        0x0 hda.o
+ .bss           0x0000000000462509        0x0 speaker.o
+ *fill*         0x0000000000462509        0x7 
+ .bss           0x0000000000462510       0x10 e1000.o
+ .bss           0x0000000000462520        0x8 ethernet.o
+                0x0000000000462520                package_recieved_ack
+ .bss           0x0000000000462528        0x0 arp.o
+ .bss           0x0000000000462528        0x0 udp.o
+ .bss           0x0000000000462528        0x4 ipv4.o
+                0x0000000000462528                ipv4_count
+ .bss           0x000000000046252c        0x0 dhcp.o
+ .bss           0x000000000046252c        0x0 tcp.o
+ .bss           0x000000000046252c        0x0 checksum.o
+ .bss           0x000000000046252c        0x0 rtl8169.o
+ .bss           0x000000000046252c        0x4 pcnet.o
+ .bss           0x0000000000462530        0x8 vmnet.o
+ .bss           0x0000000000462538        0x0 port.o
+ .bss           0x0000000000462538        0x0 bga.o
+ .bss           0x0000000000462538        0x0 video.o
+ .bss           0x0000000000462538        0x0 gui.o
+ .bss           0x0000000000462538        0x0 compositor.o
+ .bss           0x0000000000462538        0x0 window_server.o
+ .bss           0x0000000000462538        0x0 font8x16.o
+ .bss           0x0000000000462538        0x4 terminal.o
+ .bss           0x000000000046253c        0x0 std.o
+ .bss           0x000000000046253c        0x0 cfs.o
+ .bss           0x000000000046253c        0x0 pipe.o
+ .bss           0x000000000046253c        0x2 socket.o
+ .bss           0x000000000046253e        0x0 elf.o
+ .bss           0x000000000046253e        0x0 bind.o
+ .bss           0x000000000046253e        0x0 inet.o
+ .bss           0x000000000046253e        0x0 recvfrom.o
+ .bss           0x000000000046253e        0x0 sendto.o
+ .bss           0x000000000046253e        0x0 string.o
+ .bss           0x000000000046253e        0x0 vsprintf.o
+ .bss           0x000000000046253e        0x0 stdio.o
+ .bss           0x000000000046253e        0x0 stdlib.o
+ .bss           0x000000000046253e        0x0 sse_memcpy.o
+ .bss           0x000000000046253e        0x0 panic.o
+ .bss           0x000000000046253e        0x0 msi.o
+ *fill*         0x000000000046253e        0x2 
+ .bss           0x0000000000462540        0x8 communication.o
+                0x0000000000462540                memory
+ .bss           0x0000000000462548        0x0 argv.o
  *(COMMON)
- COMMON         0x0000000000462568       0x20 main.o
-                0x0000000000462568                mult_task
-                0x0000000000462570                user
-                0x0000000000462578                launcher
-                0x000000000046257c                no
-                0x0000000000462580                syspwd
- *fill*         0x0000000000462588       0x18 
- COMMON         0x00000000004625a0      0x120 gdt.o
-                0x00000000004625a0                gdtr
-                0x00000000004625c0                gdt
- COMMON         0x00000000004626c0       0x68 tss.o
-                0x00000000004626c0                tss
- *fill*         0x0000000000462728       0x18 
- COMMON         0x0000000000462740     0x100a idt.o
-                0x0000000000462740                idt
-                0x0000000000463740                idtr
- *fill*         0x000000000046374a        0x6 
- COMMON         0x0000000000463750       0x25 data.o
-                0x0000000000463750                interrupt_status
-                0x0000000000463758                kernelmouse
-                0x0000000000463760                dv_uid
-                0x0000000000463768                pipe_launcher
-                0x0000000000463770                tmpnam
-                0x0000000000463774                dv_num
- *fill*         0x0000000000463775        0xb 
- COMMON         0x0000000000463780       0x50 server.o
-                0x0000000000463780                thread_id
-                0x00000000004637a0                server_id
- *fill*         0x00000000004637d0       0x10 
- COMMON         0x00000000004637e0      0x112 smp.o
-                0x00000000004637e0                core
- *fill*         0x00000000004638f2        0x6 
- COMMON         0x00000000004638f8       0x38 mm.o
-                0x00000000004638f8                PAGE_BITMAP
-                0x0000000000463900                alloc_pte
-                0x0000000000463908                alloc_pde
-                0x0000000000463910                RAM_BITMAP
-                0x0000000000463918                alloc_spin_lock
-                0x0000000000463920                device_pde
-                0x0000000000463928                g_mm_mp_index
- COMMON         0x0000000000463930        0x4 cpuid.o
-                0x0000000000463930                CPUID_REQUEST
- *fill*         0x0000000000463934        0x4 
- COMMON         0x0000000000463938       0x10 apic.o
-                0x0000000000463938                localId
-                0x0000000000463940                lapicbase
- COMMON         0x0000000000463948        0x4 apic_timer.o
-                0x0000000000463948                apic_timer_ticks
- *fill*         0x000000000046394c       0x14 
- COMMON         0x0000000000463960       0xc8 ioapic.o
-                0x0000000000463960                ioapic_redir_table
-                0x0000000000463a20                ioapic_base
- COMMON         0x0000000000463a28      0x1f8 thread.o
-                0x0000000000463a28                context2_r15
-                0x0000000000463a30                context2_rsp0
-                0x0000000000463a38                context2_r12
-                0x0000000000463a40                context2_gs
-                0x0000000000463a48                context_rcx
-                0x0000000000463a50                context2_ds
-                0x0000000000463a58                context_r12
-                0x0000000000463a60                context_rax
-                0x0000000000463a68                context_ds
-                0x0000000000463a70                context2_ss
-                0x0000000000463a78                current_thread
-                0x0000000000463a80                context2_cs
-                0x0000000000463a88                current_thread2
-                0x0000000000463a90                context2_pid
-                0x0000000000463a98                context_rsi
-                0x0000000000463aa0                context2_r13
-                0x0000000000463aa8                context2_rbp
-                0x0000000000463ab0                context_r9
-                0x0000000000463ab8                context_rdx
-                0x0000000000463ac0                context_rflag
-                0x0000000000463ac8                current_thread1
-                0x0000000000463ad0                context_fxsave
-                0x0000000000463ad8                context2_rdx
-                0x0000000000463ae0                context_cs
-                0x0000000000463ae8                context_rsp0
-                0x0000000000463af0                context2_es
-                0x0000000000463af8                thread_ready_queue
-                0x0000000000463b00                context_cr3
-                0x0000000000463b08                context_rsp
-                0x0000000000463b10                context_fs
-                0x0000000000463b18                context2_rax
-                0x0000000000463b20                context_rbp
-                0x0000000000463b28                context_r8
-                0x0000000000463b30                threadz
-                0x0000000000463b38                context2_rcx
-                0x0000000000463b40                context_r15
-                0x0000000000463b48                context2_rflag
-                0x0000000000463b50                context_ss
-                0x0000000000463b58                context2_r14
-                0x0000000000463b60                context2_fs
-                0x0000000000463b68                context2_rbx
-                0x0000000000463b70                context2_r11
-                0x0000000000463b78                context2_cr3
-                0x0000000000463b80                next_pid
-                0x0000000000463b88                context_gs
-                0x0000000000463b90                context_r11
-                0x0000000000463b98                context2_r9
-                0x0000000000463ba0                first_thread2
-                0x0000000000463ba8                context2_r10
-                0x0000000000463bb0                context2_rip
-                0x0000000000463bb8                context2_fxsave
-                0x0000000000463bc0                context2_rsp
-                0x0000000000463bc8                context_r13
-                0x0000000000463bd0                context_r10
-                0x0000000000463bd8                context_rip
-                0x0000000000463be0                context_pid
-                0x0000000000463be8                context_rbx
-                0x0000000000463bf0                context_r14
-                0x0000000000463bf8                context2_r8
-                0x0000000000463c00                context2_rsi
-                0x0000000000463c08                context_rdi
-                0x0000000000463c10                context2_rdi
-                0x0000000000463c18                context_es
- COMMON         0x0000000000463c20        0x8 syscall.o
-                0x0000000000463c20                ret
- *fill*         0x0000000000463c28       0x18 
- COMMON         0x0000000000463c40       0x78 i965.o
-                0x0000000000463c40                fb
-                0x0000000000463c60                mode
-                0x0000000000463c80                gtt
- COMMON         0x0000000000463cb8       0x50 acpi.o
-                0x0000000000463cb8                fadt
-                0x0000000000463cc0                acpi_physical_init
-                0x0000000000463cc8                SLP_TYPa
-                0x0000000000463cd0                hpet
-                0x0000000000463cd8                xsdt
-                0x0000000000463ce0                rsdt
-                0x0000000000463ce8                dsdt
-                0x0000000000463cf0                SLP_TYPb
-                0x0000000000463cf8                acpi_virtual_addr
-                0x0000000000463d00                rsdp
- COMMON         0x0000000000463d08       0x10 hpet.o
-                0x0000000000463d08                hpet_register
-                0x0000000000463d10                period
- COMMON         0x0000000000463d18       0x10 pit.o
-                0x0000000000463d18                eticks
-                0x0000000000463d20                timer_ticks
- COMMON         0x0000000000463d28       0x24 mouse.o
-                0x0000000000463d28                mouse_x
-                0x0000000000463d2c                count_mouse
-                0x0000000000463d30                mouse2
-                0x0000000000463d38                first_time
-                0x0000000000463d3c                buttons
-                0x0000000000463d40                mouse
-                0x0000000000463d48                mouse_y
- COMMON         0x0000000000463d4c        0x4 keyboard.o
-                0x0000000000463d4c                key_buffer
-                0x0000000000463d4e                led_status
-                0x0000000000463d4f                keyboard_charset
- *fill*         0x0000000000463d50       0x10 
- COMMON         0x0000000000463d60      0x220 ahci.o
-                0x0000000000463d60                dmavirt
-                0x0000000000463d68                dmaphy
-                0x0000000000463d70                HBA_BASE
-                0x0000000000463d78                hba_mem_space
-                0x0000000000463d80                sata_idtfy
- COMMON         0x0000000000463f80        0x8 ide.o
-                0x0000000000463f80                ata_record_channel
-                0x0000000000463f84                ata_record_dev
- *fill*         0x0000000000463f88       0x18 
- COMMON         0x0000000000463fa0      0x830 storage.o
-                0x0000000000463fa0                ATA_BAR1
-                0x0000000000463fa4                ATA_BAR4
-                0x0000000000463fc0                ata
-                0x00000000004647c0                ATA_BAR0
-                0x00000000004647c4                ATA_BAR3
-                0x00000000004647c8                ATA_BAR2
-                0x00000000004647cc                ATA_BAR5
- COMMON         0x00000000004647d0        0x8 rtc.o
-                0x00000000004647d0                clock
- *fill*         0x00000000004647d8        0x8 
- COMMON         0x00000000004647e0       0xd4 hda.o
-                0x00000000004647e0                corb_pointer
-                0x00000000004647e4                HDBARL
-                0x00000000004647e8                hda_base
-                0x00000000004647f0                HDA_MEM_SIZE
-                0x00000000004647f4                beep_node
-                0x0000000000464800                hda_widget
-                0x0000000000464880                output_node
-                0x0000000000464888                HDA_STREAM_MEMORY
-                0x0000000000464890                RIRB_MEMORY
-                0x0000000000464898                HDA_MEM
-                0x00000000004648a0                CORB_MEMORY
-                0x00000000004648a8                hda_max_volume
-                0x00000000004648ac                HDBARU
-                0x00000000004648b0                input_node
- *fill*         0x00000000004648b4        0xc 
- COMMON         0x00000000004648c0      0x180 e1000.o
-                0x00000000004648c0                tx_descs
-                0x0000000000464900                rx_memory
-                0x0000000000464920                rx_descs
-                0x0000000000464a20                tx_memory
- COMMON         0x0000000000464a40      0x2e4 ethernet.o
-                0x0000000000464a40                our_ip
-                0x0000000000464a44                local_ip
-                0x0000000000464a48                router_ip
-                0x0000000000464a60                packege_desc_buffer
+ COMMON         0x0000000000462548       0x20 main.o
+                0x0000000000462548                mult_task
+                0x0000000000462550                user
+                0x0000000000462558                launcher
+                0x000000000046255c                no
+                0x0000000000462560                syspwd
+ *fill*         0x0000000000462568       0x18 
+ COMMON         0x0000000000462580      0x120 gdt.o
+                0x0000000000462580                gdtr
+                0x00000000004625a0                gdt
+ COMMON         0x00000000004626a0       0x68 tss.o
+                0x00000000004626a0                tss
+ *fill*         0x0000000000462708       0x18 
+ COMMON         0x0000000000462720     0x100a idt.o
+                0x0000000000462720                idt
+                0x0000000000463720                idtr
+ *fill*         0x000000000046372a        0x6 
+ COMMON         0x0000000000463730       0x25 data.o
+                0x0000000000463730                interrupt_status
+                0x0000000000463738                kernelmouse
+                0x0000000000463740                dv_uid
+                0x0000000000463748                pipe_launcher
+                0x0000000000463750                tmpnam
+                0x0000000000463754                dv_num
+ *fill*         0x0000000000463755        0xb 
+ COMMON         0x0000000000463760       0x50 server.o
+                0x0000000000463760                thread_id
+                0x0000000000463780                server_id
+ *fill*         0x00000000004637b0       0x10 
+ COMMON         0x00000000004637c0      0x112 smp.o
+                0x00000000004637c0                core
+ *fill*         0x00000000004638d2        0x6 
+ COMMON         0x00000000004638d8       0x38 mm.o
+                0x00000000004638d8                PAGE_BITMAP
+                0x00000000004638e0                alloc_pte
+                0x00000000004638e8                alloc_pde
+                0x00000000004638f0                RAM_BITMAP
+                0x00000000004638f8                alloc_spin_lock
+                0x0000000000463900                device_pde
+                0x0000000000463908                g_mm_mp_index
+ COMMON         0x0000000000463910        0x4 cpuid.o
+                0x0000000000463910                CPUID_REQUEST
+ *fill*         0x0000000000463914        0x4 
+ COMMON         0x0000000000463918       0x10 apic.o
+                0x0000000000463918                localId
+                0x0000000000463920                lapicbase
+ COMMON         0x0000000000463928        0x4 apic_timer.o
+                0x0000000000463928                apic_timer_ticks
+ *fill*         0x000000000046392c       0x14 
+ COMMON         0x0000000000463940       0xc8 ioapic.o
+                0x0000000000463940                ioapic_redir_table
+                0x0000000000463a00                ioapic_base
+ COMMON         0x0000000000463a08      0x1f8 thread.o
+                0x0000000000463a08                context2_r15
+                0x0000000000463a10                context2_rsp0
+                0x0000000000463a18                context2_r12
+                0x0000000000463a20                context2_gs
+                0x0000000000463a28                context_rcx
+                0x0000000000463a30                context2_ds
+                0x0000000000463a38                context_r12
+                0x0000000000463a40                context_rax
+                0x0000000000463a48                context_ds
+                0x0000000000463a50                context2_ss
+                0x0000000000463a58                current_thread
+                0x0000000000463a60                context2_cs
+                0x0000000000463a68                current_thread2
+                0x0000000000463a70                context2_pid
+                0x0000000000463a78                context_rsi
+                0x0000000000463a80                context2_r13
+                0x0000000000463a88                context2_rbp
+                0x0000000000463a90                context_r9
+                0x0000000000463a98                context_rdx
+                0x0000000000463aa0                context_rflag
+                0x0000000000463aa8                current_thread1
+                0x0000000000463ab0                context_fxsave
+                0x0000000000463ab8                context2_rdx
+                0x0000000000463ac0                context_cs
+                0x0000000000463ac8                context_rsp0
+                0x0000000000463ad0                context2_es
+                0x0000000000463ad8                thread_ready_queue
+                0x0000000000463ae0                context_cr3
+                0x0000000000463ae8                context_rsp
+                0x0000000000463af0                context_fs
+                0x0000000000463af8                context2_rax
+                0x0000000000463b00                context_rbp
+                0x0000000000463b08                context_r8
+                0x0000000000463b10                threadz
+                0x0000000000463b18                context2_rcx
+                0x0000000000463b20                context_r15
+                0x0000000000463b28                context2_rflag
+                0x0000000000463b30                context_ss
+                0x0000000000463b38                context2_r14
+                0x0000000000463b40                context2_fs
+                0x0000000000463b48                context2_rbx
+                0x0000000000463b50                context2_r11
+                0x0000000000463b58                context2_cr3
+                0x0000000000463b60                next_pid
+                0x0000000000463b68                context_gs
+                0x0000000000463b70                context_r11
+                0x0000000000463b78                context2_r9
+                0x0000000000463b80                first_thread2
+                0x0000000000463b88                context2_r10
+                0x0000000000463b90                context2_rip
+                0x0000000000463b98                context2_fxsave
+                0x0000000000463ba0                context2_rsp
+                0x0000000000463ba8                context_r13
+                0x0000000000463bb0                context_r10
+                0x0000000000463bb8                context_rip
+                0x0000000000463bc0                context_pid
+                0x0000000000463bc8                context_rbx
+                0x0000000000463bd0                context_r14
+                0x0000000000463bd8                context2_r8
+                0x0000000000463be0                context2_rsi
+                0x0000000000463be8                context_rdi
+                0x0000000000463bf0                context2_rdi
+                0x0000000000463bf8                context_es
+ COMMON         0x0000000000463c00        0x8 syscall.o
+                0x0000000000463c00                ret
+ *fill*         0x0000000000463c08       0x18 
+ COMMON         0x0000000000463c20       0x78 i965.o
+                0x0000000000463c20                fb
+                0x0000000000463c40                mode
+                0x0000000000463c60                gtt
+ COMMON         0x0000000000463c98       0x50 acpi.o
+                0x0000000000463c98                fadt
+                0x0000000000463ca0                acpi_physical_init
+                0x0000000000463ca8                SLP_TYPa
+                0x0000000000463cb0                hpet
+                0x0000000000463cb8                xsdt
+                0x0000000000463cc0                rsdt
+                0x0000000000463cc8                dsdt
+                0x0000000000463cd0                SLP_TYPb
+                0x0000000000463cd8                acpi_virtual_addr
+                0x0000000000463ce0                rsdp
+ COMMON         0x0000000000463ce8       0x10 hpet.o
+                0x0000000000463ce8                hpet_register
+                0x0000000000463cf0                period
+ COMMON         0x0000000000463cf8       0x10 pit.o
+                0x0000000000463cf8                eticks
+                0x0000000000463d00                timer_ticks
+ COMMON         0x0000000000463d08       0x24 mouse.o
+                0x0000000000463d08                mouse_x
+                0x0000000000463d0c                count_mouse
+                0x0000000000463d10                mouse2
+                0x0000000000463d18                first_time
+                0x0000000000463d1c                buttons
+                0x0000000000463d20                mouse
+                0x0000000000463d28                mouse_y
+ COMMON         0x0000000000463d2c        0x4 keyboard.o
+                0x0000000000463d2c                key_buffer
+                0x0000000000463d2e                led_status
+                0x0000000000463d2f                keyboard_charset
+ *fill*         0x0000000000463d30       0x10 
+ COMMON         0x0000000000463d40      0x220 ahci.o
+                0x0000000000463d40                dmavirt
+                0x0000000000463d48                dmaphy
+                0x0000000000463d50                HBA_BASE
+                0x0000000000463d58                hba_mem_space
+                0x0000000000463d60                sata_idtfy
+ COMMON         0x0000000000463f60        0x8 ide.o
+                0x0000000000463f60                ata_record_channel
+                0x0000000000463f64                ata_record_dev
+ *fill*         0x0000000000463f68       0x18 
+ COMMON         0x0000000000463f80      0x830 storage.o
+                0x0000000000463f80                ATA_BAR1
+                0x0000000000463f84                ATA_BAR4
+                0x0000000000463fa0                ata
+                0x00000000004647a0                ATA_BAR0
+                0x00000000004647a4                ATA_BAR3
+                0x00000000004647a8                ATA_BAR2
+                0x00000000004647ac                ATA_BAR5
+ COMMON         0x00000000004647b0        0x8 rtc.o
+                0x00000000004647b0                clock
+ *fill*         0x00000000004647b8        0x8 
+ COMMON         0x00000000004647c0       0xd4 hda.o
+                0x00000000004647c0                corb_pointer
+                0x00000000004647c4                HDBARL
+                0x00000000004647c8                hda_base
+                0x00000000004647d0                HDA_MEM_SIZE
+                0x00000000004647d4                beep_node
+                0x00000000004647e0                hda_widget
+                0x0000000000464860                output_node
+                0x0000000000464868                HDA_STREAM_MEMORY
+                0x0000000000464870                RIRB_MEMORY
+                0x0000000000464878                HDA_MEM
+                0x0000000000464880                CORB_MEMORY
+                0x0000000000464888                hda_max_volume
+                0x000000000046488c                HDBARU
+                0x0000000000464890                input_node
+ *fill*         0x0000000000464894        0xc 
+ COMMON         0x00000000004648a0      0x180 e1000.o
+                0x00000000004648a0                tx_descs
+                0x00000000004648e0                rx_memory
+                0x0000000000464900                rx_descs
+                0x0000000000464a00                tx_memory
+ COMMON         0x0000000000464a20      0x304 ethernet.o
+                0x0000000000464a20                local_ip
+                0x0000000000464a24                router_ip
+                0x0000000000464a40                packege_desc_buffer
+                0x0000000000464cc0                your_ip
                 0x0000000000464ce0                default_ethernet_device
                 0x0000000000464d01                dns_ip
                 0x0000000000464d05                dhcp_ip
@@ -1685,120 +1686,120 @@ Linker script and memory map
                                         0x190 (size before relaxing)
  .eh_frame      0x000000000046ad00       0x58 exectve.o
                                          0x70 (size before relaxing)
- .eh_frame      0x000000000046ad58      0x3b0 syscall.o
-                                        0x3c8 (size before relaxing)
- .eh_frame      0x000000000046b108      0x290 console.o
+ .eh_frame      0x000000000046ad58      0x3f0 syscall.o
+                                        0x408 (size before relaxing)
+ .eh_frame      0x000000000046b148      0x290 console.o
                                         0x2a8 (size before relaxing)
- .eh_frame      0x000000000046b398       0x58 exit.o
+ .eh_frame      0x000000000046b3d8       0x58 exit.o
                                          0x70 (size before relaxing)
- .eh_frame      0x000000000046b3f0       0xc8 sse.o
+ .eh_frame      0x000000000046b430       0xc8 sse.o
                                          0xe0 (size before relaxing)
- .eh_frame      0x000000000046b4b8      0x238 pci.o
+ .eh_frame      0x000000000046b4f8      0x238 pci.o
                                         0x250 (size before relaxing)
- .eh_frame      0x000000000046b6f0      0x240 i965.o
+ .eh_frame      0x000000000046b730      0x240 i965.o
                                         0x258 (size before relaxing)
- .eh_frame      0x000000000046b930       0x68 cursor.o
+ .eh_frame      0x000000000046b970       0x68 cursor.o
                                          0x80 (size before relaxing)
- .eh_frame      0x000000000046b998      0x148 acpi.o
+ .eh_frame      0x000000000046b9d8      0x148 acpi.o
                                         0x160 (size before relaxing)
- .eh_frame      0x000000000046bae0       0xa0 hpet.o
+ .eh_frame      0x000000000046bb20       0xa0 hpet.o
                                          0xb8 (size before relaxing)
- .eh_frame      0x000000000046bb80       0x48 lpc.o
+ .eh_frame      0x000000000046bbc0       0x48 lpc.o
                                          0x60 (size before relaxing)
- .eh_frame      0x000000000046bbc8       0xc8 pit.o
+ .eh_frame      0x000000000046bc08       0xc8 pit.o
                                          0xe0 (size before relaxing)
- .eh_frame      0x000000000046bc90       0x88 ps2.o
+ .eh_frame      0x000000000046bcd0       0x88 ps2.o
                                          0xa0 (size before relaxing)
- .eh_frame      0x000000000046bd18       0xf0 mouse.o
+ .eh_frame      0x000000000046bd58       0xf0 mouse.o
                                         0x108 (size before relaxing)
- .eh_frame      0x000000000046be08      0x128 keyboard.o
+ .eh_frame      0x000000000046be48      0x128 keyboard.o
                                         0x140 (size before relaxing)
- .eh_frame      0x000000000046bf30      0x218 ahci.o
+ .eh_frame      0x000000000046bf70      0x218 ahci.o
                                         0x230 (size before relaxing)
- .eh_frame      0x000000000046c148      0x248 ide.o
+ .eh_frame      0x000000000046c188      0x248 ide.o
                                         0x260 (size before relaxing)
- .eh_frame      0x000000000046c390       0xb0 storage.o
+ .eh_frame      0x000000000046c3d0       0xb0 storage.o
                                          0xc8 (size before relaxing)
- .eh_frame      0x000000000046c440      0x100 rtc.o
+ .eh_frame      0x000000000046c480      0x100 rtc.o
                                         0x118 (size before relaxing)
- .eh_frame      0x000000000046c540      0x270 hda.o
+ .eh_frame      0x000000000046c580      0x270 hda.o
                                         0x288 (size before relaxing)
- .eh_frame      0x000000000046c7b0       0x88 speaker.o
+ .eh_frame      0x000000000046c7f0       0x88 speaker.o
                                          0xa0 (size before relaxing)
- .eh_frame      0x000000000046c838      0x190 e1000.o
+ .eh_frame      0x000000000046c878      0x190 e1000.o
                                         0x1a8 (size before relaxing)
- .eh_frame      0x000000000046c9c8      0x1d8 ethernet.o
+ .eh_frame      0x000000000046ca08      0x1d8 ethernet.o
                                         0x1f0 (size before relaxing)
- .eh_frame      0x000000000046cba0      0x148 arp.o
+ .eh_frame      0x000000000046cbe0      0x148 arp.o
                                         0x160 (size before relaxing)
- .eh_frame      0x000000000046cce8       0x78 udp.o
+ .eh_frame      0x000000000046cd28       0x78 udp.o
                                          0x90 (size before relaxing)
- .eh_frame      0x000000000046cd60       0x50 ipv4.o
+ .eh_frame      0x000000000046cda0       0x50 ipv4.o
                                          0x68 (size before relaxing)
- .eh_frame      0x000000000046cdb0       0x98 dhcp.o
+ .eh_frame      0x000000000046cdf0       0x98 dhcp.o
                                          0xb0 (size before relaxing)
- .eh_frame      0x000000000046ce48      0x120 tcp.o
+ .eh_frame      0x000000000046ce88      0x120 tcp.o
                                         0x138 (size before relaxing)
- .eh_frame      0x000000000046cf68       0x40 checksum.o
+ .eh_frame      0x000000000046cfa8       0x40 checksum.o
                                          0x58 (size before relaxing)
- .eh_frame      0x000000000046cfa8      0x2c8 rtl8169.o
+ .eh_frame      0x000000000046cfe8      0x2c8 rtl8169.o
                                         0x2e0 (size before relaxing)
- .eh_frame      0x000000000046d270      0x1a0 pcnet.o
+ .eh_frame      0x000000000046d2b0      0x1a0 pcnet.o
                                         0x1b8 (size before relaxing)
- .eh_frame      0x000000000046d410      0x138 vmnet.o
+ .eh_frame      0x000000000046d450      0x138 vmnet.o
                                         0x150 (size before relaxing)
- .eh_frame      0x000000000046d548       0x88 port.o
+ .eh_frame      0x000000000046d588       0x88 port.o
                                          0xa0 (size before relaxing)
- .eh_frame      0x000000000046d5d0       0xd0 bga.o
+ .eh_frame      0x000000000046d610       0xd0 bga.o
                                          0xe8 (size before relaxing)
- .eh_frame      0x000000000046d6a0       0x30 video.o
+ .eh_frame      0x000000000046d6e0       0x30 video.o
                                          0x48 (size before relaxing)
- .eh_frame      0x000000000046d6d0      0x128 gui.o
+ .eh_frame      0x000000000046d710      0x128 gui.o
                                         0x140 (size before relaxing)
- .eh_frame      0x000000000046d7f8      0x110 compositor.o
+ .eh_frame      0x000000000046d838      0x110 compositor.o
                                         0x128 (size before relaxing)
- .eh_frame      0x000000000046d908       0x48 window_server.o
+ .eh_frame      0x000000000046d948       0x48 window_server.o
                                          0x60 (size before relaxing)
- .eh_frame      0x000000000046d950      0x100 terminal.o
+ .eh_frame      0x000000000046d990      0x100 terminal.o
                                         0x118 (size before relaxing)
- .eh_frame      0x000000000046da50       0x98 std.o
+ .eh_frame      0x000000000046da90       0x98 std.o
                                          0xb0 (size before relaxing)
- .eh_frame      0x000000000046dae8      0x118 cfs.o
+ .eh_frame      0x000000000046db28      0x118 cfs.o
                                         0x130 (size before relaxing)
- .eh_frame      0x000000000046dc00       0x68 pipe.o
+ .eh_frame      0x000000000046dc40       0x68 pipe.o
                                          0x80 (size before relaxing)
- .eh_frame      0x000000000046dc68      0x180 socket.o
+ .eh_frame      0x000000000046dca8      0x180 socket.o
                                         0x198 (size before relaxing)
- .eh_frame      0x000000000046dde8       0x48 elf.o
+ .eh_frame      0x000000000046de28       0x48 elf.o
                                          0x60 (size before relaxing)
- .eh_frame      0x000000000046de30       0x50 bind.o
+ .eh_frame      0x000000000046de70       0x50 bind.o
                                          0x68 (size before relaxing)
- .eh_frame      0x000000000046de80       0x20 inet.o
+ .eh_frame      0x000000000046dec0       0x20 inet.o
                                          0x38 (size before relaxing)
- .eh_frame      0x000000000046dea0       0x30 recvfrom.o
+ .eh_frame      0x000000000046dee0       0x30 recvfrom.o
                                          0x48 (size before relaxing)
- .eh_frame      0x000000000046ded0       0x30 sendto.o
+ .eh_frame      0x000000000046df10       0x30 sendto.o
                                          0x48 (size before relaxing)
- .eh_frame      0x000000000046df00       0xc0 string.o
+ .eh_frame      0x000000000046df40       0xc0 string.o
                                          0xd8 (size before relaxing)
- .eh_frame      0x000000000046dfc0       0x50 vsprintf.o
+ .eh_frame      0x000000000046e000       0x50 vsprintf.o
                                          0x68 (size before relaxing)
- .eh_frame      0x000000000046e010      0x198 stdio.o
+ .eh_frame      0x000000000046e050      0x198 stdio.o
                                         0x1b0 (size before relaxing)
- .eh_frame      0x000000000046e1a8       0xd8 stdlib.o
+ .eh_frame      0x000000000046e1e8       0xd8 stdlib.o
                                          0xf0 (size before relaxing)
- .eh_frame      0x000000000046e280       0x20 sse_memcpy.o
+ .eh_frame      0x000000000046e2c0       0x20 sse_memcpy.o
                                          0x38 (size before relaxing)
- .eh_frame      0x000000000046e2a0       0x20 panic.o
+ .eh_frame      0x000000000046e2e0       0x20 panic.o
                                          0x38 (size before relaxing)
- .eh_frame      0x000000000046e2c0       0xc8 msi.o
+ .eh_frame      0x000000000046e300       0xc8 msi.o
                                          0xe0 (size before relaxing)
- .eh_frame      0x000000000046e388       0x90 communication.o
+ .eh_frame      0x000000000046e3c8       0x90 communication.o
                                          0xa8 (size before relaxing)
- .eh_frame      0x000000000046e418       0x4c argv.o
+ .eh_frame      0x000000000046e458       0x4c argv.o
                                          0x68 (size before relaxing)
                 0x000000000046f000                . = ALIGN (0x1000)
- *fill*         0x000000000046e464      0xb9c 
+ *fill*         0x000000000046e4a4      0xb5c 
                 0x000000000046f000                end = .
                 0x000000000046f000                _end = .
                 0x000000000046f000                __end = .

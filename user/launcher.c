@@ -12,6 +12,7 @@
 #include <stdbool.h>
 
 #include <sys/communication.h>
+#include <sys/exectve.h>
 
 #define APP_LIST_SIZE 1024
 char *app_memory;
@@ -365,6 +366,7 @@ int main()
 	// register 
 	//wcl(w);
     __asm__ __volatile__("int $0x72"::"d"(2),"D"(w));
+    w->visibility = 1;
 
     // get list
     unsigned long addr = 0;
@@ -380,6 +382,13 @@ int main()
     app_fixe( 0, "explore.bin\0" , "folder.bmp\0" , w);
     app_fixe( 0, "term.bin\0" , "trm.bmp\0" , w);
     app_fixe( 0, "editor.bin\0" , "edit.bmp\0" , w);
+
+    // execute servidor grafico
+    char *argv[4];
+    argv[0] = (char*)malloc(0x1000);
+    strcpy(argv[0],"windowX.bin");
+    exectve(1, argv, 0, 0);
+    free(argv[0]);
 	
 	for(;;){
 

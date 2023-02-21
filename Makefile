@@ -29,7 +29,8 @@ mout_vhd:
 	./fs -g bin/kernel.bin SIRIUS.VHD
 	./fs -g bin/ap.bin SIRIUS.VHD
 	./fs -g README.md SIRIUS.VHD
-	#./fs -g font/font.psf SIRIUS.VHD
+	#./fs -g font/font.psf SIRIUS.VHD    
+	./fs -g bin/windowX.bin SIRIUS.VHD
 	./fs -g bin/term.bin SIRIUS.VHD
 	./fs -g bin/shell.bin SIRIUS.VHD
 	./fs -g bin/launcher.bin SIRIUS.VHD

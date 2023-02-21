@@ -137,7 +137,3 @@ void window_server_handle(WINDOW *w, int foco)
         break;
     }
 }
-
-
-
-

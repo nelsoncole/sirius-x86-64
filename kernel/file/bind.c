@@ -3,7 +3,7 @@
 #include <inet.h>
 #include <ethernet.h>
 
-extern unsigned char our_ip[4];
+extern unsigned char your_ip[4];
 extern unsigned char local_ip[4];
 
 int bind(int socket, const struct sockaddr *address,
@@ -33,7 +33,7 @@ int bind(int socket, const struct sockaddr *address,
         if(fd->domain == AF_LOCAL)
             fillIP((unsigned char*)&ip, local_ip);
         else
-            fillIP((unsigned char*)&ip, our_ip);
+            fillIP((unsigned char*)&ip, your_ip);
         fd->src_ip = ip;
     }
 

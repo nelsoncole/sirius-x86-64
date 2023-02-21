@@ -16,7 +16,6 @@ struct communication{
     unsigned long apid;
     unsigned char message[1024-24];
 };
-
 int communication(struct communication *commun, struct communication *ret);
 
 #endif

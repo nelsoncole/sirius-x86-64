@@ -79,8 +79,9 @@ typedef struct __WINDOW {
 	unsigned int	style;
 	unsigned int	gid;
     unsigned int    foco;
+    unsigned int    visibility;
     unsigned long long component[256];
-	char		    rsv[4096 - 176 - 2048];
+	char		    rsv[4096 - 180 - 2048];
 	unsigned long 	start;
 }__attribute__ ((packed)) WINDOW;
 typedef struct {

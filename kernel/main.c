@@ -200,8 +200,8 @@ void main(unsigned long entry_pointer_info)
     sti();
 	
     unsigned long addr =0;
-	alloc_pages(0, 2, (unsigned long *)&addr);
-	create_thread( &kernel_thread_communication/*&console*/, /*stack*/addr + 0x1FF0, (unsigned long)pml4e, 0, 0,0,0, 0);
+	alloc_pages(0, 4, (unsigned long *)&addr);
+	create_thread( &kernel_thread_communication/*&console*/, /*stack*/addr + 0x3FF0, (unsigned long)pml4e, 0, 0,0,0, 0);
 	
 	syspwd = (char*) malloc(0x1000);
 	strcpy(syspwd,"A:");

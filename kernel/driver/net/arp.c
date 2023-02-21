@@ -107,7 +107,7 @@ void arp_request(unsigned char *ip, unsigned char *mac)
     // Sender MAC Address
     fillMac(arp->source_mac, default_ethernet_device.mac);
     // Sender IP Address
-    fillIP(arp->source_ip, our_ip);
+    fillIP(arp->source_ip, your_ip);
     // Target MAC Address
     fillMac(arp->dest_mac, empty);
     // Target IP Address
@@ -146,7 +146,7 @@ void arp_replay(unsigned char *ip, unsigned char *mac)
     // Sender MAC Address
     fillMac(arp->source_mac, default_ethernet_device.mac);
     // Sender IP Address
-    fillIP(arp->source_ip, our_ip);
+    fillIP(arp->source_ip, your_ip);
     // Target MAC Address
     fillMac(arp->dest_mac, mac);
     // Target IP Address

@@ -19,7 +19,8 @@ void user_free(THREAD *thr )
 	POOL_SYSCALL *m = (POOL_SYSCALL *)thr->pool;
 
 	for(int i=0; i <POOL_COUNT; i++){
-		if(m->ptr != 0)free_pages((void*)m->ptr);
+		int *ptr = (int*)m->ptr;
+		if(ptr != 0)free_pages(ptr);
 		m++;
 	}
 
@@ -35,8 +36,8 @@ void exit(int rc, THREAD *thr) {
 	THREAD *tmp = thr;
 	// macar todas como zumbi
 	while(tmp) {
-	 tmp->status = THREAD_ZUMBI;	
-	 tmp = tmp->tail;
+	 	tmp->status |= THREAD_ZUMBI;
+	 	tmp = tmp->tail;
 	}
 	
 	// enviar memsagem dizendo que terminou.
@@ -78,7 +79,7 @@ void exit(int rc, THREAD *thr) {
 
             // Avizar ao launcher que o janela terminou
             // pipe_write ( void *buf, FILE *fp);
-            pipe[0] = 0x1001;
+           	pipe[0] = 0x1001;
 	        pipe[1] = 0;
             pipe[2] = 0;
             pipe[3] = 0;
@@ -90,8 +91,7 @@ void exit(int rc, THREAD *thr) {
 	        pipe_write ( pipe, pipe_launcher);
 	    }
 
-        user_free(tmp);
-	 	
+        user_free(tmp);	 	
 	    tmp = tmp->tail;
 	}
 	
@@ -112,7 +112,7 @@ void exit(int rc, THREAD *thr) {
     	}
         
     }
-    // processo filho, remover all
+    // processo pai, remover
 	while(tmp) {
 	    unsigned long addr = (unsigned long) tmp;
 	 
@@ -120,6 +120,11 @@ void exit(int rc, THREAD *thr) {
 	    while (list) {
 		    if(list->next == tmp) {
 		        list->next = tmp->next;
+				// reset Thread wait
+				THREAD *father = tmp->head;
+				father->status &=~THREAD_WAIT;
+				// clear tail
+				father->tail = 0;
 		        break;
 		    }
     		list = list->next;

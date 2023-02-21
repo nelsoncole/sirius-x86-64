@@ -182,6 +182,8 @@ void paint_desktop(void *bankbuffer) {
 	    if(paint->w != 0) {
             count++;
 		    WINDOW *w = (WINDOW*) paint->w;
+
+			if(!w->visibility) goto next;
 		
 		    while(*(unsigned char *)&w->spinlock != 0){};
 		    *(unsigned char *)&w->spinlock = 1;
@@ -237,6 +239,7 @@ void paint_desktop(void *bankbuffer) {
            
             *(unsigned char *)&w->spinlock = 0;
        }
+	   	next:
        	paint = paint->next;
     }
 

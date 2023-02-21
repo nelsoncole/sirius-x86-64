@@ -62,20 +62,20 @@ int commun_switch(struct communication *commun, struct communication *ret)
             foco(commun->pid,commun->apid);
             return 0;
         case COMMUN_TYPE_EXEC:
+            cli();
             strcpy((char*)ret->message,"exective\n" );
             addr = (unsigned long*)((unsigned long)&commun->message);
-            cli();
 			buf = (char *) addr[0];
 			pwd = (char *)&addr[1];
             thread_id = commun->apid; // usado para registro da thread ID 
 			exectve(0, 0, pwd, buf);
             thread_id = 0;
-			sti();
+            sti();
             return 0;
         case COMMUN_TYPE_EXEC_CHILD:
+            cli();
             strcpy((char*)ret->message,"exective child\n" );
             addr = (unsigned long*)((unsigned long)&commun->message);
-            cli();
 			buf = (char *) addr[0];
 			pid = commun->pid;
             option = (char *)&addr[1];
@@ -95,11 +95,14 @@ int commun_switch(struct communication *commun, struct communication *ret)
 		
 			if(!exectve_child(argc, argv, pwd, buf, get_thread(pid)))
             {	// error
-				thread = get_thread(pid);
-				pipe_write ( pipe, thread->pipe);
+                ret->type = -1;
                 
-			}
-			sti();
+			}else{
+                // sucesso
+                ret->type = 0;
+                strcpy((char*)&ret->message, "executado...");
+            }
+            sti();
             return 0;
     }
 
@@ -132,14 +135,15 @@ void kernel_thread_communication(){
     memory = (unsigned long) malloc(0x1000);
     struct communication *commun = (struct communication*) malloc(sizeof(struct communication));
     struct communication *commun2 = (struct communication*)malloc(sizeof(struct communication));
-    char *message = "sirius operating system\n\0";
+    
     while(1){
         socklen_t len;
         ssize_t to = recvfrom(sd, commun, sizeof(struct communication), 0, (struct sockaddr*)&serb, &len);
 
         commun_switch(commun, commun2);
-        ssize_t count = sendto(sd, commun2, sizeof(struct communication), 0, (struct sockaddr*)&serb, sizeof(struct sockaddr_in));
-        
+        if(commun->type != COMMUN_TYPE_EXIT){
+            ssize_t count = sendto(sd, commun2, sizeof(struct communication), 0, (struct sockaddr*)&serb, sizeof(struct sockaddr_in));
+        }
     }
 
 }

@@ -9,6 +9,7 @@
 
 #include <sys/communication.h>
 
+
 extern void term_color(int fg, int bg);
 
 void shell();
@@ -95,7 +96,6 @@ char *path;
 
 static int cmd_run(int argc,char **argv)
 {
-
 	if(argc < 1) return - 1; 
  
 	char *a = argv[0];
@@ -139,7 +139,10 @@ static int cmd_run(int argc,char **argv)
         strcpy( arg, (const char*)_v_);
         communication(&commun, &commun2);
 
-        wait_exit();
+		if(!commun2.type)
+			wait(0);
+		else
+			printf("executive error: \'%s\'\n", path);
 
     }else {
         printf("fopen error: \'%s\'\n", path);

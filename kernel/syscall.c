@@ -73,7 +73,7 @@ void syscall_free_pages(unsigned long rdi, unsigned long rsi, unsigned long rdx,
 	free_pages((void*)rdi);
 }
 
-void *__malloc_syscall(THREAD *thread, unsigned size) {
+unsigned long __malloc_syscall(THREAD *thread, unsigned size) {
 
 	unsigned long addr;
 	
@@ -95,7 +95,7 @@ void *__malloc_syscall(THREAD *thread, unsigned size) {
         m++;
     }
 	
-	return (void*)(addr);
+	return addr;
 
 }
 
@@ -262,6 +262,23 @@ void syscall_pthread_join(unsigned long rdi)
     ret = (unsigned long) pthread_join(thread);
 }
 
+void syscall_wait_state(unsigned long rdi)
+{
+    if(current_thread->tail != 0) {
+       current_thread->status |= THREAD_WAIT;
+    }
+}
+
+
+void syscall_wait(unsigned long rdi)
+{
+    ret = 0;
+    if(!(current_thread->status&THREAD_WAIT)){
+        ret = current_thread->wait_pid;
+    }
+}
+
+
 void *fnvetors_syscall[SYSCALL_TABLE] = {
 	&default_syscall, 	    // 0
     &syscall_getpid,        // 1
@@ -293,8 +310,8 @@ void *fnvetors_syscall[SYSCALL_TABLE] = {
     &default_syscall, 	    // 27
     &default_syscall, 	    // 28
     &default_syscall, 	    // 29
-    &default_syscall, 	    // 30
-    &default_syscall, 	    // 31
+    &syscall_wait_state,    // 30
+    &syscall_wait, 	        // 31
     &malloc_syscall, 	    // 32
     &free_syscall, 	        // 33
     &realloc_syscall        // 34

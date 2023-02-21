@@ -28,7 +28,7 @@ ethernet_device_t default_ethernet_device;
 unsigned long package_recieved_ack = 0;
 ethernet_package_descriptor_t default_ethernet_package_descriptor;
 
-unsigned char our_ip[SIZE_OF_IP];
+unsigned char your_ip[SIZE_OF_IP];
 unsigned char router_ip[SIZE_OF_IP];
 unsigned char dns_ip[SIZE_OF_IP];
 unsigned char dhcp_ip[SIZE_OF_IP];
@@ -264,7 +264,7 @@ void initialise_ethernet(){
     if(ed.is_enabled){
 
         memset(dhcp, 0, sizeof(dhcp_header_t));
-        dhcp_send(our_ip, dhcp_ip, DHCP_DISCOVER);
+        dhcp_send(your_ip, dhcp_ip, DHCP_DISCOVER);
         if( udp_receive(dhcp, sizeof(dhcp_header_t), 68) ){
             if(htonl(dhcp->magic_cookie) != 0x63825363) {
                 printf("No DHCP\n");
@@ -278,13 +278,13 @@ void initialise_ethernet(){
             goto end;
         }
 
-        printf("Your    IP %d.%d.%d.%d \n",our_ip[0],our_ip[1],our_ip[2],our_ip[3]);
+        printf("Your    IP %d.%d.%d.%d \n",your_ip[0],your_ip[1],your_ip[2],your_ip[3]);
         printf("Gateway IP %d.%d.%d.%d \n",router_ip[0],router_ip[1],router_ip[2],router_ip[3]);
         printf("DNS     IP %d.%d.%d.%d \n",dns_ip[0],dns_ip[1],dns_ip[2],dns_ip[3]);
         printf("DHCP    IP %d.%d.%d.%d \n",dhcp_ip[0],dhcp_ip[1],dhcp_ip[2],dhcp_ip[3]);    
 
         memset(dhcp, 0, sizeof(dhcp_header_t));
-        dhcp_send(our_ip, dhcp_ip, DHCP_REQUEST);
+        dhcp_send(your_ip, dhcp_ip, DHCP_REQUEST);
         if( udp_receive(dhcp, sizeof(dhcp_header_t), 68) ){
             if(htonl(dhcp->magic_cookie) != 0x63825363) {
                 printf("No DHCP\n");
@@ -299,7 +299,7 @@ void initialise_ethernet(){
             printf("%s\n", string_dhcp_message[dhcp->options[2]]);
         }
 
-        fillIP((unsigned char*)& default_ethernet_device.client_ip,(unsigned char*)&our_ip);
+        fillIP((unsigned char*)& default_ethernet_device.client_ip,(unsigned char*)&your_ip);
         fillIP((unsigned char*)&default_ethernet_device.server_ip,(unsigned char*)&dhcp_ip);
 
         ethernet_set_link_status(1);

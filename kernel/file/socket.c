@@ -128,7 +128,7 @@ void socket_server_transmit(){
                 len = current_saddr->length2;
 
                 if(!src_ip) {
-                    fillIP((unsigned char*)&current_saddr->src_ip, our_ip);
+                    fillIP((unsigned char*)&current_saddr->src_ip, your_ip);
                     src_ip = current_saddr->src_ip;
                 }
                 // TODO define porta, temporario
@@ -140,7 +140,7 @@ void socket_server_transmit(){
 
                 switch(current_saddr->type){
                     case SOCK_DGRAM:
-                        if(current_saddr->domain == AF_INET)
+                        if(current_saddr->domain == AF_INET && dest_ip != inet_addr("127.0.0.1"))
                             udp_send(src_ip, dest_ip, src_port, dest_port, buf, len);
                         else
                             vmnet_udp_send(src_ip, dest_ip, src_port, dest_port, buf, len);

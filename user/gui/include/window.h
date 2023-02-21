@@ -64,8 +64,9 @@ typedef struct __WINDOW {
 	unsigned int	style;
 	unsigned int	gid;
     unsigned int    foco;
+	unsigned int    visibility;
     unsigned long long component[256];
-	char		    rsv[4096 - 176 - 2048];
+	char		    rsv[4096 - 180 - 2048];
 	unsigned long 	start;
 	
 }__attribute__ ((packed)) WINDOW;
@@ -213,5 +214,10 @@ int m_file_list(HANDLE_T *obj);
 HANDLE_T *terminalbox(int x, int y, int width, int height, int fg, int bg, WINDOW *w, unsigned int id);
 void trminalscroll(HANDLE_T *obj, int mouse_x, int mouse_y);
 void m_terminalbox(HANDLE_T *obj);
+
+// -----------------------
+WINDOW *init_window(int x, int y, int width, int height, int fg, int bg, int style, WINDOW *window);
+void drawtriagle(int x, int y, int width, int fill, int rgb, WINDOW *w);
+WINDOW *create_new_window(WINDOW *window, int x, int y);
 
 #endif

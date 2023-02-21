@@ -103,7 +103,7 @@ int dhcp_parse_options(const void *buf){
 
     int ip_size;
     unsigned char opt_type;
-    fillIP((unsigned char*)&our_ip,(unsigned char*)&dhcp->yiaddr);
+    fillIP((unsigned char*)&your_ip,(unsigned char*)&dhcp->yiaddr);
     int i =0;
     while(1){
         opt_type = dhcp->options[i++];

@@ -7,6 +7,7 @@
 #include <pipe.h>
 
 #include <sys/communication.h>
+#include <sys/exectve.h>
 
 
 #define ID_MENU_FILE 	(0x10 + 0)
@@ -123,39 +124,11 @@ void main() {
 
 	__asm__ __volatile__("int $0x72"::"d"(3),"D"(stdin)); // foco do teclado
 
-	char *path = malloc(128);
-
-	strcpy(path,"shell.bin\0");
-
-    FILE *fp = fopen(path,"r+b");
-    if(fp) {
-        fseek(fp,0,SEEK_END);
-	    int size = ftell(fp);
-	    rewind(fp);
-        fread (app_memory, 1, size, fp);
-	    fclose(fp);
-
-        /*__asm__ __volatile__("movq %%rax,%%r8;"
-	    " int $0x72;"
-	    ::"d"(8),"D"(app_memory),"S"(0),"c"(1), "a"(pwd)); // fork*/
-        unsigned long pid = 0;
-        // getpid()
-        __asm__ __volatile__("int $0x72":"=a"(pid):"d"(1),"c"(0));
-        struct communication commun, commun2;
-        memset((char*)&commun, 0, sizeof(struct communication));
-        commun.type = COMMUN_TYPE_EXEC_CHILD;
-        commun.pid = pid;
-        unsigned long *addr = (unsigned long*)((unsigned long)&commun.message);
-        addr[0] = (unsigned long)((unsigned long*)app_memory);
-        strcpy( (char*)&addr[1],pwd);
-        char *arg = (char*)&addr[1];
-        arg += strlen(pwd) + 1;
-        strcpy( arg, path);
-        communication(&commun, &commun2);
-
-    }else {
-        printf("fopen error: \'%s\'\n", path);
-	}
+    char *argv[4];
+    argv[0] = (char*)malloc(0x1000);
+    strcpy(argv[0],"shell.bin\0");
+    exectve(1, argv, 1, 0);
+    free(argv[0]);
 
 	while(1) loop(w);
 }

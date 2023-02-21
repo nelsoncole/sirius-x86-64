@@ -14,6 +14,7 @@ void *__malloc_r(unsigned size)
 void __free_r(void *p)
 {
 	if(!p)return;
+	
 	__asm__ __volatile__("int $0x72": :"d"(33),"D"(p));
 }
 

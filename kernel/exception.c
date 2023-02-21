@@ -125,7 +125,7 @@ void fault_exception(int  n)
 	}
 	
     printf("Local APIC ID: %x\n",id);
-    THREAD	*tmp = current_thread1;
+    THREAD	*tmp = current_thread;
     if(id > 0){
         tmp = current_thread2;
     }
@@ -148,7 +148,7 @@ void die(char *menssage)
 	: "=b"(id) );
 	
     printf("Local APIC ID: %x ",id);
-    THREAD	*tmp = current_thread1;
+    THREAD	*tmp = current_thread;
     if(id > 0){
         tmp = current_thread2;
     }

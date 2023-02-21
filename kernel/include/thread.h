@@ -4,7 +4,8 @@
 #include <stdio.h>
 #include <data.h>
 
-#define THREAD_ZUMBI 1
+#define THREAD_ZUMBI 	1
+#define THREAD_WAIT 	2
 
 typedef struct _THREAD {
 	// Registradores geral
@@ -38,6 +39,8 @@ typedef struct _THREAD {
 	unsigned long pml4e_addr, pdpte_addr, pde_addr, pte_addr, frame_size;
 
 	unsigned long pool;
+
+	unsigned long wait_pid;
 	
 
     struct _THREAD *head;	

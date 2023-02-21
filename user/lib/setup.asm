@@ -23,8 +23,8 @@ start:
 	mov qword[rbx], r13
 	
 	call ctr0
-	
 	jmp $
+	
 global call_function	
 call_function:
    	mov rax, rdi
