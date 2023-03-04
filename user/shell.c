@@ -137,7 +137,7 @@ static int cmd_run(int argc,char **argv)
         char *arg = (char*)&addr[1];
         arg += strlen(pwd) + 1;
         strcpy( arg, (const char*)_v_);
-        communication(&commun, &commun2);
+        communication(&commun, &commun2, 1024);
 
 		if(!commun2.type)
 			wait(0);
@@ -260,7 +260,7 @@ int cmd_shutdown(int argc,char **argv)
 	//__asm__ __volatile__("int $0x72"::"d"(8),"c"(4));
     struct communication commun, commun2;
     commun.type = COMMUN_TYPE_POWEROFF;
-    communication(&commun, &commun2);
+    communication(&commun, &commun2, 1024);
     printf("%s", commun2.message);
 	return 0;
 }
@@ -278,7 +278,7 @@ int cmd_reboot(int argc,char **argv)
     //__asm__ __volatile__("int $0x72"::"d"(8),"c"(3));
     struct communication commun, commun2;
     commun.type = COMMUN_TYPE_REBOOT;
-    communication(&commun, &commun2);
+    communication(&commun, &commun2, 1024);
     printf("%s", commun2.message);
    	return 0;
 }
@@ -334,10 +334,10 @@ int cmd_exit(int argc,char **argv)
     __asm__ __volatile__("int $0x72":"=a"(pid):"d"(1),"c"(1234));
 
     struct communication commun;
+	struct communication commun2;
     commun.type = COMMUN_TYPE_EXIT;
     commun.pid = pid;
-    communication(&commun, &commun);
-    printf("%s", commun.message);
+    communication(&commun, &commun2, 1024);
 
 	return 0;
 }

@@ -109,16 +109,36 @@ void setup_smp() {
         unsigned int apic_id = core->lapic_ids[i];
 
         // Send INIT IPI
-        local_apic_write_command(0x280, 0); // clear APIC errors
-        local_apic_send_init(apic_id);
-        mdelay(100); // wait 10 msec
+        // local_apic_write_command(0x280, 0); // clear APIC errors
+        //local_apic_send_init(apic_id);
+        //mdelay(100); // wait 10 msec
+
+		local_apic_write_command(0x280, 0); // clear APIC errors
+		local_apic_write_command(0x310, (local_apic_read_command(0x310) & 0xffffff) | (apic_id << 24) );
+		local_apic_write_command(0x300, (local_apic_read_command(0x300) & 0xfff00000) | (0xC500) );
+		do{
+			__asm__ __volatile__("pause;":::"memory");
+		}while(local_apic_read_command(0x300) & (1 << 12));
+		local_apic_write_command(0x310, (local_apic_read_command(0x310) & 0xffffff) | (apic_id << 24) );
+		local_apic_write_command(0x300, (local_apic_read_command(0x300) & 0xfff00000) | (0x8500) );
+		do{
+			__asm__ __volatile__("pause;":::"memory");
+		}while(local_apic_read_command(0x300) & (1 << 12));
+		mdelay(100); // wait 10 msec
 
         // Send STARTUP IPI (twice)
-        local_apic_write_command(0x280, 0); // clear APIC errors
-        local_apic_send_startup(apic_id, 0x8);
-		
-        mdelay(100); // wait 10 msec
-
+		for(int j=0; j < 2; j++){
+			//local_apic_write_command(0x280, 0); // clear APIC errors
+        	//local_apic_send_startup(apic_id, 0x8);
+			local_apic_write_command(0x280, 0); // clear APIC errors
+			local_apic_write_command(0x310, (local_apic_read_command(0x310) & 0xffffff) | (apic_id << 24) );
+			local_apic_write_command(0x300, (local_apic_read_command(0x300) & 0xfff0f800) | (0x608) );
+			//udelay(200);
+			mdelay(100);
+			do{
+				__asm__ __volatile__("pause;":::"memory");
+			}while(local_apic_read_command(0x300) & (1 << 12));
+		}
         
 	}
 

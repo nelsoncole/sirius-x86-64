@@ -61,7 +61,7 @@ int exectve(int argc,char **argv, char type, unsigned long app_id)
         char *arg = (char*)&addr[1];
         arg += strlen(pwd) + 1;
         strcpy( arg, (const char*)v);
-        communication(&commun, &commun2);
+        communication(&commun, &commun2, 1024);
 
 		if(commun2.type)
 		{

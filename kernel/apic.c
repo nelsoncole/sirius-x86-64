@@ -142,7 +142,9 @@ void local_apic_send_init(unsigned int apic_id)
     local_apic_write_command(LAPIC_ICRLO,
     ICR_INIT | ICR_PHYSICAL | ICR_ASSERT | ICR_EDGE | ICR_NO_SHORTHAND);
 
-    while (local_apic_read_command(LAPIC_ICRLO) & ICR_SEND_PENDING){__asm__ __volatile__("pause;");}
+    while (local_apic_read_command(LAPIC_ICRLO) & ICR_SEND_PENDING){
+		__asm__ __volatile__("pause;":::"memory");
+	}
 }
 
 void local_apic_send_startup(unsigned int apic_id, unsigned int vector)
@@ -151,6 +153,9 @@ void local_apic_send_startup(unsigned int apic_id, unsigned int vector)
 
     local_apic_write_command(LAPIC_ICRLO,
     vector | ICR_STARTUP | ICR_PHYSICAL | ICR_ASSERT | ICR_EDGE | ICR_NO_SHORTHAND);
-
-    while (local_apic_read_command(LAPIC_ICRLO) & ICR_SEND_PENDING){__asm__ __volatile__("pause;");}
+	//udelay(200);
+	mdelay(100);
+    while (local_apic_read_command(LAPIC_ICRLO) & ICR_SEND_PENDING){
+		__asm__ __volatile__("pause;":::"memory");
+	}
 }

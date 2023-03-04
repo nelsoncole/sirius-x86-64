@@ -64,7 +64,7 @@ static void *trans_memcpy(void *s1, const void *s2, unsigned n)
     return s1;
 }
 
-void window_add(unsigned long addr) {
+void window_add(unsigned long addr, int flag) {
 
 	PAINT *new = (PAINT*) malloc(sizeof(PAINT));//(addr + 0x1000 - 32);
 	WINDOW *w = (WINDOW*) addr;

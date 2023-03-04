@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <pipe.h>
 #include <stdio.h>
+#include <sys/communication.h>
 
 void drawline(int x1, int y1, int x2, int y2, int rgb, WINDOW *w)
 {
@@ -139,7 +140,13 @@ void drawstring_trans( const char *str, int cx, int cy, unsigned int fg, unsigne
 }
 
 
-WINDOW *init_window(int x, int y, int width, int height, int fg, int bg, int style, WINDOW *window){
+WINDOW *get_window_surface(){
+	WINDOW *w = (WINDOW*) (__window);
+	return w;
+}
+
+
+WINDOW *init_window(int x, int y, int width, int height, unsigned int fg, unsigned int bg, int style, WINDOW *window){
 	// Limpar de acordo ao limit de buffer
 	WINDOW *w = (WINDOW*) window;
 
@@ -151,19 +158,52 @@ WINDOW *init_window(int x, int y, int width, int height, int fg, int bg, int sty
 
 	w->pos_x = x;
 	w->pos_y = y;
-	
-	w->style = style;
-	
-	w->area_width = w->width;
-	w->area_height = w->height;
-	w->area_x = 0;
-	w->area_y = 0;
 
 	w->fg = fg;
 	w->bg = bg;
 
+	//init font
+	w->font.x = 8;
+	w->font.y = 16;
+	w->font.fg_color = w->fg;
+	w->font.bg_color = w->bg;
+
+    char *tmp = (char*) malloc(FONT_DATA_SIZE);
+	memcpy(tmp, font8x16, FONT_DATA_SIZE);
+    w->font.buf = (unsigned long)tmp; 
+
+	w->cy = w->cx = 0;
+	w->style = style;
+
 	drawline(0, 0, w->width, w->height, w->bg, w);
-	drawrect(0, 0, w->width, w->height, w->fg, w);
+	drawrect(0, 0, w->width, w->height, 0/*w->fg*/, w);
+
+	if(style == WINDOW_STYLE_DEFAULT){
+		w->area_width = w->width - 2;
+		w->area_height = w->height - (48+16+2);
+		w->area_x = 1;
+		w->area_y = 48+1;
+
+		// barra de titulo
+		drawline(1, 1, w->width-2, 24, w->fg, w);
+		drawline(1, 1 + (24-1), w->width-2, 1, 0xFFFFFF, w);
+		// barra de menu
+		drawline(1, 1+24, w->width -2, 24, 0xe0e0e0, w);
+		drawline(1, 1+48, w->width -2, 1, w->fg, w);
+
+		// button status
+		int _x = w->width -4 - 18;
+		int _y = 3;
+		create_button("X", _x, _y, 18, 18, 0, 0xe0e0e0, w);
+		create_button("M", _x-20, _y, 18, 18, 0, 0xe0e0e0, w);
+		create_button("-", _x-40, _y, 18, 18, 0, 0xe0e0e0, w);
+
+	}else if(style == WINDOW_STYLE_FLAT){
+		w->area_width = w->width;
+		w->area_height = w->height;
+		w->area_x = 0;
+		w->area_y = 0;
+	}
 
 	return w;
 }
@@ -177,6 +217,37 @@ WINDOW *create_new_window(WINDOW *window, int x, int y){
 	w->scanline = window->scanline;
 
 	return w;
+}
+
+void __wcl(WINDOW *w) {
+	struct communication req, ack;
+	unsigned long *message = (unsigned long*)((unsigned long)&req.message);
+    // enviar para window server
+	req.type = COMMUN_TYPE_WINDOW_REGISTER;
+	*message = (unsigned long)w;
+
+	communication(&req, &ack, 1025);
+	w->visibility = 1; 
+}
+
+unsigned int rgb(int r, int g, int b){
+	return (r<<16 &0xff0000)|(g<<8 &0xff00)|(b &0xff);
+}
+
+void create_button(char *text, int x, int y, int width, int height, unsigned int fg, unsigned int bg, WINDOW *w){
+	
+	drawline(x, y, width, height, bg, w);
+
+	drawline(x+1, y, width-1, 1, 0, w);
+	drawline(x, y+1, 1, height-2,0, w);
+	drawline(x+width, y+1, 1, height-2,0, w);
+	drawline(x+1, y+height, width-1,1, 0, w);
+	//drawrect(x, y, width, height, fg, w);
+
+	unsigned short int c = *text;
+	int cx = x + (width-6)/2;
+	int cy = y + (height-12)/2;
+	drawchar_trans( c, cx, cy, fg, 0, &w->font,w);	
 }
 
 

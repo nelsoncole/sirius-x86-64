@@ -25,6 +25,12 @@
 
 #define MSG_MAX 10
 
+
+#define COMMUN_TYPE_WINDOW_REGISTER 0x1000
+
+#define WINDOW_STYLE_FLAT 0
+#define WINDOW_STYLE_DEFAULT (WINDOW_STYLE_FLAT+1)
+
 extern int getkey();
 extern unsigned long __window;
 
@@ -216,8 +222,11 @@ void trminalscroll(HANDLE_T *obj, int mouse_x, int mouse_y);
 void m_terminalbox(HANDLE_T *obj);
 
 // -----------------------
-WINDOW *init_window(int x, int y, int width, int height, int fg, int bg, int style, WINDOW *window);
+WINDOW *init_window(int x, int y, int width, int height, unsigned int fg, unsigned int bg, int style, WINDOW *window);
 void drawtriagle(int x, int y, int width, int fill, int rgb, WINDOW *w);
 WINDOW *create_new_window(WINDOW *window, int x, int y);
+WINDOW *get_window_surface();
+void __wcl(WINDOW *w);
+void create_button(char *text, int x, int y, int width, int height, unsigned int fg, unsigned int bg, WINDOW *w);
 
 #endif

@@ -8,7 +8,7 @@ void sys_exit(int rc){
 
     commun.type = COMMUN_TYPE_EXIT;
     commun.pid = pid;
-    communication(&commun, &commun);
+    communication(&commun, &commun, 1024);
 
     while(1){}
 }

@@ -39,7 +39,7 @@ struct app
 
 
 
-PAINT *paint, *paint_ready_queue;
+static PAINT *paint, *paint_ready_queue;
 struct app app[APP_LIST_SIZE];
 int app_index;
 int app_index_foco;
@@ -205,7 +205,7 @@ static int app_execute(int index, WINDOW *w)
             commun.type = COMMUN_TYPE_FOCO;
             commun.pid = 0;
             commun.apid = app[index].id;
-            communication(&commun, &commun2);
+            communication(&commun, &commun2, 1024);
 
         }
     }
@@ -246,7 +246,7 @@ static int app_execute(int index, WINDOW *w)
         addr[0] = (unsigned long)((unsigned long*)app_memory);
         //addr[1] = pwd;
         strcpy( (char*)&addr[1],pwd);
-        communication(&commun, &commun2);
+        communication(&commun, &commun2, 1024);
 
         app_id ++;
     }
@@ -365,7 +365,7 @@ int main()
 
 	// register 
 	//wcl(w);
-    __asm__ __volatile__("int $0x72"::"d"(2),"D"(w));
+    __asm__ __volatile__("int $0x72"::"d"(2),"D"(w), "S"(0));
     w->visibility = 1;
 
     // get list

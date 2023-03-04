@@ -3,7 +3,7 @@
 #include <arpa/inet.h>
 #include <sys/communication.h>
 
-int communication(struct communication *commun, struct communication *ret){
+int communication(struct communication *commun, struct communication *ret, int port){
     if(commun == 0 || ret == 0 ) return 1;
     int sd = socket(AF_LOCAL, SOCK_DGRAM, IPPROTO_UDP);
     struct sockaddr_in sera;
@@ -15,7 +15,7 @@ int communication(struct communication *commun, struct communication *ret){
 
     serb.sin_family         = AF_LOCAL;
     serb.sin_addr.s_addr    = inet_addr("127.0.0.1");
-    serb.sin_port           = htons(1024);
+    serb.sin_port           = htons(port);
 
     if(sd < 0) {
         printf("Cannot create socket!\n");

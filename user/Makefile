@@ -47,6 +47,8 @@ LAUNCHER = $(HEADER) launcher.o wallpaper.o $(GUI)  $(sys) $(LIBC)
 
 WINDOWX = $(HEADER) windowX.o $(GUI)  $(sys) $(LIBC)
 
+CHATIRC = $(HEADER) chatirc.o $(GUI) $(GUI2) $(sys) $(LIBC)
+
 TERM = $(HEADER) term.o $(GUI) $(GUI2) $(sys) $(LIBC)
 
 _SHELL = $(HEADER) shell.o dir.o $(GUI) $(sys) $(LIBC)
@@ -72,13 +74,16 @@ NANOJPEG = $(HEADER) nanojpeg.o $(sys) $(GUI) $(LIBC)
 
 NASM = $(HEADER) $(NASM_OBJS) $(sys) $(GUI) $(LIBC)
 
-.PHONY: all term.bin shell.bin explore.bin editor.bin cat.bin test.bin telnet.bin chat.bin lua.bin nasm.bin nanojpeg.bin pci.bin png move
-all: launcher.bin windowX.bin term.bin shell.bin explore.bin editor.bin cat.bin test.bin telnet.bin chat.bin pci.bin move # nanojpeg.bin lua.bin move #
+.PHONY: all term.bin shell.bin explore.bin editor.bin cat.bin test.bin telnet.bin chat.bin lua.bin nasm.bin nanojpeg.bin pci.bin windowX.bin chatirc.bin png move
+all: launcher.bin windowX.bin chatirc.bin term.bin shell.bin explore.bin editor.bin cat.bin test.bin telnet.bin chat.bin pci.bin move # nanojpeg.bin lua.bin move #
 
 launcher.bin: $(LAUNCHER)
 	$(LD) $(LDFLAGS64) -o $@ $^
 
 windowX.bin: $(WINDOWX)
+	$(LD) $(LDFLAGS64) -o $@ $^
+
+chatirc.bin: $(CHATIRC)
 	$(LD) $(LDFLAGS64) -o $@ $^
 	
 term.bin: $(TERM)

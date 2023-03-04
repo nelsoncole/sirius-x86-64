@@ -74,17 +74,17 @@ typedef struct _ACPI_TABLE_XSDT {
 
 typedef struct _ACPI_TABLE_FADT {
 	// Header
-    	char signature[4];
-    	unsigned int length;
-    	unsigned char major_version;
-    	unsigned char checksum;
-    	char oem_id[6];
-    	char oem_table_id[8];
-    	unsigned int oem_revision;
-    	unsigned int creator_id;
-    	unsigned int creator_revision;
-    	unsigned int FIRMWARE_CTRL;
-    	unsigned int  DSDT;
+    char signature[4];
+    unsigned int length;
+    unsigned char major_version;
+    unsigned char checksum;
+    char oem_id[6];
+    char oem_table_id[8];
+    unsigned int oem_revision;
+    unsigned int creator_id;
+    unsigned int creator_revision;
+    unsigned int FIRMWARE_CTRL;
+    unsigned int  DSDT;
    	unsigned char unneded2[48 - 44];
    	unsigned int  SMI_CMD;
    	unsigned char ACPI_ENABLE;
@@ -95,45 +95,45 @@ typedef struct _ACPI_TABLE_FADT {
    	
   	unsigned int		Pm2ControlBlock;    /* 32-bit port address of Power Mgt 2 Control Reg Blk */
    	unsigned int		PmTimerBlock;       /* 32-bit port address of Power Mgt Timer Ctrl Reg Blk */
-    	unsigned int		Gpe0Block;          /* 32-bit port address of General Purpose Event 0 Reg Blk */
+    unsigned int		Gpe0Block;          /* 32-bit port address of General Purpose Event 0 Reg Blk */
    	unsigned int		Gpe1Block;          /* 32-bit port address of General Purpose Event 1 Reg Blk */
-    	unsigned char		Pm1EventLength;     /* Byte Length of ports at Pm1xEventBlock */
+    unsigned char		Pm1EventLength;     /* Byte Length of ports at Pm1xEventBlock */
    	unsigned char		Pm1ControlLength;   /* Byte Length of ports at Pm1xControlBlock */
-    	unsigned char		Pm2ControlLength;   /* Byte Length of ports at Pm2ControlBlock */
-    	unsigned char		PmTimerLength;      /* Byte Length of ports at PmTimerBlock */
-    	unsigned char		Gpe0BlockLength;    /* Byte Length of ports at Gpe0Block */
-    	unsigned char		Gpe1BlockLength;    /* Byte Length of ports at Gpe1Block */
+    unsigned char		Pm2ControlLength;   /* Byte Length of ports at Pm2ControlBlock */
+    unsigned char		PmTimerLength;      /* Byte Length of ports at PmTimerBlock */
+    unsigned char		Gpe0BlockLength;    /* Byte Length of ports at Gpe0Block */
+    unsigned char		Gpe1BlockLength;    /* Byte Length of ports at Gpe1Block */
    	unsigned char		Gpe1Base;           /* Offset in GPE number space where GPE1 events start */
-    	unsigned char		CstControl;         /* Support for the _CST object and C-States change notification */
-    	unsigned short		C2Latency;          /* Worst case HW latency to enter/exit C2 state */
-    	unsigned short		C3Latency;          /* Worst case HW latency to enter/exit C3 state */
-    	unsigned short		FlushSize;          /* Processor memory cache line width, in bytes */
-    	unsigned short		FlushStride;        /* Number of flush strides that need to be read */
-    	unsigned char		DutyOffset;         /* Processor duty cycle index in processor P_CNT reg */
+    unsigned char		CstControl;         /* Support for the _CST object and C-States change notification */
+    unsigned short		C2Latency;          /* Worst case HW latency to enter/exit C2 state */
+    unsigned short		C3Latency;          /* Worst case HW latency to enter/exit C3 state */
+    unsigned short		FlushSize;          /* Processor memory cache line width, in bytes */
+    unsigned short		FlushStride;        /* Number of flush strides that need to be read */
+    unsigned char		DutyOffset;         /* Processor duty cycle index in processor P_CNT reg */
    	unsigned char		DutyWidth;          /* Processor duty cycle value bit width in P_CNT register */
-    	unsigned char		DayAlarm;           /* Index to day-of-month alarm in RTC CMOS RAM */
+    unsigned char		DayAlarm;           /* Index to day-of-month alarm in RTC CMOS RAM */
    	unsigned char		MonthAlarm;         /* Index to month-of-year alarm in RTC CMOS RAM */
    	unsigned char		Century;            /* Index to century in RTC CMOS RAM */
-    	unsigned short		BootFlags;          /* IA-PC Boot Architecture Flags (see below for individual flags) */
-    	unsigned char		Reserved;           /* Reserved, must be zero */
-    	unsigned int		Flags;              /* Miscellaneous flag bits (see below for individual flags) */
-    	ACPI_GENERIC_ADDRESS  	ResetRegister;      /* 64-bit address of the Reset register */
+    unsigned short		BootFlags;          /* IA-PC Boot Architecture Flags (see below for individual flags) */
+    unsigned char		Reserved;           /* Reserved, must be zero */
+    unsigned int		Flags;              /* Miscellaneous flag bits (see below for individual flags) */
+    ACPI_GENERIC_ADDRESS  	ResetRegister;      /* 64-bit address of the Reset register */
    	unsigned char		ResetValue;         /* Value to write to the ResetRegister port to reset the system */
-    	unsigned short		ArmBootFlags;       /* ARM-Specific Boot Flags (see below for individual flags) (ACPI 5.1) */
+    unsigned short		ArmBootFlags;       /* ARM-Specific Boot Flags (see below for individual flags) (ACPI 5.1) */
    	unsigned char		 MinorRevision;      /* FADT Minor Revision (ACPI 5.1) */
-    	unsigned long long	XFacs;              /* 64-bit physical address of FACS */
-    	unsigned long long	XDsdt;              /* 64-bit physical address of DSDT */
-    	ACPI_GENERIC_ADDRESS   XPm1aEventBlock;    /* 64-bit Extended Power Mgt 1a Event Reg Blk address */
-    	ACPI_GENERIC_ADDRESS  	XPm1bEventBlock;    /* 64-bit Extended Power Mgt 1b Event Reg Blk address */
-    	ACPI_GENERIC_ADDRESS  	XPm1aControlBlock;  /* 64-bit Extended Power Mgt 1a Control Reg Blk address */
-    	ACPI_GENERIC_ADDRESS  	XPm1bControlBlock;  /* 64-bit Extended Power Mgt 1b Control Reg Blk address */
-    	ACPI_GENERIC_ADDRESS  	XPm2ControlBlock;   /* 64-bit Extended Power Mgt 2 Control Reg Blk address */
-    	ACPI_GENERIC_ADDRESS  	XPmTimerBlock;      /* 64-bit Extended Power Mgt Timer Ctrl Reg Blk address */
-    	ACPI_GENERIC_ADDRESS  	XGpe0Block;         /* 64-bit Extended General Purpose Event 0 Reg Blk address */
-    	ACPI_GENERIC_ADDRESS  	XGpe1Block;         /* 64-bit Extended General Purpose Event 1 Reg Blk address */
-    	ACPI_GENERIC_ADDRESS  	SleepControl;       /* 64-bit Sleep Control register (ACPI 5.0) */
-    	ACPI_GENERIC_ADDRESS  	SleepStatus;        /* 64-bit Sleep Status register (ACPI 5.0) */
-    	unsigned long long	HypervisorId;       /* Hypervisor Vendor ID (ACPI 6.0) */
+    unsigned long long	XFacs;              /* 64-bit physical address of FACS */
+    unsigned long long	XDsdt;              /* 64-bit physical address of DSDT */
+    ACPI_GENERIC_ADDRESS   XPm1aEventBlock;    /* 64-bit Extended Power Mgt 1a Event Reg Blk address */
+    ACPI_GENERIC_ADDRESS  	XPm1bEventBlock;    /* 64-bit Extended Power Mgt 1b Event Reg Blk address */
+    ACPI_GENERIC_ADDRESS  	XPm1aControlBlock;  /* 64-bit Extended Power Mgt 1a Control Reg Blk address */
+    ACPI_GENERIC_ADDRESS  	XPm1bControlBlock;  /* 64-bit Extended Power Mgt 1b Control Reg Blk address */
+    ACPI_GENERIC_ADDRESS  	XPm2ControlBlock;   /* 64-bit Extended Power Mgt 2 Control Reg Blk address */
+    ACPI_GENERIC_ADDRESS  	XPmTimerBlock;      /* 64-bit Extended Power Mgt Timer Ctrl Reg Blk address */
+    ACPI_GENERIC_ADDRESS  	XGpe0Block;         /* 64-bit Extended General Purpose Event 0 Reg Blk address */
+    ACPI_GENERIC_ADDRESS  	XGpe1Block;         /* 64-bit Extended General Purpose Event 1 Reg Blk address */
+    ACPI_GENERIC_ADDRESS  	SleepControl;       /* 64-bit Sleep Control register (ACPI 5.0) */
+    ACPI_GENERIC_ADDRESS  	SleepStatus;        /* 64-bit Sleep Status register (ACPI 5.0) */
+    unsigned long long	HypervisorId;       /* Hypervisor Vendor ID (ACPI 6.0) */
        
 }__attribute__ ((packed)) ACPI_TABLE_FADT;
 

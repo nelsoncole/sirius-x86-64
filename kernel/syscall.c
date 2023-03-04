@@ -43,10 +43,10 @@ void syscall_getpid(unsigned long rdi, unsigned long rsi, unsigned long rdx, uns
 }
 
 
-extern void window_add(unsigned long addr);
+extern void window_add(unsigned long addr, int flag);
 void syscall_window(unsigned long rdi, unsigned long rsi, unsigned long rdx, unsigned long rcx)
 {
-	window_add(rdi);
+	window_add(rdi, rsi);
 }
 
 
