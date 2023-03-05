@@ -141,7 +141,7 @@ void kernel_thread_communication(){
         ssize_t to = recvfrom(sd, commun, sizeof(struct communication), 0, (struct sockaddr*)&serb, &len);
 
         commun_switch(commun, commun2);
-        if(commun->type != COMMUN_TYPE_EXIT){
+        if(commun->type != COMMUN_TYPE_FOCO && commun->type != COMMUN_TYPE_EXIT ){
             ssize_t count = sendto(sd, commun2, sizeof(struct communication), 0, (struct sockaddr*)&serb, sizeof(struct sockaddr_in));
         }
     }

@@ -18,4 +18,19 @@ struct communication{
 };
 int communication(struct communication *commun, struct communication *ret, int port);
 
+
+#include <arpa/inet.h>
+struct con{
+    int                     socket;
+    struct sockaddr_in      sera;
+    struct sockaddr_in      serb;
+    struct communication    req;
+    struct communication    ack;
+    unsigned short          port;
+};
+
+int con_init(struct con *con);
+ssize_t con_sendto(struct con *con);
+ssize_t con_recvfrom(struct con *con);
+
 #endif

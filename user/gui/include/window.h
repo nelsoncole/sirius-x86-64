@@ -4,6 +4,7 @@
 #include "gui.h"
 
 #include <data.h>
+#include <sys/communication.h>
 
 
 #define FONT_DATA_SIZE (128*16*2)
@@ -22,6 +23,9 @@
 #define TYPE_LISTBOX 3
 #define TYPE_FILE_LISTBOX 4
 #define TYPE_TERMINALBOX 5
+
+#define WINDOW_TYPE_BUTTON 10
+#define WINDOW_TYPE_TEXTBOX (WINDOW_TYPE_BUTTON+1)
 
 #define MSG_MAX 10
 
@@ -72,7 +76,11 @@ typedef struct __WINDOW {
     unsigned int    foco;
 	unsigned int    visibility;
     unsigned long long component[256];
-	char		    rsv[4096 - 180 - 2048];
+	unsigned int   	id;
+	unsigned int  	type;
+	unsigned char	text[256];
+	struct __WINDOW	*next;
+	char		    rsv[4096 - 196 - 2048 - 256];
 	unsigned long 	start;
 	
 }__attribute__ ((packed)) WINDOW;
@@ -226,7 +234,11 @@ WINDOW *init_window(int x, int y, int width, int height, unsigned int fg, unsign
 void drawtriagle(int x, int y, int width, int fill, int rgb, WINDOW *w);
 WINDOW *create_new_window(WINDOW *window, int x, int y);
 WINDOW *get_window_surface();
-void __wcl(WINDOW *w);
-void create_button(char *text, int x, int y, int width, int height, unsigned int fg, unsigned int bg, WINDOW *w);
+void __wcl(WINDOW *w, struct con *con);
+void create_button(char *text, int x, int y, int width, int height, unsigned int fg, unsigned int bg, WINDOW *w, int id);
+void handler_button(WINDOW *w, WINDOW *btn, int flag);
+void create_textbox(char *text, int x, int y, int width, int height, unsigned int fg, unsigned int bg, WINDOW *w, int id);
+void handler_textbox(WINDOW *w, WINDOW *txtbox, int flag);
+
 
 #endif

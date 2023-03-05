@@ -34,5 +34,8 @@ struct sockaddr_in
 
 #define INET_ADDRSTRLEN 	16
 
+
+unsigned short ether_getport();
+
 #endif
 

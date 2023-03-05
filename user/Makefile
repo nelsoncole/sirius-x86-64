@@ -9,7 +9,7 @@ CC=gcc
 LD=ld
 
 pthread = pthread.o
-net = dns.o
+net = dns.o ether.o
 sys = file.o cfs.o alloc.o pipe.o path.o socket.o inet.o communication.o sys_exit.o wait.o exectve.o $(net) $(pthread)
 time = time.o gmtime.o localtime.o strftime.o clock.o difftime.o mktime.o
 errno = errno.o 

@@ -194,9 +194,9 @@ WINDOW *init_window(int x, int y, int width, int height, unsigned int fg, unsign
 		// button status
 		int _x = w->width -4 - 18;
 		int _y = 3;
-		create_button("X", _x, _y, 18, 18, 0, 0xe0e0e0, w);
-		create_button("M", _x-20, _y, 18, 18, 0, 0xe0e0e0, w);
-		create_button("-", _x-40, _y, 18, 18, 0, 0xe0e0e0, w);
+		create_button("X", _x, _y, 18, 18, 0, 0xe0e0e0, w, 1);
+		create_button("M", _x-20, _y, 18, 18, 0, 0xe0e0e0, w, 2);
+		create_button("-", _x-40, _y, 18, 18, 0, 0xe0e0e0, w, 3);
 
 	}else if(style == WINDOW_STYLE_FLAT){
 		w->area_width = w->width;
@@ -219,14 +219,17 @@ WINDOW *create_new_window(WINDOW *window, int x, int y){
 	return w;
 }
 
-void __wcl(WINDOW *w) {
-	struct communication req, ack;
-	unsigned long *message = (unsigned long*)((unsigned long)&req.message);
-    // enviar para window server
-	req.type = COMMUN_TYPE_WINDOW_REGISTER;
+void __wcl(WINDOW *w, struct con *con) {
+    unsigned long pid = 0;
+    // getpid()
+    __asm__ __volatile__("int $0x72":"=a"(pid):"d"(1),"c"(0));
+	
+	con->req.type = COMMUN_TYPE_WINDOW_REGISTER;
+	con->req.pid = pid;
+	unsigned long *message = (unsigned long*)((unsigned long)&con->req.message);
 	*message = (unsigned long)w;
-
-	communication(&req, &ack, 1025);
+	// enviar para window server
+	con_sendto(con);
 	w->visibility = 1; 
 }
 
@@ -234,7 +237,7 @@ unsigned int rgb(int r, int g, int b){
 	return (r<<16 &0xff0000)|(g<<8 &0xff00)|(b &0xff);
 }
 
-void create_button(char *text, int x, int y, int width, int height, unsigned int fg, unsigned int bg, WINDOW *w){
+void create_button(char *text, int x, int y, int width, int height, unsigned int fg, unsigned int bg, WINDOW *w, int id){
 	
 	drawline(x, y, width, height, bg, w);
 
@@ -244,12 +247,110 @@ void create_button(char *text, int x, int y, int width, int height, unsigned int
 	drawline(x+1, y+height, width-1,1, 0, w);
 	//drawrect(x, y, width, height, fg, w);
 
-	unsigned short int c = *text;
-	int cx = x + (width-6)/2;
+	int cx = x + (width - (strlen(text)*8))/2;
 	int cy = y + (height-12)/2;
-	drawchar_trans( c, cx, cy, fg, 0, &w->font,w);	
+	if(cx < 0) cx = 0;
+	if(cy < 0) cy = 0;
+
+	drawstring_trans(text, cx, cy, fg, 0, &w->font,w);
+
+	WINDOW *new = (WINDOW*)malloc(0x1000);
+	memset(new, 0, 0x1000);
+
+	new->id = id;
+	new->pos_x = x;
+	new->pos_y = y;
+	new->width = width;
+	new->height = height;
+	new->fg = fg;
+	new->bg = bg;
+	new->type = WINDOW_TYPE_BUTTON;
+	int len = strlen(text);
+	if(len > 256) len = 256;
+	memcpy(new->text, text, len);
+
+	WINDOW *tmp = w;
+	while(tmp->next) tmp = tmp->next;
+	tmp->next = new;
 }
 
+void handler_button(WINDOW *w, WINDOW *btn, int flag){
+	char *text = (char *) btn->text;
+	int x = btn->pos_x;
+	int y = btn->pos_y;
+	int width = btn->width;
+	int height = btn->height;
+	unsigned int fg = btn->fg;
+	unsigned int bg = btn->bg;
+
+	if(flag == 1){ //no default
+		fg = 0xffffff;
+		bg = 0x008f00;
+	}else if(flag == 2){ //no default
+		fg = 0xffffff;
+		bg = 0x8f0000;
+	}
+	
+
+	drawline(x, y, width, height, bg, w);
+
+	drawline(x+1, y, width-1, 1, 0, w);
+	drawline(x, y+1, 1, height-2,0, w);
+	drawline(x+width, y+1, 1, height-2,0, w);
+	drawline(x+1, y+height, width-1,1, 0, w);
+	//drawrect(x, y, width, height, fg, w);
+
+	int cx = x + (width - (strlen(text)*8))/2;
+	int cy = y + (height-12)/2;
+	if(cx < 0) cx = 0;
+	if(cy < 0) cy = 0;
+
+	drawstring_trans(text, cx, cy, fg, 0, &w->font,w);
+}
+
+void create_textbox(char *text, int x, int y, int width, int height, unsigned int fg, unsigned int bg, WINDOW *w, int id){
+	
+	x += w->area_x;
+	y += w->area_y;
+
+	drawline(x, y, width, height, bg, w);
+	drawrect(x, y, width, height, 0, w);
+
+	WINDOW *new = (WINDOW*)malloc(0x1000);
+	memset(new, 0, 0x1000);
+
+	new->id = id;
+	new->pos_x = x;
+	new->pos_y = y;
+	new->width = width;
+	new->height = height;
+	new->fg = fg;
+	new->bg = bg;
+	new->type = WINDOW_TYPE_TEXTBOX;
+	int len = strlen(text);
+	if(len > 256) len = 256;
+	memcpy(new->text, text, len);
+
+	WINDOW *tmp = w;
+	while(tmp->next) tmp = tmp->next;
+	tmp->next = new;
+}
+
+void handler_textbox(WINDOW *w, WINDOW *txtbox, int flag){
+	char *text = (char *) txtbox->text;
+	int x = txtbox->pos_x;
+	int y = txtbox->pos_y;
+	int width = txtbox->width;
+	int height = txtbox->height;
+	unsigned int fg = txtbox->fg;
+	unsigned int bg = txtbox->bg;
+
+	unsigned int color = 0x0000ff;
+	if(flag == 0)color = 0;
+
+	//drawline(x, y, width, height, bg, w);
+	drawrect(x, y, width, height, color, w);
+}
 
 
 /*

@@ -92,7 +92,9 @@ int bind(int socket, const struct sockaddr *address,
     // permitido
     fd->flags |= 0x80;
 
-    return 0;
+    int r = 0;
+    //__asm__ __volatile__("int $0x72;":"=a"(r):"d"(28), "D"(socket), "S"(address), "c"(address_len));
+    return r;
 }
 
 int connect(int socket, const struct sockaddr *address,

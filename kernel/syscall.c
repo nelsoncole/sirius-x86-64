@@ -278,6 +278,32 @@ void syscall_wait(unsigned long rdi)
     }
 }
 
+void syscall_get_client_id(unsigned long rdi){
+    THREAD *tmp = thread_ready_queue;
+	 
+	while (tmp) {
+
+		if(tmp->window == rdi){
+            ret = tmp->id;
+            return;
+        } 
+        tmp = tmp->next;
+    }
+    
+    ret = 0;
+}
+
+void syscall_socket_bind(unsigned long rdi, unsigned long rsi, unsigned long rdx, unsigned long rcx){
+    int socket = rdi;
+    const struct sockaddr *address = (const struct sockaddr *) rsi;
+    socklen_t address_len = rcx;
+
+    ret = bind(socket, address, address_len);
+}
+
+void syscall_ether_getport(){
+    ret = get_port();
+}
 
 void *fnvetors_syscall[SYSCALL_TABLE] = {
 	&default_syscall, 	    // 0
@@ -307,9 +333,9 @@ void *fnvetors_syscall[SYSCALL_TABLE] = {
     &default_syscall, 	    // 24
     &default_syscall, 	    // 25
     &default_syscall, 	    // 26
-    &default_syscall, 	    // 27
-    &default_syscall, 	    // 28
-    &default_syscall, 	    // 29
+    &syscall_ether_getport, // 27
+    &syscall_socket_bind, 	// 28
+    &syscall_get_client_id, // 29
     &syscall_wait_state,    // 30
     &syscall_wait, 	        // 31
     &malloc_syscall, 	    // 32

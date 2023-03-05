@@ -9,7 +9,7 @@
 
 
 #define SOCKET_BUF_SIZE 8192
-#define ROW_NUM 32
+#define ROW_NUM 128
 
 int socket_next_id;
 
@@ -133,7 +133,7 @@ void socket_server_transmit(){
                 }
                 // TODO define porta, temporario
                 if(!src_port) {
-                    if(port < 2000) port = 2000;
+                    if(port < 2000) port = 2000; //FIXME 
                     current_saddr->src_port = htons(port++);
                     src_port = htons(current_saddr->src_port);
                 }
